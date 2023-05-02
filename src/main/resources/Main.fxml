@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.agilelovers.ui.Main"
-            prefHeight="800.0" prefWidth="1200.0">
 
+<AnchorPane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.agilelovers.ui.Main">
+   <children>
+      <ListView layoutX="-1.0" prefHeight="750.0" prefWidth="232.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="0.0" />
+      <Button layoutY="762.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="105.0" text="Clear All" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+      <Button layoutX="104.0" layoutY="762.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="126.0" text="Delete Question" AnchorPane.bottomAnchor="0.0" />
+      <Label alignment="TOP_LEFT" layoutX="261.0" layoutY="21.0" prefHeight="190.0" prefWidth="907.0" text="Q: dsfhjdsafh fhdsf jf sj fasdjf sak? Q: dsfhjdsafh fhdsf jf sj fasdjf sak?Q: dsfhjdsafh fhdsf jf sj fasdjf sak?Q: dsfhjdsafh fhdsf jf sj fasdjf sak?Q: dsfhjdsafh fhdsf jf sj fasdjf sak?Q: dsfhjdsafh fhdsf jf sj fasdjf sak?Q: dsfhjdsafh fhdsf jf sj fasdjf sak?Q: dsfhjdsafh fhdsf jf sj fasdjf sak?" wrapText="true" AnchorPane.leftAnchor="261.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="21.0" />
+      <Label alignment="TOP_LEFT" layoutX="261.0" layoutY="228.0" prefHeight="516.0" prefWidth="907.0" text="A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa.A: dfdsaf safdsfsa dfsa sa." wrapText="true" AnchorPane.leftAnchor="261.0" AnchorPane.rightAnchor="32.0" />
+      <Button layoutX="638.0" layoutY="764.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="153.0" text="New Question" AnchorPane.bottomAnchor="0.0" />
+   </children>
 </AnchorPane>
