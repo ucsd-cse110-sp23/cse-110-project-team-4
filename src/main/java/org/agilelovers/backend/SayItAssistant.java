@@ -24,7 +24,7 @@ record APIData(String endpoint, String model) { }
 
 public class SayItAssistant {
 
-    public SayItAssistant assistant = new SayItAssistant();
+    public static SayItAssistant assistant = new SayItAssistant();
 
     private class OutputStreamFormatter {
         private static void writeParameterToOutputStream(
