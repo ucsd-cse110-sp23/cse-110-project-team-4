@@ -1,5 +1,6 @@
 package org.agilelovers.backend;
 
+import org.agilelovers.ui.object.Question;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +12,11 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -62,6 +67,7 @@ public class SayItAssistant {
             ".com/v1/completions", "text-davinci-003");
     private final String TOKEN;
     private final String ORGANIZATION;
+    private final File queryDataBase;
 
     private static String handleSuccessResponse(HttpURLConnection connection)
             throws IOException, JSONException {
@@ -168,11 +174,100 @@ public class SayItAssistant {
         return choices.getJSONObject(0).getString("text");
     }
 
+    private void writeToFile(String encodedKey, JSONObject jsonObject) throws IOException {
+
+        // for multi-thread - if we ever wanted to
+        /*
+        synchronized (queryDataBase) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(queryDataBase, true))) {
+                writer.write(jsonObject.toString());
+                writer.newLine(); // add a newline character after each JSON object
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+         */
+
+        synchronized (queryDataBase) {
+            // Read existing contents of file into a JSONObject
+            JSONObject existingData = new JSONObject();
+            if (queryDataBase.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(queryDataBase))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        JSONObject data = new JSONObject(line);
+
+                        Iterator<String> keys = data.keys();
+                        while(keys.hasNext()){
+                            String key = keys.next();
+                            JSONObject answer = data.getJSONObject(key);
+                            existingData.put(key, answer);
+                        }
+
+                    }
+                }
+            }
+
+            // Update or add new key-value pair to JSONObject
+            existingData.put(encodedKey, jsonObject);
+
+            // Write updated JSONObject to file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(queryDataBase))) {
+                for (String existingKey : existingData.keySet()) {
+                    JSONObject currLine = new JSONObject();
+                    currLine.put(existingKey, existingData.getJSONObject(existingKey));
+                    writer.write(currLine.toString());
+                    writer.newLine();
+                }
+            }
+        }
+    }
+
+    private String encodeQuery(String query){
+        byte[] query_bytes = query.getBytes();
+        byte[] query_bytesEncoded = Base64.getEncoder().encode(query_bytes);
+        return new String(query_bytesEncoded);
+    }
+
+    private void transcribeQueryIntoFile(String title, String questionQuery, String answerQuery) throws IOException {
+
+        JSONObject innerShell = new JSONObject();
+
+        innerShell.put("Title", title);
+        innerShell.put("Question", questionQuery);
+        innerShell.put("Answer", answerQuery);
+
+        String key_inBytes = encodeQuery(questionQuery);
+
+        writeToFile(key_inBytes, innerShell);
+    }
+
+    public Question obtainQuery(String questionQuery) throws IOException {
+
+        String jsonStr = new String(Files.readAllBytes(queryDataBase.toPath()));
+        JSONObject tempJSON = new JSONObject(jsonStr);
+
+        String key_inBytes = encodeQuery(questionQuery);
+        JSONObject queryValue = tempJSON.getJSONObject(key_inBytes);
+
+        String title = queryValue.getString("Title");
+        String question = queryValue.getString("Question");
+        String answer = queryValue.getString("Answer");
+
+
+        return new Question(title, question, answer);
+
+    }
+
+
     SayItAssistant() {
         Dotenv dotenv = Dotenv.load();
         this.TOKEN = dotenv.get("OPENAI_API_KEY");
         this.ORGANIZATION = dotenv.get("OPENAI_ORG");
+        queryDataBase = new File("AgileLovers_DB");
     }
+
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -189,9 +284,24 @@ public class SayItAssistant {
         recorder.stop();
         System.out.println("STOPPED RECORDING");
 
-        String question = assistant.getTextFromAudio(audioFile);
-        String response = assistant.getAnswer(question);
-        System.out.println(response);
+
+        String question = assistant.getTextFromAudio(audioFile).toLowerCase();
+
+        String prompt =
+                "In the first line of the response, provide a title for my query." +
+                " Following the title, provide the response for my query in a new line." +
+                " Follow the format:\n" +
+                "[title] * [answer]\n" +
+                question;
+
+        String response = assistant.getAnswer(prompt);
+        String[] split_response = response.split(Pattern.quote("*"), 2);
+
+        String title = split_response[0].replaceAll("\n", "");
+        String answerToQuestion = split_response[1];
+
+        //multi-thread file writing?
+        assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
 
         audioFile.deleteOnExit();
     }

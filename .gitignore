@@ -42,3 +42,6 @@ build/
 
 ### env file ###
 .env
+
+### Testing DataBase ###
+AgileLovers_DB
