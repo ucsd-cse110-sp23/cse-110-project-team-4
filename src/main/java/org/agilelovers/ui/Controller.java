@@ -4,8 +4,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import org.agilelovers.ui.object.Question;
 
 /**
  * Controller class for the UI
@@ -17,14 +19,32 @@ public class Controller {
     Label questionLabel;
     @FXML
     Label answerLabel;
+    @FXML
+    Button recordButton;
+    @FXML
+    Button deleteButton;
+    @FXML
+    Button clearAllButton;
 
-    private ObservableList<String> pastQuestions = FXCollections.observableArrayList();
+
+    private ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
     private boolean isInitialized = false;
+    private int i = 0;
+    private boolean isRecording = false;
 
     public void initHistoryList() {
-        historyList.setItems(this.pastQuestions);
+        this.historyList.setItems(this.pastQuestions);
+        this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                questionLabel.setText("");
+                answerLabel.setText("");
+                return;
+            }
+            Question currentQuestion = (Question) newValue;
+            questionLabel.setText(currentQuestion.question());
+            answerLabel.setText(currentQuestion.answer());
+        });
     }
-
 
     /**
      * Removes all the old questions.
@@ -34,6 +54,7 @@ public class Controller {
      */
     public void clearAll(ActionEvent event) {
         System.out.println("Clear All");
+        this.pastQuestions.clear();
     }
 
     /**
@@ -44,21 +65,37 @@ public class Controller {
      */
     public void deleteQuestion(ActionEvent event) {
         System.out.println("Delete Question");
+        if (!this.pastQuestions.isEmpty())
+            this.pastQuestions.remove(this.historyList.getFocusModel().getFocusedIndex());
     }
 
     /**
      * New question.
-     *
      * TODO: implement this
      *
      * @param event the event
      */
-    public void newQuestion(ActionEvent event) {
+    public void record(ActionEvent event) {
         if (!this.isInitialized) {
             this.isInitialized = true;
             this.initHistoryList();
         }
 
-        this.pastQuestions.add("New Question");
+        if (this.isRecording) {
+            this.deleteButton.setDisable(false);
+            this.clearAllButton.setDisable(false);
+            // change back to new question
+            // wait for chatgpt to response
+            this.recordButton.setText("New Question");
+        } else {
+            this.pastQuestions.add(new Question("title" + (++i), "Question" + i, "answer" + i));
+            // change to stop recording
+            // start recording
+            this.recordButton.setText("Stop Recording");
+            this.deleteButton.setDisable(true);
+            this.clearAllButton.setDisable(true);
+        }
+        this.isRecording = !this.isRecording;
+
     }
 }
