@@ -24,6 +24,8 @@ record APIData(String endpoint, String model) { }
 
 public class SayItAssistant {
 
+    public SayItAssistant assistant = new SayItAssistant();
+
     private class OutputStreamFormatter {
         private static void writeParameterToOutputStream(
                 OutputStream outputStream,
@@ -257,20 +259,81 @@ public class SayItAssistant {
 
 
         return new Question(title, question, answer);
-
     }
 
 
-    SayItAssistant() {
+    private SayItAssistant() {
         Dotenv dotenv = Dotenv.load();
         this.TOKEN = dotenv.get("OPENAI_API_KEY");
         this.ORGANIZATION = dotenv.get("OPENAI_ORG");
         queryDataBase = new File("AgileLovers_DB");
     }
 
+    private File audioFile;
+    private AudioRecorder recorder;
+
+    private void start_recording(){
+        audioFile = new File("./recording.wav");
+        recorder = new AudioRecorder(audioFile);
+
+        recorder.start();
+    }
+
+    private Question end_recording(){
+        Question ques = new Question();
+
+        Thread thread = new Thread(() -> {
+
+            recorder.stop();
+
+            String question = null;
+            try {
+                question = assistant.getTextFromAudio(audioFile).toLowerCase();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            ques.setQuestion(question);
+
+            String prompt =
+                    "In the first line of the response, provide a title for my query." +
+                            " Following the title, provide the response for my query in a new line." +
+                            " Follow the format:\n" +
+                            "[title] * [answer]\n" +
+                            question;
+
+            String response = null;
+            try {
+                response = assistant.getAnswer(prompt);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            String[] split_response = response.split(Pattern.quote("*"), 2);
+            String title = split_response[0].replaceAll("\n", "");
+            String answerToQuestion = split_response[1];
+
+            try {
+                assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            ques.setAnswer(answerToQuestion);
+            ques.setTitle(title);
+
+
+            audioFile.deleteOnExit();
+        });
+
+        // new thread for operations
+
+        return ques;
+    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-
+    /*
         SayItAssistant assistant = new SayItAssistant();
 
         File audioFile = new File("./recording.wav");
@@ -304,6 +367,8 @@ public class SayItAssistant {
         assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
 
         audioFile.deleteOnExit();
+
+     */
     }
 
 
