@@ -11,6 +11,8 @@ public class Question {
         this.answer = answer;
     }
 
+    public Question() {}
+
     public String question() {
         return this.question;
     }
