@@ -272,14 +272,14 @@ public class SayItAssistant {
     private File audioFile;
     private AudioRecorder recorder;
 
-    private void start_recording(){
+    public void start_recording(){
         audioFile = new File("./recording.wav");
         recorder = new AudioRecorder(audioFile);
 
         recorder.start();
     }
 
-    private Question end_recording(){
+    public Question end_recording(){
         Question ques = new Question();
 
         Thread thread = new Thread(() -> {
