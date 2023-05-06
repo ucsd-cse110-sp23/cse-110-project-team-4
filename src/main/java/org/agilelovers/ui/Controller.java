@@ -75,7 +75,7 @@ public class Controller {
      *
      * @param event the event
      */
-    public void record(ActionEvent event) {
+    public void newQuestion(ActionEvent event) {
         if (!this.isInitialized) {
             this.isInitialized = true;
             this.initHistoryList();
@@ -86,16 +86,16 @@ public class Controller {
             this.clearAllButton.setDisable(false);
             // change back to new question
             // wait for chatgpt to response
+            // Question stopRecording()
             this.recordButton.setText("New Question");
         } else {
             this.pastQuestions.add(new Question("title" + (++i), "Question" + i, "answer" + i));
-            // change to stop recording
-            // start recording
+            this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            // call a method that starts recording
             this.recordButton.setText("Stop Recording");
             this.deleteButton.setDisable(true);
             this.clearAllButton.setDisable(true);
         }
         this.isRecording = !this.isRecording;
-
     }
 }
