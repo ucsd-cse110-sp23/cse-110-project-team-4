@@ -303,6 +303,7 @@ public class SayItAssistant {
             }
             ques.setQuestion(question);
             ((Controller) this.fxmlLoader.getController()).refreshLabels();
+            audioFile.delete();
 
             String prompt =
                     "In the first line of the response, provide a title for my query." +
@@ -323,6 +324,7 @@ public class SayItAssistant {
             String[] split_response = response.split(Pattern.quote("*"), 2);
             String title = split_response[0].replaceAll("\n", "");
             String answerToQuestion = split_response[1];
+            // bug here
 
             try {
                 assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
