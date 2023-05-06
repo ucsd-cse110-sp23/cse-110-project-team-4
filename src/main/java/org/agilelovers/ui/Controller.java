@@ -7,7 +7,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import org.agilelovers.backend.SayItAssistant;
 import org.agilelovers.ui.object.Question;
+
+import java.util.List;
 
 /**
  * Controller class for the UI
@@ -46,6 +49,30 @@ public class Controller {
         });
     }
 
+    public void refreshLabels() {
+        var index = this.historyList.getSelectionModel().getSelectedIndex();
+        if (index == -1) {
+            questionLabel.setText("");
+            answerLabel.setText("");
+            return;
+        }
+        Question currentQuestion = this.pastQuestions.get(index);
+        questionLabel.setText(currentQuestion.question());
+        answerLabel.setText(currentQuestion.answer());
+    }
+
+    public ListView getHistoryList() {
+        return this.historyList;
+    }
+
+    public Label getQuestionLabel() {
+        return this.questionLabel;
+    }
+
+    public Label getAnswerLabel() {
+        return this.answerLabel;
+    }
+
     /**
      * Removes all the old questions.
      * TODO: implement this
@@ -82,16 +109,20 @@ public class Controller {
         }
 
         if (this.isRecording) {
-            this.deleteButton.setDisable(false);
-            this.clearAllButton.setDisable(false);
-            // change back to new question
             // wait for chatgpt to response
             // Question stopRecording()
-            this.recordButton.setText("New Question");
-        } else {
-            this.pastQuestions.add(new Question("title" + (++i), "Question" + i, "answer" + i));
+            var currentQuestion = SayItAssistant.assistant.endRecording();
+            this.pastQuestions.remove(this.pastQuestions.size() - 1);
+            this.pastQuestions.add(currentQuestion);
             this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            // change back to new question
+            this.recordButton.setText("New Question");
+            this.deleteButton.setDisable(false);
+            this.clearAllButton.setDisable(false);
+        } else {
+            this.pastQuestions.add(new Question("title" + (++i), "RECORDING", ""));
             // call a method that starts recording
+            SayItAssistant.assistant.startRecording();
             this.recordButton.setText("Stop Recording");
             this.deleteButton.setDisable(true);
             this.clearAllButton.setDisable(true);

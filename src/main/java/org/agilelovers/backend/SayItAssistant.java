@@ -1,5 +1,8 @@
 package org.agilelovers.backend;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import javafx.fxml.FXMLLoader;
+import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.object.Question;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,16 +18,20 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Iterator;
-import java.util.Scanner;
 import java.util.regex.Pattern;
-
-import io.github.cdimascio.dotenv.Dotenv;
 
 record APIData(String endpoint, String model) { }
 
 public class SayItAssistant {
 
     public static SayItAssistant assistant = new SayItAssistant();
+
+    // reference variable to the list view
+    private FXMLLoader fxmlLoader;
+
+    public void setFXMLLoader(FXMLLoader loader) {
+        this.fxmlLoader = loader;
+    }
 
     private class OutputStreamFormatter {
         private static void writeParameterToOutputStream(
@@ -272,27 +279,27 @@ public class SayItAssistant {
     private File audioFile;
     private AudioRecorder recorder;
 
-    public void start_recording(){
+    public void startRecording() {
         audioFile = new File("./recording.wav");
         recorder = new AudioRecorder(audioFile);
 
         recorder.start();
     }
 
-    public Question end_recording(){
+    public Question endRecording() {
         Question ques = new Question();
 
-        Thread thread = new Thread(() -> {
+        // new thread for operations
+        recorder.stop();
 
-            recorder.stop();
-
-            String question = null;
-            try {
-                question = assistant.getTextFromAudio(audioFile).toLowerCase();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        String question = null;
+        try {
+            question = assistant.getTextFromAudio(audioFile).toLowerCase();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
             }
-            ques.setQuestion(question);
+        ques.setQuestion(question);
+        ((Controller) this.fxmlLoader.getController()).refreshLabels();
 
             String prompt =
                     "In the first line of the response, provide a title for my query." +
@@ -310,24 +317,28 @@ public class SayItAssistant {
                 throw new RuntimeException(e);
             }
 
-            String[] split_response = response.split(Pattern.quote("*"), 2);
-            String title = split_response[0].replaceAll("\n", "");
-            String answerToQuestion = split_response[1];
+        String[] split_response = response.split(Pattern.quote("*"), 2);
+        String title = split_response[0].replaceAll("\n", "");
+        String answerToQuestion = split_response[1];
 
-            try {
-                assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-            ques.setAnswer(answerToQuestion);
-            ques.setTitle(title);
+        System.out.println(answerToQuestion);
+        System.out.println(title);
+        ques.setAnswer(answerToQuestion);
+        ques.setTitle(title);
 
 
-            audioFile.deleteOnExit();
-        });
+        audioFile.deleteOnExit();
 
-        // new thread for operations
+        // refresh
+        ((Controller) this.fxmlLoader.getController()).getHistoryList().refresh();
+        ((Controller) this.fxmlLoader.getController()).refreshLabels();
+
 
         return ques;
     }
