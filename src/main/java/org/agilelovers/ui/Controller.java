@@ -1,5 +1,6 @@
 package org.agilelovers.ui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,8 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import org.agilelovers.backend.SayItAssistant;
 import org.agilelovers.ui.object.Question;
-
-import java.util.List;
 
 /**
  * Controller class for the UI
@@ -50,15 +49,17 @@ public class Controller {
     }
 
     public void refreshLabels() {
-        var index = this.historyList.getSelectionModel().getSelectedIndex();
-        if (index == -1) {
-            questionLabel.setText("");
-            answerLabel.setText("");
-            return;
-        }
-        Question currentQuestion = this.pastQuestions.get(index);
-        questionLabel.setText(currentQuestion.question());
-        answerLabel.setText(currentQuestion.answer());
+        Platform.runLater(() -> {
+            var index = this.historyList.getSelectionModel().getSelectedIndex();
+            if (index == -1) {
+                questionLabel.setText("");
+                answerLabel.setText("");
+                return;
+            }
+            Question currentQuestion = this.pastQuestions.get(index);
+            questionLabel.setText(currentQuestion.question());
+            answerLabel.setText(currentQuestion.answer());
+        });
     }
 
     public ListView getHistoryList() {

@@ -1,6 +1,5 @@
 package org.agilelovers.backend;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import javafx.fxml.FXMLLoader;
 import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.object.Question;
@@ -19,6 +18,8 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 record APIData(String endpoint, String model) { }
 
@@ -279,27 +280,29 @@ public class SayItAssistant {
     private File audioFile;
     private AudioRecorder recorder;
 
-    public void startRecording() {
+    public void startRecording(){
         audioFile = new File("./recording.wav");
         recorder = new AudioRecorder(audioFile);
 
         recorder.start();
     }
 
-    public Question endRecording() {
+    public Question endRecording(){
         Question ques = new Question();
 
         // new thread for operations
-        recorder.stop();
+        var thread = new Thread(() -> {
 
-        String question = null;
-        try {
-            question = assistant.getTextFromAudio(audioFile).toLowerCase();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            recorder.stop();
+
+            String question = null;
+            try {
+                question = assistant.getTextFromAudio(audioFile).toLowerCase();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        ques.setQuestion(question);
-        ((Controller) this.fxmlLoader.getController()).refreshLabels();
+            ques.setQuestion(question);
+            ((Controller) this.fxmlLoader.getController()).refreshLabels();
 
             String prompt =
                     "In the first line of the response, provide a title for my query." +
@@ -317,27 +320,31 @@ public class SayItAssistant {
                 throw new RuntimeException(e);
             }
 
-        String[] split_response = response.split(Pattern.quote("*"), 2);
-        String title = split_response[0].replaceAll("\n", "");
-        String answerToQuestion = split_response[1];
+            String[] split_response = response.split(Pattern.quote("*"), 2);
+            String title = split_response[0].replaceAll("\n", "");
+            String answerToQuestion = split_response[1];
 
-        try {
-            assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            try {
+                assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-        System.out.println(answerToQuestion);
-        System.out.println(title);
-        ques.setAnswer(answerToQuestion);
-        ques.setTitle(title);
+            System.out.println(answerToQuestion);
+            System.out.println(title);
+            ques.setAnswer(answerToQuestion);
+            ques.setTitle(title);
 
 
-        audioFile.deleteOnExit();
+            audioFile.deleteOnExit();
 
-        // refresh
-        ((Controller) this.fxmlLoader.getController()).getHistoryList().refresh();
-        ((Controller) this.fxmlLoader.getController()).refreshLabels();
+            // refresh
+            ((Controller) this.fxmlLoader.getController()).getHistoryList().refresh();
+            ((Controller) this.fxmlLoader.getController()).refreshLabels();
+        });
+
+        thread.start();
+
 
 
         return ques;
