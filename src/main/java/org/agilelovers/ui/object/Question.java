@@ -5,10 +5,6 @@ public class Question {
     private String answer = "";
     private String title = "";
 
-    private Question() {
-
-    }
-
     public Question(String title, String question, String answer) {
         this.title = title;
         this.question = question;
