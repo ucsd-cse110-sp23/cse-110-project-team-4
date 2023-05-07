@@ -296,8 +296,18 @@ public class SayItAssistant {
             recorder.stop();
 
             String question = null;
+            String temp = "";
+            char upper = 0;
             try {
                 question = assistant.getTextFromAudio(audioFile).toLowerCase();
+                for (String s : question.split("")){
+                    if (upper == 0){
+                        upper = (char) (question.charAt(0) - 32);
+                        temp = temp + upper;
+                    }
+                    else temp = temp + s;
+                }
+                question = temp;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -305,12 +315,12 @@ public class SayItAssistant {
             ((Controller) this.fxmlLoader.getController()).refreshLabels();
             audioFile.delete();
 
-            String prompt =
-                    "In the first line of the response, provide a title for my query." +
+            String prompt = question;
+                    /*"In the first line of the response, provide a title for my query." +
                             " Following the title, provide the response for my query in a new line." +
                             " Follow the format:\n" +
                             "[title] * [answer]\n" +
-                            question;
+                            question;*/
 
             String response = null;
             try {
@@ -321,9 +331,9 @@ public class SayItAssistant {
                 throw new RuntimeException(e);
             }
 
-            String[] split_response = response.split(Pattern.quote("*"), 2);
-            String title = split_response[0].replaceAll("\n", "");
-            String answerToQuestion = split_response[1];
+            //String[] split_response = response.split(Pattern.quote("*"), 2);
+            String title = question;//split_response[0].replaceAll("\n", "");
+            String answerToQuestion = response;//split_response[1];
             // bug here
 
             try {
