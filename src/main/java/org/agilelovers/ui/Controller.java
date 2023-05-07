@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import org.agilelovers.backend.SayItAssistant;
 import org.agilelovers.ui.object.Question;
 
@@ -20,7 +21,12 @@ public class Controller {
     @FXML
     Label questionLabel;
     @FXML
-    Label answerLabel;
+    //Label answerLabel;
+    TextArea answerLabel;
+    @FXML
+    private void initialize() {
+        answerLabel.setEditable(false);
+    }
     @FXML
     Button recordButton;
     @FXML
@@ -70,7 +76,10 @@ public class Controller {
         return this.questionLabel;
     }
 
-    public Label getAnswerLabel() {
+    /*public Label getAnswerLabel() {
+        return this.answerLabel;
+    }*/
+    public TextArea getAnswerLabel() {
         return this.answerLabel;
     }
 
