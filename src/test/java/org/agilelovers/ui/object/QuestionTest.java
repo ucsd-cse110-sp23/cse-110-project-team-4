@@ -46,9 +46,54 @@ class QuestionTest {
         Assertions.assertThat(testQuestion.toString()).isEqualTo("newTitle");
     }
 
+    @Test
+    void testEmptyQuestion() {
+        Question emptyQuestion = new Question();
+        Assertions.assertThat(emptyQuestion.question()).isEqualTo("");
+    }
 
-    /*
-    TODO: need to add more "non-trivial" tests to cover
-     */
+    @Test
+    void testEmptyAnswer() {
+        Question emptyAnswer = new Question();
+        Assertions.assertThat(emptyAnswer.answer()).isEqualTo("");
+    }
+
+    @Test
+    void testEmptyTitle() {
+        Question emptyTitle = new Question();
+        Assertions.assertThat(emptyTitle.toString()).isEqualTo("");
+    }
+
+    @Test
+    void testSetNullAnswer() {
+        testQuestion.setAnswer(null);
+        Assertions.assertThat(testQuestion.answer()).isNull();
+    }
+
+    @Test
+    void testSetNullQuestion() {
+        testQuestion.setQuestion(null);
+        Assertions.assertThat(testQuestion.question()).isNull();
+    }
+
+    @Test
+    void testSetNullTitle() {
+        testQuestion.setTitle(null);
+        Assertions.assertThat(testQuestion.toString()).isNull();
+    }
+
+    @Test
+    void testToStringWithNullQuestion() {
+        Question question = new Question("Title", null, "Answer");
+        Assertions.assertThat(question.toString()).isEqualTo("Title");
+    }
+
+    @Test
+    void testToStringWithNullAnswer() {
+        Question question = new Question("Title", "Question", null);
+        Assertions.assertThat(question.toString()).isEqualTo("Title");
+    }
+
+
 
 }
