@@ -49,19 +49,19 @@ class QuestionTest {
     @Test
     void testEmptyQuestion() {
         Question emptyQuestion = new Question();
-        Assertions.assertThat(emptyQuestion.question()).isEqualTo("");
+        Assertions.assertThat(emptyQuestion.question()).isEmpty();
     }
 
     @Test
     void testEmptyAnswer() {
         Question emptyAnswer = new Question();
-        Assertions.assertThat(emptyAnswer.answer()).isEqualTo("");
+        Assertions.assertThat(emptyAnswer.answer()).isEmpty();
     }
 
     @Test
     void testEmptyTitle() {
         Question emptyTitle = new Question();
-        Assertions.assertThat(emptyTitle.toString()).isEqualTo("");
+        Assertions.assertThat(emptyTitle.toString()).isEmpty();
     }
 
     @Test
