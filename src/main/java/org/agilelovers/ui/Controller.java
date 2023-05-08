@@ -40,6 +40,8 @@ public class Controller {
     private int i = 0;
     private boolean isRecording = false;
 
+    boolean test = false;
+
     public void initHistoryList() {
         this.historyList.setItems(this.pastQuestions);
         this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -102,8 +104,10 @@ public class Controller {
      */
     public void deleteQuestion(ActionEvent event) {
         System.out.println("Delete Question");
-        if (!this.pastQuestions.isEmpty())
+        if (!this.pastQuestions.isEmpty()) {
             this.pastQuestions.remove(this.historyList.getFocusModel().getFocusedIndex());
+            System.out.println("Succesfully deleted question");
+        }
     }
 
     /**
@@ -118,7 +122,9 @@ public class Controller {
             this.initHistoryList();
         }
 
-        if (this.isRecording) {
+        if (test) {
+            this.newMockQuestion(event);
+        } else if (this.isRecording) {
             // wait for chatgpt to response
             // Question stopRecording()
             var currentQuestion = SayItAssistant.assistant.endRecording();
@@ -137,6 +143,43 @@ public class Controller {
             this.deleteButton.setDisable(true);
             this.clearAllButton.setDisable(true);
         }
+        if (!test) { this.isRecording = !this.isRecording; }
+    }
+
+    // for testing ----------------------------------
+    void addQuestion(Question question) {
+        this.pastQuestions.add(question);
+    }
+
+    void newMockQuestion(ActionEvent event) {
+        if (!this.isInitialized) {
+            this.isInitialized = true;
+            this.initHistoryList();
+        }
+
+        if (this.isRecording) {
+            System.out.println("isRecording: " + this.isRecording);
+            // wait for chatgpt to response
+            // Question stopRecording()
+            //var currentQuestion = new Question("temp1", "temp2", "temp3");
+            Question currentQuestion = pastQuestions.get(i-1);
+            this.pastQuestions.remove(this.pastQuestions.size() - 1);
+            currentQuestion.setQuestion("question"+i);
+            this.pastQuestions.add(currentQuestion);
+            this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            // change back to new question
+            this.recordButton.setText("New Question");
+            this.deleteButton.setDisable(false);
+            this.clearAllButton.setDisable(false);
+        } else {
+            System.out.println("isRecording: " + this.isRecording);
+            this.pastQuestions.add(new Question("title" + (++i), "RECORDING", ""));
+            // call a method that starts recording
+            this.recordButton.setText("Stop Recording");
+            this.deleteButton.setDisable(true);
+            this.clearAllButton.setDisable(true);
+        }
         this.isRecording = !this.isRecording;
     }
+
 }

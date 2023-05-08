@@ -1,5 +1,6 @@
 package org.agilelovers.backend;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import javafx.fxml.FXMLLoader;
 import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.object.Question;
@@ -17,9 +18,6 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Iterator;
-import java.util.regex.Pattern;
-
-import io.github.cdimascio.dotenv.Dotenv;
 
 record APIData(String endpoint, String model) { }
 
@@ -277,7 +275,7 @@ public class SayItAssistant {
         queryDataBase = new File("AgileLovers_DB");
     }
 
-    private File audioFile;
+    File audioFile;
     private AudioRecorder recorder;
 
     public void startRecording(){
