@@ -20,6 +20,12 @@ on:
     - US1
     - test
 
+# pray this works bro.
+permissions:
+    contents: read
+    checks: write
+    id-token: write    
+
 jobs:
   build:
 
@@ -46,13 +52,3 @@ jobs:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         detailed_summary: true # display detailed summary of the report
         include_passed: true # include passed tests in the results table
-
-#   doesn't work bro idek anymore
-#    - name: Report
-#      uses: dorny/test-reporter@v1
-#      if: always()
-#      with:
-#          name: Maven Tests
-#          path: '**/target/surefire-reports/*.xml'
-#          reporter: java-junit
-#          fail-on-error: false
