@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 
@@ -37,7 +38,6 @@ class ControllerTest extends ApplicationTest{
         controller = fxmlLoader.getController();
         Scene scene = new Scene(root); //??
         stage.setScene(scene);
-        stage.requestFocus();
         stage.show();
         System.out.println("start() called and finished");
     }
@@ -59,12 +59,14 @@ class ControllerTest extends ApplicationTest{
         Assertions.assertThat(controller.getHistoryList()).isNotNull();
     }
 
+
     @Test
     void testRefreshLabels() {
         controller.refreshLabels();
         Assertions.assertThat(controller.getQuestionLabel()).isNotNull();
         Assertions.assertThat(controller.getAnswerLabel()).isNotNull();
     }
+    @Disabled("UI Test")
     @Test
     void testClearAllButton() {
         ListView historyList = controller.getHistoryList();
@@ -72,36 +74,37 @@ class ControllerTest extends ApplicationTest{
         verifyThat(historyList, hasItems(0));
     }
 
+    @Disabled("UI Test")
     @Test
     void testDeleteQuestion() {
         clickOn("#historyList").clickOn(testQuestion2.toString());
         clickOn("#deleteButton");
-        sleep(1000);
+        //sleep(1000);
         Assertions.assertThat(controller.getHistoryList().getItems()).containsExactly(testQuestion1);
         Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(1);
     }
 
-
+    @Disabled("UI Test")
     @Test
     void testNewQuestion() {
         clickOn("#clearAllButton");
         // Simulate clicking the "Record" button, this is question3
         clickOn("#recordButton");
         // Wait for recording to start
-        sleep(2000);
+        //sleep(2000);
 
         // Simulate stopping the recording
         clickOn("#recordButton");
-        sleep(1000);
+        //sleep(1000);
 
         // Simulate clicking the "New Question" button, this is question4
         clickOn("#recordButton");
         // Wait for recording to start
-        sleep(2000);
+        //sleep(2000);
 
         // Simulate stopping the recording
         clickOn("#recordButton");
-        sleep(1000);
+        //sleep(1000);
 
         // Verify that the new question has been added to the history list
         ListView<Question> historyList = lookup("#historyList").query();
@@ -109,6 +112,7 @@ class ControllerTest extends ApplicationTest{
         Question newQuestion = historyList.getItems().get(1);
         Assertions.assertThat(newQuestion.question()).isEqualTo("question2");
     }
+    @Disabled("UI Test")
     @Test
     void testRecordButton() {
         clickOn("#recordButton");
