@@ -37,7 +37,6 @@ class ControllerTest extends ApplicationTest{
         controller = fxmlLoader.getController();
         Scene scene = new Scene(root); //??
         stage.setScene(scene);
-        stage.requestFocus();
         stage.show();
         System.out.println("start() called and finished");
     }
