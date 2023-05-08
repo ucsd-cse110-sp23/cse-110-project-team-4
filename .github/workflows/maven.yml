@@ -40,7 +40,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Test with Maven
-      run: mvn -B test --file pom.xml -Dmaven.test.failure.ignore=true
+      run: mvn -B test --file pom.xml -Dmaven.test.failure.ignore=true -Dmaven.compiler.showWarnings=false
 
 # report the results, from lab 2
     - name: Publish Test Report
