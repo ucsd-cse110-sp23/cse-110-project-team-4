@@ -1,8 +1,8 @@
 on:
   push:
-    branches: main
+    branches: [ main ]
   pull_request:
-    branches: main
+    branches: [ main ]
 language: java
 jdk:
   - openjdk17
@@ -16,23 +16,23 @@ matrix:
   branches:
     only:
       - main
-  addons:
-    apt:
-      packages:
-        - oracle-java8-installer
-  before_install:
-    - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
-  install: true
-  script:
-    - mvn -B test --file pom.xml -Dmaven.test.failure.ignore=true -Dmaven.compiler.showWarnings=false
-    - ./gradlew check
-  before_cache:
-    - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-    - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-    - rm -f  $HOME/.gradle/caches/*/fileHashes/fileHashes.bin
-    - rm -f  $HOME/.gradle/caches/*/fileHashes/fileHashes.lock
-  cache:
-    directories:
-      - $HOME/.gradle/caches/
-      - $HOME/.gradle/wrapper/
-      - $HOME/.m2
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+before_install:
+  - if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; fi
+install: true
+script:
+  - mvn -B test --file pom.xml -Dmaven.test.failure.ignore=true -Dmaven.compiler.showWarnings=false
+  - ./gradlew check
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f  $HOME/.gradle/caches/*/fileHashes/fileHashes.bin
+  - rm -f  $HOME/.gradle/caches/*/fileHashes/fileHashes.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.m2
