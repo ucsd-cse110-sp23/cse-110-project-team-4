@@ -3,17 +3,18 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 language: java
 jdk:
   - openjdk17
-matrix:
-  include:
+
+include:
     - os: linux
       dist: focal
       jdk: openjdk17
       env:
         - _JAVA_OPTIONS="-Djava.awt.headless=true -Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw"
-  branches:
+branches:
     only:
       - main
 addons:
