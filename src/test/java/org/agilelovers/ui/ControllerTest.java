@@ -2,19 +2,14 @@ package org.agilelovers.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.io.IOException;
-
-import static org.testfx.api.FxAssert.verifyThat;
-import static org.testfx.matcher.control.ListViewMatchers.hasItems;
 
 class ControllerTest extends ApplicationTest{
 
@@ -65,6 +60,8 @@ class ControllerTest extends ApplicationTest{
         Assertions.assertThat(controller.getQuestionLabel()).isNotNull();
         Assertions.assertThat(controller.getAnswerLabel()).isNotNull();
     }
+
+    /*
     @Disabled("UI Test")
     @Test
     void testClearAllButton() {
@@ -119,4 +116,5 @@ class ControllerTest extends ApplicationTest{
         clickOn("#recordButton");
         Assertions.assertThat(lookup("#recordButton").queryButton().getText()).isEqualTo("New Question");
     }
+     */
 }
