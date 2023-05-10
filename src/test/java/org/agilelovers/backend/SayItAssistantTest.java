@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 
 class SayItAssistantTest {
-
     private SayItAssistant assistant;
     private File file;
     private String question;

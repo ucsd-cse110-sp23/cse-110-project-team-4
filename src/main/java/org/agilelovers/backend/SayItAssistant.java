@@ -7,7 +7,6 @@ import org.agilelovers.ui.object.Question;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -20,9 +19,7 @@ import java.util.Base64;
 import java.util.Iterator;
 
 record APIData(String endpoint, String model) { }
-
 public class SayItAssistant {
-
     public static SayItAssistant assistant = new SayItAssistant();
 
     // reference variable to the list view
