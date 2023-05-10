@@ -18,7 +18,7 @@ mvn javafx:run -f pom.xml
 *Note: Make sure you have `Maven` installed to run this command. If you're running Linux or MacOS, you can use Homebrew to install Maven (https://maven.apache.org).*
 
 Once you've run this command, a window should appear on your screen. It should look like:
-[insert image]
+![app](./assets/sayitassistant.png)
 
 ---
 
@@ -29,12 +29,12 @@ The purpose of the **SayItAssistant** application is to let the user speak out l
 
 On our application, there are several buttons the user should know about:
 1. "New Question"
-    a. The button initiates a recording for the user
-    b. The user should start speaking their question or statement
-    c. Once the user is finished with their query, click "End Recording"
-3. "Delete Question"
-    a. The user should click on the question they wish to delete
-    b. Once the user has selected their question, click on the "Delete Question" button
-5. "Clear All"
-    a. Clears all questions from the question list and no questions should be displayed
+   * the button initiates a recording for the user 
+   * The user should start speaking their question or statement 
+   * Once the user is finished with their query, click "End Recording"
+2. "Delete Question"
+   * The user should click on the question they wish to delete
+   * Once the user has selected their question, click on the "Delete Question" button
+3. "Clear All"
+   * Clears all questions from the question list and no questions should be displayed
 

@@ -61,8 +61,6 @@ class ControllerTest extends ApplicationTest{
         Assertions.assertThat(controller.getAnswerLabel()).isNotNull();
     }
 
-    /*
-    @Disabled("UI Test")
     @Test
     void testClearAllButton() {
         ListView historyList = controller.getHistoryList();
@@ -70,7 +68,6 @@ class ControllerTest extends ApplicationTest{
         verifyThat(historyList, hasItems(0));
     }
 
-    @Disabled("UI Test")
     @Test
     void testDeleteQuestion() {
         clickOn("#historyList").clickOn(testQuestion2.toString());
@@ -80,7 +77,6 @@ class ControllerTest extends ApplicationTest{
         Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(1);
     }
 
-    @Disabled("UI Test")
     @Test
     void testNewQuestion() {
         clickOn("#clearAllButton");
@@ -108,7 +104,7 @@ class ControllerTest extends ApplicationTest{
         Question newQuestion = historyList.getItems().get(1);
         Assertions.assertThat(newQuestion.question()).isEqualTo("question2");
     }
-    @Disabled("UI Test")
+
     @Test
     void testRecordButton() {
         clickOn("#recordButton");
@@ -116,5 +112,4 @@ class ControllerTest extends ApplicationTest{
         clickOn("#recordButton");
         Assertions.assertThat(lookup("#recordButton").queryButton().getText()).isEqualTo("New Question");
     }
-     */
 }
