@@ -5,7 +5,11 @@
 
 ---
 
+## Prerequisite installations
+Our project is running on **JDK 20** and utilizes **Maven** as our package manager. Please make sure you have these installed on your machine before running our project ( *If you're running Linux or MacOS, you can use Homebrew to install Maven (https://maven.apache.org))*.
+
 ## Instructions to run
+
 In other to build and run our project, install our project by:
 1. click on `Code`
 2. click on `Download ZIP`
@@ -16,8 +20,6 @@ Open your terminal and go to the directory where you unzipped the file. Run the 
 ```
 mvn javafx:run -f pom.xml
 ```
-
-*Note: Make sure you have `Maven` installed to run this command. If you're running Linux or MacOS, you can use Homebrew to install Maven (https://maven.apache.org).*
 
 Once you've run this command, a window should appear on your screen. It should look like:
 ![app](./assets/sayitassistant.png)
