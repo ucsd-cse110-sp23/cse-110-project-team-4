@@ -1,9 +1,11 @@
 # SayIt Assistant
-By Agile Lovers
+#### By Agile Lovers
+
+*Team 4: Louie Cai, Anish Govind, Lilian Kong, Nicholas Lam, Billy Phan, Shera Zhong*
 
 ---
 
-# Instructions to run
+## Instructions to run
 In other to build and run our project, install our project by:
 1. click on `Code`
 2. click on `Download ZIP`
@@ -37,4 +39,3 @@ On our application, there are several buttons the user should know about:
    * Once the user has selected their question, click on the "Delete Question" button
 3. "Clear All"
    * Clears all questions from the question list and no questions should be displayed
-
