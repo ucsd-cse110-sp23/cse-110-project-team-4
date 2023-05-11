@@ -93,8 +93,8 @@ On our application, there are several buttons the user should know about:
 
 #### Github Project – 9 points
 - [ ] User Stories started in priority order; iterations run in sequence (3 pts)
-- [ ]Tasks assigned to developers, all team members assigned tasks (3 pts)
-- [ ]Burndown chart looks good (steady progress, not all work at end) (3 pts)
+- [ ] Tasks assigned to developers, all team members assigned tasks (3 pts)
+- [ ] Burndown chart looks good (steady progress, not all work at end) (3 pts)
 
 #### GitHub - 10 points
 - [ ] Consistent use, all team members contributed (4 pts)
