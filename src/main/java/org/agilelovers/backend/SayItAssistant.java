@@ -17,6 +17,8 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Iterator;
+import java.util.Scanner;
+
 
 record APIData(String endpoint, String model) { }
 public class SayItAssistant {
@@ -229,6 +231,44 @@ public class SayItAssistant {
         }
     }
 
+    private void deleteFromFile(String questionQuery) throws IOException{
+
+        synchronized (queryDataBase) {
+            // Read existing contents of file into a JSONObject
+            JSONObject existingData = new JSONObject();
+            if (queryDataBase.exists()) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(queryDataBase))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        JSONObject data = new JSONObject(line);
+
+                        Iterator<String> keys = data.keys();
+                        while(keys.hasNext()){
+                            String key = keys.next();
+                            JSONObject answer = data.getJSONObject(key);
+                            existingData.put(key, answer);
+                        }
+
+                    }
+                }
+            }
+
+            String encodedKey = encodeQuery(questionQuery);
+            // Update or add new key-value pair to JSONObject
+            existingData.remove(encodedKey);
+
+            // Write updated JSONObject to file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(queryDataBase))) {
+                for (String existingKey : existingData.keySet()) {
+                    JSONObject currLine = new JSONObject();
+                    currLine.put(existingKey, existingData.getJSONObject(existingKey));
+                    writer.write(currLine.toString());
+                    writer.newLine();
+                }
+            }
+        }
+    }
+
     private String encodeQuery(String query){
         byte[] query_bytes = query.getBytes();
         byte[] query_bytesEncoded = Base64.getEncoder().encode(query_bytes);
@@ -358,8 +398,12 @@ public class SayItAssistant {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-    /*
+
+        /*
+        String testDelete = "how far away is the earth from the sun?";
         SayItAssistant assistant = new SayItAssistant();
+        assistant.deleteFromFile(testDelete);
+
 
         File audioFile = new File("./recording.wav");
         AudioRecorder recorder = new AudioRecorder(audioFile);
@@ -375,25 +419,18 @@ public class SayItAssistant {
 
         String question = assistant.getTextFromAudio(audioFile).toLowerCase();
 
-        String prompt =
-                "In the first line of the response, provide a title for my query." +
-                " Following the title, provide the response for my query in a new line." +
-                " Follow the format:\n" +
-                "[title] * [answer]\n" +
-                question;
 
-        String response = assistant.getAnswer(prompt);
-        String[] split_response = response.split(Pattern.quote("*"), 2);
+        String response = assistant.getAnswer(question);
 
-        String title = split_response[0].replaceAll("\n", "");
-        String answerToQuestion = split_response[1];
+
 
         //multi-thread file writing?
-        assistant.transcribeQueryIntoFile(title, question, answerToQuestion);
+        assistant.transcribeQueryIntoFile(question, question, response);
 
         audioFile.deleteOnExit();
 
-     */
+         */
+
     }
 
 
