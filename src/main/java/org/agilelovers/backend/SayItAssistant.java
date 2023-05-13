@@ -16,6 +16,7 @@ import java.util.Objects;
 record APIData(String endpoint, String model) {
 }
 
+
 public class SayItAssistant {
     public static SayItAssistant assistant = new SayItAssistant();
 
@@ -222,15 +223,8 @@ public class SayItAssistant {
             ((Controller) this.fxmlLoader.getController()).refreshLabels();
 
             String prompt = question;
-                    /*"In the first line of the response, provide a title for
-                     my query." +
-                            " Following the title, provide the response for
-                            my query in a new line." +
-                            " Follow the format:\n" +
-                            "[title] * [answer]\n" +
-                            question;*/
-
             String response = null;
+
             try {
                 response = ChatGPTHelper.getAnswer(CHATGPT, TOKEN,
                         ORGANIZATION, prompt);
