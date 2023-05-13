@@ -13,12 +13,7 @@ import org.agilelovers.backend.SayItAssistant;
 import org.agilelovers.ui.object.Question;
 
 /**
- * Controller class for the UI.
- * This class is responsible for handling user input and updating the UI accordingly. It also handles the interaction
- * between the UI and the backend. The UI utilizes the JavaFX framework to create visual objects on the application's
- * window using labels and buttons defined in this class. The UI is defined in the Main.fxml file.
- * The backend is defined in the SayItAssistant.java file.
- * The Question object is defined in the Question.java file.
+ * Controller class for the UI
  */
 public class Controller {
     /**
@@ -58,10 +53,16 @@ public class Controller {
     @FXML
     Button clearAllButton;
 
-    ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
-    private boolean isInitialized = false;
 
-    boolean isRecording = false;
+    private ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
+    private boolean isInitialized = false;
+    private int i = 0;
+    private boolean isRecording = false;
+
+    /**
+     * TODO:
+     */
+    boolean test = false;
 
     /**
      * Initiates the history list.
@@ -182,7 +183,9 @@ public class Controller {
             this.initHistoryList();
         }
 
-        if (this.isRecording) {
+        if (test) {
+            this.newMockQuestion(event);
+        } else if (this.isRecording) {
             // wait for chatgpt to response
             // Question stopRecording()
             var currentQuestion = SayItAssistant.assistant.endRecording();
@@ -194,13 +197,62 @@ public class Controller {
             this.deleteButton.setDisable(false);
             this.clearAllButton.setDisable(false);
         } else {
-            this.pastQuestions.add(new Question("", "RECORDING", ""));
+            this.pastQuestions.add(new Question("title" + (++i), "RECORDING", ""));
             // call a method that starts recording
             SayItAssistant.assistant.startRecording();
             this.recordButton.setText("Stop Recording");
             this.deleteButton.setDisable(true);
             this.clearAllButton.setDisable(true);
         }
+        if (!test) {
+            this.isRecording = !this.isRecording;
+        }
+    }
+
+    // for testing ----------------------------------
+    /**
+     * Add question for testing.
+     *
+     * @param question the question
+     */
+    void addQuestion(Question question) {
+        this.pastQuestions.add(question);
+    }
+
+    /**
+     * New mock question.
+     *
+     * @param event the event
+     */
+    void newMockQuestion(ActionEvent event) {
+        if (!this.isInitialized) {
+            this.isInitialized = true;
+            this.initHistoryList();
+        }
+
+        if (this.isRecording) {
+            System.out.println("isRecording: " + this.isRecording);
+            // wait for chatgpt to response
+            // Question stopRecording()
+            //var currentQuestion = new Question("temp1", "temp2", "temp3");
+            Question currentQuestion = pastQuestions.get(i - 1);
+            this.pastQuestions.remove(this.pastQuestions.size() - 1);
+            currentQuestion.setQuestion("question" + i);
+            this.pastQuestions.add(currentQuestion);
+            this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            // change back to new question
+            this.recordButton.setText("New Question");
+            this.deleteButton.setDisable(false);
+            this.clearAllButton.setDisable(false);
+        } else {
+            System.out.println("isRecording: " + this.isRecording);
+            this.pastQuestions.add(new Question("title" + (++i), "RECORDING", ""));
+            // call a method that starts recording
+            this.recordButton.setText("Stop Recording");
+            this.deleteButton.setDisable(true);
+            this.clearAllButton.setDisable(true);
+        }
         this.isRecording = !this.isRecording;
     }
+
 }
