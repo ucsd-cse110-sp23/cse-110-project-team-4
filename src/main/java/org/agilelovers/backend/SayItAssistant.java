@@ -7,6 +7,7 @@ import org.agilelovers.ui.object.Question;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -17,8 +18,6 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Iterator;
-import java.util.Scanner;
-
 
 record APIData(String endpoint, String model) { }
 public class SayItAssistant {
@@ -351,13 +350,8 @@ public class SayItAssistant {
             audioFile.delete();
 
             String prompt = question;
-                    /*"In the first line of the response, provide a title for my query." +
-                            " Following the title, provide the response for my query in a new line." +
-                            " Follow the format:\n" +
-                            "[title] * [answer]\n" +
-                            question;*/
-
             String response = null;
+
             try {
                 response = assistant.getAnswer(prompt);
             } catch (IOException e) {
@@ -391,8 +385,6 @@ public class SayItAssistant {
         });
 
         thread.start();
-
-
 
         return ques;
     }
