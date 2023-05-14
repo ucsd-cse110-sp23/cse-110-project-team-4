@@ -20,13 +20,15 @@ public class AudioRecorder {
         // the number of bits in each sample of a sound that has been digitized.
         int sampleSizeInBits = 16;
 
-        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        // the number of audio channels in this format (1 for mono, 2 for
+        // stereo).
         int channels = 1;
 
         // whether the data is signed or unsigned.
         boolean signed = true;
 
-        // whether the audio data is stored in big-endian or little-endian order.
+        // whether the audio data is stored in big-endian or little-endian
+        // order.
         boolean bigEndian = false;
 
         return new AudioFormat(
@@ -39,30 +41,30 @@ public class AudioRecorder {
     }
 
     public void start() {
-        Thread t = new Thread(() -> {
-            try {
-                AudioFormat audioFormat = getAudioFormat();
-                // the format of the TargetDataLine
-                DataLine.Info dataLineInfo = new DataLine.Info(
-                        TargetDataLine.class,
-                        audioFormat
-                );
-                // the TargetDataLine used to capture audio data from the microphone
-                targetDataLine =
-                        (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-                targetDataLine.open(audioFormat);
-                targetDataLine.start();
+        try {
+            AudioFormat audioFormat = getAudioFormat();
+            // the format of the TargetDataLine
+            DataLine.Info dataLineInfo = new DataLine.Info(
+                    TargetDataLine.class,
+                    audioFormat
+            );
+            // the TargetDataLine used to capture audio data from the microphone
+            targetDataLine =
+                    (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+            targetDataLine.open(audioFormat);
+            targetDataLine.start();
 
-                // the AudioInputStream that will be used to write the audio data to a file
-                AudioInputStream audioInputStream = new AudioInputStream(targetDataLine);
+            // the AudioInputStream that will be used to write the audio data
+            // to a file
+            AudioInputStream audioInputStream =
+                    new AudioInputStream(targetDataLine);
 
-                // the file that will contain the audio data
-                AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, audioFile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-        t.start();
+            // the file that will contain the audio data
+            AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE,
+                    audioFile);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void stop() {
