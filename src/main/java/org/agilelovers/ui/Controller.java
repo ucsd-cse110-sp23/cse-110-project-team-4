@@ -61,6 +61,8 @@ public class Controller {
     ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
     private boolean isInitialized = false;
 
+    public static Controller instance;
+
     boolean isRecording = false;
 
     /**

@@ -21,11 +21,6 @@ public class SayItAssistant {
     public static SayItAssistant assistant = new SayItAssistant();
 
     // reference variable to the list view
-    private FXMLLoader fxmlLoader;
-
-    public void setFXMLLoader(FXMLLoader loader) {
-        this.fxmlLoader = loader;
-    }
 
     private static final APIData WHISPER = new APIData("https://api.openai" +
             ".com/v1/audio/transcriptions", "whisper-1");
@@ -156,7 +151,7 @@ public class SayItAssistant {
         writeToFile(key_inBytes, innerShell);
     }
 
-    public Question obtainQuery(String questionQuery) throws IOException {
+    public Question obtainQuery(String questionQuery, Controller controller) throws IOException {
 
         String jsonStr = new String(Files.readAllBytes(queryDataBase.toPath()));
         JSONObject tempJSON = new JSONObject(jsonStr);
@@ -220,7 +215,6 @@ public class SayItAssistant {
                 throw new RuntimeException(e);
             }
             ques.setQuestion(question);
-            ((Controller) this.fxmlLoader.getController()).refreshLabels();
 
             String prompt = question;
             String response = null;
@@ -249,10 +243,6 @@ public class SayItAssistant {
             ques.setAnswer(answerToQuestion);
             ques.setTitle(title);
 
-            // refresh
-            ((Controller) this.fxmlLoader.getController()).getHistoryList()
-                    .refresh();
-            ((Controller) this.fxmlLoader.getController()).refreshLabels();
         });
 
         thread.start();

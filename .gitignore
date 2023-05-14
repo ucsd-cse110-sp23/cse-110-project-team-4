@@ -45,3 +45,7 @@ build/
 
 ### Testing DataBase ###
 AgileLovers_DB
+
+### Audio ###
+*.wav
+*.mp3
