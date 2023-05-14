@@ -47,37 +47,35 @@ On our application, there are several buttons the user should know about:
 ## Milestone 1 Delivery Checklist
 
 #### Software design – 10 points
-- [ ] tidy code (indented, consistent naming, file-/method-level comments as needed) (1 pts)
-- [ ] classes other than Activities (2 pts)
+- [x] tidy code (indented, consistent naming, file-/method-level comments as needed) (1 pts)
+- [x] classes other than Activities (2 pts)
 - [ ] wide use of SRP and DRY (5 pts)
-- [ ] code sounds like the requirements (2 pts)
+- [x] code sounds like the requirements (2 pts)
 
 #### Demo: satisfaction of all milestone requirements – 35 points [priority] - points:
 
-- [ ] Story 1: **Ask a question** [H] - 12 pts 
+- [x] Story 1: **Ask a question** [H] - 12 pts 
   - As a user I want the app to display an answer when I ask a question verbally so that I don’t have to type in my questions
 
-- [ ] Story 2: **Copy and paste answers** [M] - 2 pts 
+- [x] Story 2: **Copy and paste answers** [M] - 2 pts 
   - As a user I want copy parts of an answer so that I can paste them into another program like Google Documents so that I can add part of the answer to my research paper
 
-- [ ] Story 3: **Browse question prompt history** [H] - 5 pts 
+- [x] Story 3: **Browse question prompt history** [H] - 5 pts 
   - As a user I want to be able to view a list of past questions so that I can see what questions I already asked
 
-- [ ] Story 4: **Persistence of old prompts and answers** [M] - 2 pts 
+- [] Story 4: **Persistence of old prompts and answers** [M] - 2 pts 
   - As a user I want older questions and answers to still be available after the program is killed and restarted so that I can find the information and topics again
 
-- [ ] Story 5: **Read old question prompt and answer** [H] - 5 pts 
+- [x] Story 5: **Read old question prompt and answer** [H] - 5 pts 
   - As a user I want to be able to view the answer to a past question when I click on it the question history so that I can review a previous answer
 
-- [ ] Story 6: **Delete old question prompt and answer** [M] - 3 pts 
+- [x] Story 6: **Delete old question prompt and answer** [M] - 3 pts 
   - As a user I want to be able to select a past question and then delete it so that I can remove unneeded questions so I can more easily find important information
 
-- [ ] Story 7: **Clear all older question prompts and answers** [M] - 3 pts 
+- [x] Story 7: **Clear all older question prompts and answers** [M] - 3 pts 
   - As a user I want to be able to clear all past questions when I no longer need them so that I can prevent my screen from being cluttered when researching new topics
 
-- [ ] Story 8: **Scalable to work on multiple platforms** [M] - 3 pts 
-  - As a user I want an app that would eventually be ported to multiple platforms so that I can use the
-
+- [x] Story 8: **Scalable to work on multiple platforms** [M] - 3 pts
 *Details for Story 8:*
 - We won’t actually be doing multiple platforms due to the lack of time.
 - The best way to accomplish this and cut development time is to use a 3 (or more) tier architecture that separates the front-end from the middleware and backend. 
@@ -87,17 +85,17 @@ On our application, there are several buttons the user should know about:
 
 #### Testing – 25 points
 - [ ] Tests with non-trivial testing-class coverage (all testable non-trivial methods tested, e.g., can exclude field getter/setter methods) (15 pts)
-- [ ] Local testing: All tests automated, tied into JUnit (run and show pass/fail) (5 pts)
-- [ ] Continuous Integration: All tests run on GitHub Actions (5 pts)
+- [x] Local testing: All tests automated, tied into JUnit (run and show pass/fail) (5 pts)
+- [x] Continuous Integration: All tests run on GitHub Actions (5 pts)
 
 
 #### Github Project – 9 points
 - [ ] User Stories started in priority order; iterations run in sequence (3 pts)
-- [ ] Tasks assigned to developers, all team members assigned tasks (3 pts)
-- [ ] Burndown chart looks good (steady progress, not all work at end) (3 pts)
+- [x] Tasks assigned to developers, all team members assigned tasks (3 pts)
+- [x] Burndown chart looks good (steady progress, not all work at end) (3 pts)
 
 #### GitHub - 10 points
-- [ ] Consistent use, all team members contributed (4 pts)
-- [ ] Each push labelled with its GitHub Project issue number (2 pts) 
-- [ ] Protected master branch (pull requests passed tests on GitHub Actions and passed code review) (2 pts)
-- [ ] Merged protected branch story-by-story (2 pts)
+- [x] Consistent use, all team members contributed (4 pts)
+- [x] Each push labelled with its GitHub Project issue number (2 pts) 
+- [] Protected master branch (pull requests passed tests on GitHub Actions and passed code review) (2 pts)
+- [] Merged protected branch story-by-story (2 pts)
