@@ -151,7 +151,7 @@ public class SayItAssistant {
         writeToFile(key_inBytes, innerShell);
     }
 
-    public Question obtainQuery(String questionQuery, Controller controller) throws IOException {
+    public Question obtainQuery(String questionQuery) throws IOException {
 
         String jsonStr = new String(Files.readAllBytes(queryDataBase.toPath()));
         JSONObject tempJSON = new JSONObject(jsonStr);
