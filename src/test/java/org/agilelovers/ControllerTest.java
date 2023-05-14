@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import org.agilelovers.backend.SayItAssistant;
+import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.MockController;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
@@ -40,7 +41,8 @@ class ControllerTest extends ApplicationTest {
         var fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
         Parent root = fxmlLoader.load();
-        controller = fxmlLoader.getController();
+        Controller.instance = fxmlLoader.getController();
+        controller = (MockController) Controller.instance;
         Scene scene = new Scene(root); //??
         stage.setScene(scene);
         stage.show();
@@ -118,9 +120,12 @@ class ControllerTest extends ApplicationTest {
 
     @Test
     void testRecordButton() {
+        clickOn("#clearAllButton");
         clickOn("#recordButton");
+        //sleep(500);
         Assertions.assertThat(lookup("#recordButton").queryButton().getText()).isEqualTo("Stop Recording");
         clickOn("#recordButton");
+        //sleep(500);
         Assertions.assertThat(lookup("#recordButton").queryButton().getText()).isEqualTo("New Question");
     }
 
