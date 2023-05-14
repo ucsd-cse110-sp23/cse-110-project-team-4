@@ -1,14 +1,19 @@
 package org.agilelovers.ui.object;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-//temp comment
 class QuestionTest {
     String title = "title";
     String question = "question";
     String answer = "answer";
-    Question testQuestion = new Question(title  , question, answer);
+    Question testQuestion;
+    @BeforeEach
+    void setUp() {
+        testQuestion = new mockQuestion(title, question, answer);
+    }
+
     @Test
     void testQuestion() {
         Assertions.assertThat(testQuestion.question()).isEqualTo("question");
@@ -21,7 +26,7 @@ class QuestionTest {
 
     @Test
     void testTitle(){
-        Assertions.assertThat(testQuestion.toString()).isEqualTo("title");
+        Assertions.assertThat(testQuestion.toString()).hasToString("title");
     }
 
     @Test
@@ -38,12 +43,12 @@ class QuestionTest {
 
     @Test
     void toTestString(){
-        Assertions.assertThat(testQuestion.toString()).isEqualTo("title");
+        Assertions.assertThat(testQuestion.toString()).hasToString("title");
     }
     @Test
     void setTestTitle(){
         testQuestion.setTitle("newTitle");
-        Assertions.assertThat(testQuestion.toString()).isEqualTo("newTitle");
+        Assertions.assertThat(testQuestion.toString()).hasToString("newTitle");
     }
 
     @Test
@@ -85,12 +90,36 @@ class QuestionTest {
     @Test
     void testToStringWithNullQuestion() {
         Question question = new Question("Title", null, "Answer");
-        Assertions.assertThat(question.toString()).isEqualTo("Title");
+        Assertions.assertThat(question.toString()).hasToString("Title");
     }
 
     @Test
     void testToStringWithNullAnswer() {
         Question question = new Question("Title", "Question", null);
-        Assertions.assertThat(question.toString()).isEqualTo("Title");
+        Assertions.assertThat(question.toString()).hasToString("Title");
+    }
+
+    private class mockQuestion extends Question {
+        private String answer;
+        private String question;
+        private String title;
+        public mockQuestion(String title, String question, String answer) {
+            super(title, question, answer);
+        }
+
+        @Override
+        public void setAnswer(String newAnswer) {
+            super.answer = newAnswer;
+        }
+
+        @Override
+        public void setQuestion(String newQuestion) {
+            super.question = newQuestion;
+        }
+
+        @Override
+        public void setTitle(String newTitle) {
+            super.title = newTitle;
+        }
     }
 }

@@ -3,9 +3,9 @@ package org.agilelovers.ui.object;
 import org.agilelovers.ui.Controller;
 
 public class Question {
-    private String question = "";
-    private String answer = "";
-    private String title = "";
+     String question = "";
+     String answer = "";
+     String title = "";
 
     public Question(String title, String question, String answer) {
         this.title = title;
