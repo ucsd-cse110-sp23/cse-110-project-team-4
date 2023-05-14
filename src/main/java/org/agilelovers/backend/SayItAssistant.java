@@ -1,8 +1,6 @@
 package org.agilelovers.backend;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import javafx.fxml.FXMLLoader;
-import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.object.Question;
 import org.json.JSONObject;
 
@@ -33,6 +31,15 @@ public class SayItAssistant {
     File audioFile;
     private AudioRecorder recorder;
 
+    /*
+     * writeToFile() is used to write a specified query and its answer to the database file.
+     *
+     * It reads the queryDataBase file and adds the query and its answer to the file.
+     * @param encodedKey the encoded key of the query
+     * @param jsonObject the JSONObject of the query and its answer
+     * @return void
+     * @throws IOException if the file is not found
+     */
     private void writeToFile(String encodedKey, JSONObject jsonObject)
             throws IOException {
 
@@ -89,6 +96,14 @@ public class SayItAssistant {
         }
     }
 
+    /*
+     * deleteFromFile() is used to delete a specified query from the database file.
+     *
+     * It reads the queryDataBase file and deletes the query that matches the questionQuery.
+     * @param questionQuery the question query to be deleted from the file
+     * @return void
+     * @throws IOException if the file is not found
+     */
     private void deleteFromFile(String questionQuery) throws IOException {
 
         synchronized (queryDataBase) {
@@ -130,12 +145,30 @@ public class SayItAssistant {
         }
     }
 
+    /*
+     * encodeQuery() takes in the query and encodes it into a string of bytes.
+     *
+     * @param query - the query that the user wants to obtain the answer
+     * @return String of bytes that represents the query
+     */
     private String encodeQuery(String query) {
         byte[] query_bytes = query.getBytes();
         byte[] query_bytesEncoded = Base64.getEncoder().encode(query_bytes);
         return new String(query_bytesEncoded);
     }
 
+    /*
+     * transcribeQueryIntoFile() takes in the title, question and answer of the query and writes it into the queryDataBase file.
+     *
+     * It encodes the questionQuery into a string of bytes and uses that as the key for the queryDataBase file.
+     * It then writes the title, question and answer into the queryDataBase file.
+     *
+     * @param title - the title of the query
+     * @param questionQuery - the query that the user wants to obtain the answer
+     * @param answerQuery - the answer to the query
+     * @return void
+     * @throws IOException if the file is not found
+     */
     private void transcribeQueryIntoFile(String title, String questionQuery,
                                          String answerQuery)
             throws IOException {
@@ -151,6 +184,15 @@ public class SayItAssistant {
         writeToFile(key_inBytes, innerShell);
     }
 
+    /*
+     * obtainQuery() returns a Question object that contains the title, question and answer of the query.
+     *
+     * It reads the queryDataBase file and returns the Question object that matches the query.
+     *
+     * @param questionQuery - the query that the user wants to obtain the answer
+     * @return Question object that contains the title, question and answer of the query
+     * @throws IOException if the file is not found
+     */
     public Question obtainQuery(String questionQuery) throws IOException {
 
         String jsonStr = new String(Files.readAllBytes(queryDataBase.toPath()));
@@ -168,6 +210,11 @@ public class SayItAssistant {
     }
 
 
+    /*
+     * SayItAssistant() is the constructor for the SayItAssistant class.
+     *
+     * It initializes the TOKEN, ORGANIZATION, audioFile, queryDataBase, and recorder.
+     */
     private SayItAssistant() {
         Dotenv dotenv = Dotenv.load();
         this.TOKEN = dotenv.get("OPENAI_API_KEY");
@@ -178,16 +225,22 @@ public class SayItAssistant {
         this.audioFile.deleteOnExit();
     }
 
+    /*
+     * startRecording() starts the recording of the user's voice.
+     *
+     * It creates a new thread to start the recording.
+     */
     public void startRecording() {
         new Thread(() -> recorder.start()).start();
     }
 
-    public void startRecording(AssistantCallback callback) {
-        callback.start();
-        startRecording();
-        callback.end();
-    }
-
+    /*
+     * endRecording() stops the recording and transcribes the audio into text.
+     *
+     * It grabs the question prompted by the Whisper recording and sends it to the OpenAI API to generate a response
+     * to the corresponding transcribed text.
+     * @return Question object with the question, answer, and title
+     */
     public Question endRecording() {
         Question ques = new Question();
 
@@ -226,10 +279,8 @@ public class SayItAssistant {
                 throw new RuntimeException(e);
             }
 
-            //String[] split_response = response.split(Pattern.quote("*"), 2);
-            String title = question;//split_response[0].replaceAll("\n", "");
-            String answerToQuestion = response;//split_response[1];
-            // bug here
+            String title = question;
+            String answerToQuestion = response;
 
             try {
                 assistant.transcribeQueryIntoFile(title, question,
@@ -242,17 +293,9 @@ public class SayItAssistant {
             System.out.println(title);
             ques.setAnswer(answerToQuestion);
             ques.setTitle(title);
-
         });
 
         thread.start();
         return ques;
-    }
-
-    public Question endRecording(AssistantCallback callback) {
-        callback.start();
-        Question result = endRecording();
-        callback.end();
-        return result;
     }
 }
