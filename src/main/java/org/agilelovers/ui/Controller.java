@@ -12,6 +12,8 @@ import javafx.scene.control.TextArea;
 import org.agilelovers.backend.SayItAssistant;
 import org.agilelovers.ui.object.Question;
 
+import java.io.IOException;
+
 /**
  * Controller class for the UI.
  * This class is responsible for handling user input and updating the UI accordingly. It also handles the interaction
@@ -38,8 +40,14 @@ public class Controller {
     TextArea answerTextArea;
 
     @FXML
-    private void initialize() {
+    private void initialize() throws IOException {
+        System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
+        pastQuestions.addAll(SayItAssistant.assistant.getDatabaseQuestions());
+        for (Question question : pastQuestions) {
+            System.out.println(question);
+        }
+        initHistoryList();
     }
 
     /**
@@ -137,13 +145,16 @@ public class Controller {
      * Removes all questions from the history list.
      *
      * If no questions are in the list, nothing will happen.
-     * TODO: implement this
      *
      * @param event event triggered by the "clear all" button click
      */
-    public void clearAll(ActionEvent event) {
+    public void clearAll(ActionEvent event) throws IOException {
         System.out.println("Clear All");
+        for (Question pastQuestion : this.pastQuestions) {
+            SayItAssistant.assistant.deleteDatabaseQuestion(pastQuestion);
+        }
         this.pastQuestions.clear();
+        this.historyList.getSelectionModel().select(null);
     }
 
     /**
@@ -155,9 +166,12 @@ public class Controller {
      *
      * @param event event triggered by the "delete" button click
      */
-    public void deleteQuestion(ActionEvent event) {
+    public void deleteQuestion(ActionEvent event) throws IOException {
         System.out.println("Delete Question");
         if (!this.pastQuestions.isEmpty()) {
+            SayItAssistant.assistant.deleteDatabaseQuestion(this.pastQuestions.get(
+                    this.historyList.getFocusModel().getFocusedIndex())
+            );
             this.pastQuestions.remove(this.historyList.getFocusModel().getFocusedIndex());
             this.historyList.getSelectionModel().select(null);
             System.out.println("Successfully deleted question");
