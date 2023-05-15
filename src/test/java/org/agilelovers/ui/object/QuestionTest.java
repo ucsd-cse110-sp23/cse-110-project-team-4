@@ -1,49 +1,78 @@
 package org.agilelovers.ui.object;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import org.agilelovers.ui.Controller;
+import org.agilelovers.ui.MockController;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testfx.framework.junit5.ApplicationTest;
 
-//temp comment
-class QuestionTest {
+import java.io.IOException;
+
+class QuestionTest extends ApplicationTest {
+    MockController controller;
     String title = "title";
     String question = "question";
     String answer = "answer";
-    Question testQuestion = new Question(title  , question, answer);
+    Question testQuestion;
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        var fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
+        Parent root = fxmlLoader.load();
+        Controller.instance = fxmlLoader.getController();
+        this.controller = (MockController) Controller.instance;
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        System.out.println("start() called and finished");
+    }
+
+    @BeforeEach
+    void setUp() {
+        testQuestion = new Question(title, question, answer);
+    }
+
     @Test
     void testQuestion() {
         Assertions.assertThat(testQuestion.question()).isEqualTo("question");
     }
 
     @Test
-    void testAnswer(){
+    void testAnswer() {
         Assertions.assertThat(testQuestion.answer()).isEqualTo("answer");
     }
 
     @Test
-    void testTitle(){
-        Assertions.assertThat(testQuestion.toString()).isEqualTo("title");
+    void testTitle() {
+        Assertions.assertThat(testQuestion.toString()).hasToString("title");
     }
 
     @Test
-    void setTestAnswer(){
+    void setTestAnswer() {
         testQuestion.setAnswer("newAnswer");
         Assertions.assertThat(testQuestion.answer()).isEqualTo("newAnswer");
     }
 
     @Test
-    void setTestQuestion(){
+    void setTestQuestion() {
         testQuestion.setQuestion("newQuestion");
         Assertions.assertThat(testQuestion.question()).isEqualTo("newQuestion");
     }
 
     @Test
-    void toTestString(){
-        Assertions.assertThat(testQuestion.toString()).isEqualTo("title");
+    void toTestString() {
+        Assertions.assertThat(testQuestion.toString()).hasToString("title");
     }
+
     @Test
-    void setTestTitle(){
+    void setTestTitle() {
         testQuestion.setTitle("newTitle");
-        Assertions.assertThat(testQuestion.toString()).isEqualTo("newTitle");
+        Assertions.assertThat(testQuestion.toString()).hasToString("newTitle");
     }
 
     @Test
@@ -85,12 +114,12 @@ class QuestionTest {
     @Test
     void testToStringWithNullQuestion() {
         Question question = new Question("Title", null, "Answer");
-        Assertions.assertThat(question.toString()).isEqualTo("Title");
+        Assertions.assertThat(question.toString()).hasToString("Title");
     }
 
     @Test
     void testToStringWithNullAnswer() {
         Question question = new Question("Title", "Question", null);
-        Assertions.assertThat(question.toString()).isEqualTo("Title");
+        Assertions.assertThat(question.toString()).hasToString("Title");
     }
 }
