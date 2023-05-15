@@ -49,7 +49,7 @@ On our application, there are several buttons the user should know about:
 #### Software design – 10 points
 - [x] tidy code (indented, consistent naming, file-/method-level comments as needed) (1 pts)
 - [x] classes other than Activities (2 pts)
-- [ ] wide use of SRP and DRY (5 pts)
+- [] wide use of SRP and DRY (5 pts) 
 - [x] code sounds like the requirements (2 pts)
 
 #### Demo: satisfaction of all milestone requirements – 35 points [priority] - points:
@@ -63,7 +63,7 @@ On our application, there are several buttons the user should know about:
 - [x] Story 3: **Browse question prompt history** [H] - 5 pts 
   - As a user I want to be able to view a list of past questions so that I can see what questions I already asked
 
-- [] Story 4: **Persistence of old prompts and answers** [M] - 2 pts 
+- [x] Story 4: **Persistence of old prompts and answers** [M] - 2 pts 
   - As a user I want older questions and answers to still be available after the program is killed and restarted so that I can find the information and topics again
 
 - [x] Story 5: **Read old question prompt and answer** [H] - 5 pts 
@@ -97,5 +97,5 @@ On our application, there are several buttons the user should know about:
 #### GitHub - 10 points
 - [x] Consistent use, all team members contributed (4 pts)
 - [x] Each push labelled with its GitHub Project issue number (2 pts) 
-- [] Protected master branch (pull requests passed tests on GitHub Actions and passed code review) (2 pts)
-- [] Merged protected branch story-by-story (2 pts)
+- [x] Protected master branch (pull requests passed tests on GitHub Actions and passed code review) (2 pts)
+- [x] Merged protected branch story-by-story (2 pts)
