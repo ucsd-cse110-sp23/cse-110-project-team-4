@@ -30,19 +30,15 @@ class SayItAssistantTest {
             ".com/v1/completions", "text-davinci-003");
     private final String TOKEN = "sk_test_123";
     private final String ORGANIZATION = "org_123";
-
-    private SayItAssistant assistant; //non mock object
     private File file;
-    private String question;
-    private String answer;
-
 
     @BeforeEach
     void setUp() throws IOException {
         //mocks startRecording method
         mock = mock(SayItAssistant.class);
         queryDatabase = new MockDatabase();
-        assistant = SayItAssistant.assistant;
+        //non mock object
+        SayItAssistant assistant = SayItAssistant.assistant;
         file = new File("assets/recording.wav");
         mock.audioFile = file;
     }
@@ -118,25 +114,35 @@ class SayItAssistantTest {
     }
 
     @Test
-    void testGetMockTextFromAudio() throws IOException {
-        question = TestWhisper.getTextFromAudio(WHISPER, TOKEN, ORGANIZATION, file);
+    void testGetMockTextFromAudio() {
+        String question = TestWhisper.getTextFromAudio(WHISPER, TOKEN, ORGANIZATION, file);
         Assertions.assertThat(question).isEqualTo("Who's in the CSE 110 Spring 2023 Team 4?");
     }
 
     @Test //mock test because we need to request from  openai to generate a response
-    void testGetAnswer() throws IOException, InterruptedException {
+    void testGetAnswer() {
         String prompt = TestWhisper.getTextFromAudio(WHISPER, TOKEN, ORGANIZATION, file);
-        answer = TestChatGPT.getAnswer(CHATGPT, TOKEN, ORGANIZATION, prompt);
+        String answer = TestChatGPT.getAnswer(CHATGPT, TOKEN, ORGANIZATION, prompt);
         Assertions.assertThat(answer).isEqualTo("The team members are: Billy, Lilian, Louie, Anish, Shera, and Nicholas.");
     }
 
 
+    /*
+     * TestWhisper class
+     *
+     * This class is implemented to help test the WhisperAPIHelper class by mocking the getTextFromAudio(...) method.
+     */
     static class TestWhisper extends WhisperAPIHelper{
         public static String getTextFromAudio(APIData data, String token, String organization, File file) {
             return "Who's in the CSE 110 Spring 2023 Team 4?";
         }
     }
 
+    /*
+     * TestChatGPT class
+     *
+     * This class is implemented to help test the ChatGPTHelper clas by mocking the getAnswer(...) method.
+     */
     static class TestChatGPT extends ChatGPTHelper {
         public static String getAnswer(APIData data, String token, String organization, String prompt) {
             return "The team members are: Billy, Lilian, Louie, Anish, Shera, and Nicholas.";
