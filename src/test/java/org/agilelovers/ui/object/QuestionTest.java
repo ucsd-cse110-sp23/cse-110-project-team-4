@@ -1,8 +1,6 @@
 package org.agilelovers.ui.object;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.MockController;
@@ -24,11 +22,9 @@ class QuestionTest extends ApplicationTest {
     public void start(Stage stage) throws IOException {
         var fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
-        Parent root = fxmlLoader.load();
+        //Parent root = fxmlLoader.load();
         Controller.instance = fxmlLoader.getController();
         this.controller = (MockController) Controller.instance;
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
         System.out.println("start() called and finished");
     }
 
