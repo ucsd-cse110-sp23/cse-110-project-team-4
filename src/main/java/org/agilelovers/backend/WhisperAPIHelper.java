@@ -7,7 +7,19 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * WhisperAPI helper class to get transcribed test from Whisper API (used by SayItAssistant)
+ */
 public class WhisperAPIHelper {
+    /**
+     * Writes parameter to the output stream in multipart form data format.
+     *
+     * @param outputStream output stream to write to
+     * @param parameterName name of the parameter
+     * @param parameterValue value of the parameter
+     * @param boundary boundary to separate the parameters
+     * @throws IOException if any I/O error occurs
+     */
     private static void writeParameterToOutputStream(
             OutputStream outputStream,
             String parameterName,
@@ -22,6 +34,14 @@ public class WhisperAPIHelper {
         outputStream.write((parameterValue + "\r\n").getBytes());
     }
 
+    /**
+     * Writes file to the output stream in multipart form data format.
+     *
+     * @param outputStream output stream to write to
+     * @param file file to write
+     * @param boundary boundary to separate the parameters
+     * @throws IOException if any I/O error occurs
+     */
     private static void writeFileToOutputStream(
             OutputStream outputStream,
             File file,
@@ -43,6 +63,15 @@ public class WhisperAPIHelper {
         fileInputStream.close();
     }
 
+    /**
+     * Handles a successful response from the connection's input stream and builds a string that contains
+     * the response data
+     *
+     * @param connection connection to get the input stream from
+     * @return String containing the response data
+     * @throws IOException if any I/O error occurs
+     * @throws JSONException if any JSON error occurs
+     */
     private static String handleSuccessResponse(HttpURLConnection connection)
             throws IOException, JSONException {
         BufferedReader in = new BufferedReader(
@@ -60,6 +89,13 @@ public class WhisperAPIHelper {
         return responseJson.getString("text");
     }
 
+    /**
+     * Handles an error response from the connection's error stream and prints the error response
+     *
+     * @param connection connection to get the input stream from
+     * @throws IOException if any I/O error occurs
+     * @throws JSONException if any JSON error occurs
+     */
     private static void handleErrorResponse(HttpURLConnection connection)
             throws IOException, JSONException {
         BufferedReader errorReader = new BufferedReader(
@@ -78,6 +114,17 @@ public class WhisperAPIHelper {
         System.err.println("Error Result: " + errorResult);
     }
 
+    /**
+     * Gets text from audio.
+     * Uses the Whisper API to convert the given audio file to text
+     *
+     * @param WHISPER      API data for Whisper API
+     * @param token        token to make API request
+     * @param organization the organization
+     * @param file         the file containing audio to be transcribed
+     * @return String containing the text transcribed from given file
+     * @throws IOException if any I/O error occurs
+     */
     public static String getTextFromAudio(APIData WHISPER, String token,
                                    String organization, File file) throws IOException {
         URL url = new URL(WHISPER.endpoint());

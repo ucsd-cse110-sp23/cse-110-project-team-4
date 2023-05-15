@@ -9,7 +9,21 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * ChatGPT helper class to get answer from GPT-3.5 (used by SayItAssistant)
+ */
 public class ChatGPTHelper {
+    /**
+     * Gets answer from GPT-3.5
+     *
+     * @param CHATGPT      API data to access GPT-3.5
+     * @param token        token to make API request
+     * @param organization the organization
+     * @param question     question to be answered
+     * @return answer to provided question
+     * @throws IOException          if any I/O error occurs
+     * @throws InterruptedException if the operation is interrupted
+     */
     public static String getAnswer(APIData CHATGPT, String token,
                                    String organization, String question)
             throws IOException, InterruptedException {

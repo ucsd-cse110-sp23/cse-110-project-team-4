@@ -1,36 +1,17 @@
 package org.agilelovers.ui.object;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.agilelovers.ui.Controller;
-import org.agilelovers.ui.MockController;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
 
-import java.io.IOException;
-
-class QuestionTest extends ApplicationTest {
-    MockController controller;
+class QuestionTest {
+    Controller controller;
     String title = "title";
     String question = "question";
     String answer = "answer";
     Question testQuestion;
 
-    @Override
-    public void start(Stage stage) throws IOException {
-        var fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
-        Parent root = fxmlLoader.load();
-        Controller.instance = fxmlLoader.getController();
-        this.controller = (MockController) Controller.instance;
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        System.out.println("start() called and finished");
-    }
 
     @BeforeEach
     void setUp() {

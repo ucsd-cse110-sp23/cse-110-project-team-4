@@ -10,21 +10,28 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Specifies behavior and methods to access and modify the database storing queries and answers.
+ * Mock Database for testing purposes because querying during tests would be an expensive use of our tokens, so we will
+ * be using pre-written queries and answers
+ *
+ * The implementations of methods are the same, so testing should be the same as if we were using the actual database
  */
-public class Database {
+public class MockDatabase {
     /**
      * File where the queries and answers are stored
      */
-    private final File queryDatabase;
+    private static File queryDatabase;
 
     /**
-     * Initializes the database file.
+     * Initializes the mock database file with mock data (3 queries and answers).
      *
-     * @param queryDatabase file where the queries and answers are stored
+     * @throws IOException if file is not found
      */
-    public Database(File queryDatabase) {
-        this.queryDatabase = queryDatabase;
+    public MockDatabase() throws IOException {
+        queryDatabase = new File("MockDatabase.JSON");
+        //write mock data to file
+        transcribeQueryIntoFile("title1", "question1", "answer1");
+        transcribeQueryIntoFile("title2", "question2", "answer2");
+        transcribeQueryIntoFile("title3", "question3", "answer3");
     }
 
     /**
@@ -73,7 +80,6 @@ public class Database {
 
                     }
                 } catch (IOException e) { e.printStackTrace();}
-
             }
 
             // Update or add new key-value pair to JSONObject
@@ -221,7 +227,7 @@ public class Database {
      *
      * @return list of questions from the database file
      */
-    public List<Question> obtainQuestions() {
+    public static List<Question> obtainQuestions() {
         List<Question> questions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(queryDatabase))) {
             String line;

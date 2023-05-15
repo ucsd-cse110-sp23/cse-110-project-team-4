@@ -8,29 +8,60 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Stores the API data for use in SayItAssistant class.
+ * The first string contains the API endpoint, specific location in API to access/manipulate resources
+ * The second string contains the specific model name
+ */
 record APIData(String endpoint, String model) {
 }
 
+/**
+ * SayIt Assistant handles all the API requests and responses.
+ */
 public class SayItAssistant {
+    /**
+     * The constant assistant.
+     */
     public static SayItAssistant assistant = new SayItAssistant();
 
-    // reference variable to the list view
-
+    /**
+     * API data for Whisper, for use within the SayItAssistant class
+     */
     private static final APIData WHISPER = new APIData("https://api.openai" +
             ".com/v1/audio/transcriptions", "whisper-1");
 
+    /**
+     * API data for GPT-3.5, for use within the SayItAssistant class
+     */
     private static final APIData CHATGPT = new APIData("https://api.openai" +
             ".com/v1/completions", "text-davinci-003");
+    /**
+     * API key used to make API requests
+     */
+
     private final String TOKEN;
+    /**
+     * organization ID used to make API requests
+     */
     private final String ORGANIZATION;
+    /**
+     * stores the database of queries (questions) and answers
+     */
     private Database queryDatabase;
+    /**
+     * audio file to be transcribed by Whisper API
+     */
     File audioFile;
+    /**
+     * AudioRecorder object to record audio to be sent to Whisper API
+     */
     private AudioRecorder recorder;
 
-    /*
-     * SayItAssistant() is the constructor for the SayItAssistant class.
+    /**
+     * Constructor for the SayItAssistant class.
      *
-     * It initializes the TOKEN, ORGANIZATION, audioFile, queryDataBase, and recorder.
+     * Initializes the TOKEN, ORGANIZATION, audioFile, queryDataBase, and recorder.
      */
     private SayItAssistant() {
         Dotenv dotenv = Dotenv.load();
@@ -42,20 +73,21 @@ public class SayItAssistant {
         this.audioFile.deleteOnExit();
     }
 
-    /*
-     * startRecording() starts the recording of the user's voice.
+    /**
+     * Starts the recording of the user's voice.
      *
-     * It creates a new thread to start the recording.
+     * Creates a new thread to start the recording.
      */
     public void startRecording() {
         new Thread(() -> recorder.start()).start();
     }
 
-    /*
-     * endRecording() stops the recording and transcribes the audio into text.
+    /**
+     * Stops the recording and transcribes the audio into text.
      *
-     * It grabs the question prompted by the Whisper recording and sends it to the OpenAI API to generate a response
-     * to the corresponding transcribed text.
+     * Ends the recording to send to Whisper API, then sends the question transcribed by the Whisper recording
+     * and sends it to the OpenAI API to generate a response.
+     *
      * @return Question object with the question, answer, and title
      */
     public Question endRecording() {
@@ -70,8 +102,10 @@ public class SayItAssistant {
             String temp = "";
             char upper = 0;
             try {
+                // set everything to lowercase and capitalize first letter
                 question =
                         Objects.requireNonNull(
+                                // get transcription of audio file
                                 WhisperAPIHelper.getTextFromAudio(WHISPER,
                                         TOKEN, ORGANIZATION, audioFile)).toLowerCase();
                 for (String s : question.split("")) {
@@ -89,6 +123,7 @@ public class SayItAssistant {
             String prompt = question;
             String response = null;
 
+            // get response from GPT-3.5
             try {
                 response = ChatGPTHelper.getAnswer(CHATGPT, TOKEN,
                         ORGANIZATION, prompt);
@@ -99,6 +134,7 @@ public class SayItAssistant {
             String title = question;
             String answerToQuestion = response;
 
+            // store question and answer in database
             try {
                 assistant.queryDatabase.transcribeQueryIntoFile(title, question,
                         answerToQuestion);
@@ -116,16 +152,22 @@ public class SayItAssistant {
         return ques;
     }
 
-    /*
-     * getQueryDatabase() returns the queryDatabase list of Question objects.
+    /**
+     * Gets stored questions
      *
-     * @return Database object
+     * @return list of questions currently in the database
      */
-    public List<Question> getDatabaseQuestions() throws IOException {
+    public List<Question> getDatabaseQuestions() {
         System.out.println("Getting database questions");
         return queryDatabase.obtainQuestions();
     }
 
+    /**
+     * Deletes database question.
+     *
+     * @param question the question to be deleted
+     * @throws IOException if the file is not found/cannot be opened
+     */
     public void deleteDatabaseQuestion(Question question) throws IOException {
         queryDatabase.deleteQueryFromFile(question.question());
     }

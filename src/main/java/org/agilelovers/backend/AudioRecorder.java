@@ -3,15 +3,33 @@ package org.agilelovers.backend;
 import java.io.*;
 import javax.sound.sampled.*;
 
+/**
+ * The type Audio recorder.
+ */
 public class AudioRecorder {
 
+    /**
+     * TargetDataLine used to capture audio data from the microphone
+     */
     private TargetDataLine targetDataLine;
+    /**
+     * Audio file to be recorded to
+     */
     private File audioFile;
 
+    /**
+     * Instantiates a new Audio recorder.
+     *
+     * @param audioFile audio file to be recorded to
+     */
     public AudioRecorder(File audioFile) {
         this.audioFile = audioFile;
     }
 
+    /**
+     * Specifies the audio format used for the audio data
+     * @return AudioFormat with specified format
+     */
     private AudioFormat getAudioFormat() {
         // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -40,6 +58,9 @@ public class AudioRecorder {
         );
     }
 
+    /**
+     * Starts recording audio to the specified audio file
+     */
     public void start() {
         try {
             AudioFormat audioFormat = getAudioFormat();
@@ -67,6 +88,9 @@ public class AudioRecorder {
         }
     }
 
+    /**
+     * Stops and closes the TargetDataLine to end the recording
+     */
     public void stop() {
         targetDataLine.stop();
         targetDataLine.close();
