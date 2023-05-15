@@ -24,17 +24,17 @@ public class Question {
     }
 
     public void setAnswer(String newAnswer) {
-        Controller.instance.refreshLabels();
+        if (Controller.instance != null) { Controller.instance.refreshLabels(); }
         this.answer = newAnswer;
     }
 
     public void setQuestion(String newQuestion) {
-        Controller.instance.refreshLabels();
+        if (Controller.instance != null) { Controller.instance.refreshLabels(); }
         this.question = newQuestion;
     }
 
     public void setTitle(String newTitle) {
-        Controller.instance.getHistoryList().refresh();
+        if (Controller.instance != null) { Controller.instance.getHistoryList().refresh(); }
         this.title = newTitle;
     }
 
