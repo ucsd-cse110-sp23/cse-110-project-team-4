@@ -121,7 +121,7 @@ public class SayItAssistant {
      *
      * @return Database object
      */
-    public List<Question> getDatabaseQuestions() throws IOException {
+    public List<Question> getDatabaseQuestions() {
         System.out.println("Getting database questions");
         return queryDatabase.obtainQuestions();
     }
