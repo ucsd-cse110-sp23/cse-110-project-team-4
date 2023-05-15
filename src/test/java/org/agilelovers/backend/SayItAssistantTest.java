@@ -42,8 +42,6 @@ class SayItAssistantTest {
         //mocks startRecording method
         mock = mock(SayItAssistant.class);
         queryDatabase = new MockDatabase();
-
-
         assistant = SayItAssistant.assistant;
         file = new File("assets/recording.wav");
         mock.audioFile = file;
@@ -90,7 +88,31 @@ class SayItAssistantTest {
 
         queryDatabase.deleteQueryFromFile("question1");
         List<Question> actualQuestions = queryDatabase.obtainQuestions();
+        Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size()-1);
+        Assertions.assertThat(actualQuestions.get(0).toString()).hasToString(expectedQuestions.get(0).toString());
+        Assertions.assertThat(actualQuestions.get(1).toString()).hasToString(expectedQuestions.get(1).toString());
+    }
+
+    /*
+     * sbst6: review previously asked question, delete it, ask it again, and check if it is deleted
+     */
+    @Test
+    void sbst6() throws IOException {
+        List<Question> expectedQuestions = new ArrayList<>();
+        expectedQuestions.add(new Question("title2", "question2", "answer2"));
+        expectedQuestions.add(new Question("title3", "question3", "answer3"));
+        expectedQuestions.add(new Question("title1", "question1", "answer1"));
+
+        List<Question> actualQuestions = queryDatabase.obtainQuestions();
         Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size());
+        Assertions.assertThat(actualQuestions.get(0).toString()).hasToString(expectedQuestions.get(0).toString());
+        Assertions.assertThat(actualQuestions.get(1).toString()).hasToString(expectedQuestions.get(1).toString());
+        Assertions.assertThat(actualQuestions.get(2).toString()).hasToString(expectedQuestions.get(2).toString());
+
+        queryDatabase.deleteQueryFromFile("question1");
+
+        actualQuestions = queryDatabase.obtainQuestions();
+        Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size()-1);
         Assertions.assertThat(actualQuestions.get(0).toString()).hasToString(expectedQuestions.get(0).toString());
         Assertions.assertThat(actualQuestions.get(1).toString()).hasToString(expectedQuestions.get(1).toString());
     }

@@ -19,7 +19,7 @@ public class MockDatabase {
     /**
      * File where the queries and answers are stored
      */
-    private final File queryDatabase;
+    private static File queryDatabase;
 
     /**
      * Initializes the mock database file with mock data (3 queries and answers).
@@ -27,12 +27,11 @@ public class MockDatabase {
      * @throws IOException if file is not found
      */
     public MockDatabase() throws IOException {
-        this.queryDatabase = new File("MockDatabase.JSON");
+        queryDatabase = new File("MockDatabase.JSON");
         //write mock data to file
-        transcribeQueryIntoFile("title1", "answer1", "question1");
-        transcribeQueryIntoFile("title2", "answer2", "question2");
-        transcribeQueryIntoFile("title3", "answer3", "question3");
-
+        transcribeQueryIntoFile("title1", "question1", "answer1");
+        transcribeQueryIntoFile("title2", "question2", "answer2");
+        transcribeQueryIntoFile("title3", "question3", "answer3");
     }
 
     /**
@@ -228,7 +227,7 @@ public class MockDatabase {
      *
      * @return list of questions from the database file
      */
-    public List<Question> obtainQuestions() {
+    public static List<Question> obtainQuestions() {
         List<Question> questions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(queryDatabase))) {
             String line;

@@ -5,8 +5,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import org.agilelovers.backend.MockDatabase;
 import org.agilelovers.backend.SayItAssistant;
-import org.agilelovers.ui.Controller;
 import org.agilelovers.ui.MockController;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.testfx.api.FxAssert.verifyThat;
@@ -33,16 +34,20 @@ class ControllerTest extends ApplicationTest {
     private String answer1 = "answer1";
     private String answer2 = "answer2";
 
+    private MockDatabase mockDatabase;
+    private List<Question> questions;
     private Question testQuestion1;
     private Question testQuestion2;
 
     @Override
     public void start(Stage stage) throws IOException {
+        mockDatabase = new MockDatabase();
         var fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
         Parent root = fxmlLoader.load();
-        Controller.instance = fxmlLoader.getController();
-        controller = (MockController) Controller.instance;
+        //Controller.instance = fxmlLoader.getController();
+        //controller = (MockController) Controller.instance;
+        controller = fxmlLoader.getController();
         Scene scene = new Scene(root); //??
         stage.setScene(scene);
         stage.show();
@@ -52,14 +57,18 @@ class ControllerTest extends ApplicationTest {
     @BeforeEach
     void setup() throws IOException {
         assistant = mock(SayItAssistant.class);
+        questions = mockDatabase.obtainQuestions();
+        System.out.println("setup() called and finished");
+    }
 
+    private void addQuestions() {
         testQuestion1 = new Question(title1, question1, answer1);
         testQuestion2 = new Question(title2, question2, answer2);
-
         controller.addQuestion(testQuestion1);
+        questions.add(testQuestion1);
         controller.addQuestion(testQuestion2);
+        questions.add(testQuestion2);
         controller.initHistoryList();
-        System.out.println("setup() called and finished");
     }
 
     @Test
@@ -84,11 +93,12 @@ class ControllerTest extends ApplicationTest {
 
     @Test
     void testDeleteQuestion() {
-        clickOn("#historyList").clickOn(testQuestion2.toString());
+        clickOn("#historyList").clickOn("title2");
         clickOn("#deleteButton");
         //sleep(1000);
-        Assertions.assertThat(controller.getHistoryList().getItems()).containsExactly(testQuestion1);
-        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(1);
+        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(2);
+        Assertions.assertThat(controller.getHistoryList().getItems().get(0).toString()).isEqualTo("title3");
+        Assertions.assertThat(controller.getHistoryList().getItems().get(1).toString()).isEqualTo("title1");
     }
 
     @Test
@@ -131,21 +141,27 @@ class ControllerTest extends ApplicationTest {
     }
 
     //clicking on an existing question shouldn't change anything
+    //covers sbst5
     @Test
     void testClickingOnExistingQuestion() {
-        clickOn("#historyList").clickOn(testQuestion1.toString());
+        //clickOn("#clearAllButton");
+        clickOn("#historyList").clickOn("title2");
         controller.refreshLabels();
-        clickOn("#historyList").clickOn(testQuestion2.toString());
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question2");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer2");
+        clickOn("#historyList").clickOn("title1");
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question1");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer1");
         controller.refreshLabels();
-        clickOn("#historyList").clickOn(testQuestion2.toString());
+        clickOn("#historyList").clickOn("title3");
         controller.refreshLabels();
-        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo(testQuestion2.question());
-        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo(testQuestion2.answer());
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question3");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer3");
     }
 
     @Test
     void testDeleteCurrentDisplayedQuestion() {
-        clickOn("#historyList").clickOn(testQuestion1.toString());
+        clickOn("#historyList").clickOn("title1");
         controller.refreshLabels();
         clickOn("#deleteButton");
         controller.refreshLabels();
@@ -205,5 +221,29 @@ class ControllerTest extends ApplicationTest {
         clickOn("#clearAllButton");
         controller.refreshLabels();
         Assertions.assertThat(controller.getHistoryList().getItems()).isEmpty();
+    }
+
+    //second SBST6 test
+    @Test
+    void testSBST6() {
+        ListView<Question> historyList = lookup("#historyList").query();
+        clickOn("#historyList").clickOn("title1");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question1");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer1");
+        clickOn("#deleteButton");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("");
+        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(2);
+        clickOn("#recordButton");
+        controller.refreshLabels();
+        clickOn("#recordButton");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(3);
+        clickOn("#historyList").clickOn("title");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer");
     }
 }

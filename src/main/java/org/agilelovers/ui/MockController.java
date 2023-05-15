@@ -1,6 +1,9 @@
 package org.agilelovers.ui;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import org.agilelovers.backend.MockDatabase;
 import org.agilelovers.ui.object.Question;
 
 /**
@@ -14,7 +17,7 @@ public class MockController extends Controller {
     public boolean getAnswer = false;
 
     public void addQuestion(Question question) {
-        this.pastQuestions.add(question);
+        Platform.runLater(() -> this.pastQuestions.add(question));
     }
 
     @Override
@@ -26,6 +29,7 @@ public class MockController extends Controller {
             currentQuestion.setTitle("title");
             this.pastQuestions.remove(this.pastQuestions.size() - 1);
             currentQuestion.setQuestion("question");
+            currentQuestion.setAnswer("answer");
             this.pastQuestions.add(currentQuestion);
             this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
             // change back to new question
@@ -40,5 +44,16 @@ public class MockController extends Controller {
             this.clearAllButton.setDisable(true);
         }
         this.isRecording = !this.isRecording;
+    }
+
+    @FXML
+    void initialize() {
+        System.out.println("Initializing Controller");
+        answerTextArea.setEditable(false);
+        pastQuestions.addAll(MockDatabase.obtainQuestions());
+        for (Question question : pastQuestions) {
+            System.out.println(question);
+        }
+        initHistoryList();
     }
 }
