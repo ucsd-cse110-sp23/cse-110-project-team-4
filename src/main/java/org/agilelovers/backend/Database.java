@@ -9,21 +9,32 @@ import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Specifies behavior and methods to access and modify the database storing queries and answers.
+ */
 public class Database {
+    /**
+     * File where the queries and answers are stored
+     */
     private final File queryDatabase;
 
+    /**
+     * Initializes the database file.
+     *
+     * @param queryDatabase file where the queries and answers are stored
+     */
     public Database(File queryDatabase) {
         this.queryDatabase = queryDatabase;
     }
 
-    /*
-     * writeToFile() is used to write a specified query and its answer to the database file.
+    /**
+     * Writes a specified query and its answer to the database file.
      *
-     * It reads the queryDatabase file and adds the query and its answer to the file.
+     * Reads the queryDatabase file and adds the query and its answer to the file.
      * @param encodedKey the encoded key of the query
      * @param jsonObject the JSONObject of the query and its answer
-     * @return void
-     * @throws IOException if the file is not found
+     *
+     * @throws IOException if the file is not found/cannot be opened
      */
     private void writeToFile(String encodedKey, JSONObject jsonObject)
             throws IOException {
@@ -61,7 +72,8 @@ public class Database {
                         }
 
                     }
-                }
+                } catch (IOException e) { e.printStackTrace();}
+
             }
 
             // Update or add new key-value pair to JSONObject
@@ -77,17 +89,17 @@ public class Database {
                     writer.write(currLine.toString());
                     writer.newLine();
                 }
-            }
+            } catch (IOException e) { e.printStackTrace();}
         }
     }
 
-    /*
-     * deleteFromFile() is used to delete a specified query from the database file.
+    /**
+     * Deletes a specified query from the database file.
      *
      * It reads the queryDatabase file and deletes the query that matches the questionQuery.
      * @param questionQuery the question query to be deleted from the file
-     * @return void
-     * @throws IOException if the file is not found
+     *
+     * @throws IOException if the file is not found/cannot be opened
      */
     private void deleteFromFile(String questionQuery) throws IOException {
         synchronized (queryDatabase) {
@@ -108,7 +120,7 @@ public class Database {
                         }
 
                     }
-                }
+                } catch (IOException e) { e.printStackTrace();}
             }
 
             String encodedKey = encodeQuery(questionQuery);
@@ -125,14 +137,14 @@ public class Database {
                     writer.write(currLine.toString());
                     writer.newLine();
                 }
-            }
+            } catch (IOException e) { e.printStackTrace();}
         }
     }
 
-    /*
-     * encodeQuery() takes in the query and encodes it into a string of bytes.
+    /**
+     * Takes in the query and encodes it into a string of bytes.
      *
-     * @param query - the query that the user wants to obtain the answer
+     * @param query the query that the user wants to obtain the answer
      * @return String of bytes that represents the query
      */
     private String encodeQuery(String query) {
@@ -141,16 +153,16 @@ public class Database {
         return new String(query_bytesEncoded);
     }
 
-    /*
-     * transcribeQueryIntoFile() takes in the title, question and answer of the query and writes it into the queryDatabase file.
+    /**
+     * Takes in the title, question and answer of the query and writes it into the queryDatabase file.
      *
-     * It encodes the questionQuery into a string of bytes and uses that as the key for the queryDatabase file.
-     * It then writes the title, question and answer into the queryDatabase file.
+     * Encodes the questionQuery into a string of bytes and uses that as the key for the queryDatabase file.
+     * Then writes the title, question and answer into the queryDatabase file.
      *
-     * @param title - the title of the query
-     * @param questionQuery - the query that the user wants to obtain the answer
-     * @param answerQuery - the answer to the query
-     * @return void
+     * @param title the title of the query
+     * @param questionQuery the query that the user wants to obtain the answer
+     * @param answerQuery the answer to the query
+     *
      * @throws IOException if the file is not found
      */
     void transcribeQueryIntoFile(String title, String questionQuery,
@@ -168,6 +180,12 @@ public class Database {
         writeToFile(key_inBytes, innerShell);
     }
 
+    /**
+     * Delete query from file.
+     *
+     * @param questionQuery the query that the user wants to delete
+     * @throws IOException if the file is not found/cannot be opened
+     */
     void deleteQueryFromFile(String questionQuery) throws IOException {
         deleteFromFile(questionQuery);
     }
@@ -198,6 +216,11 @@ public class Database {
     }
     */
 
+    /**
+     * Obtain questions list.
+     *
+     * @return list of questions from the database file
+     */
     public List<Question> obtainQuestions() {
         List<Question> questions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(queryDatabase))) {

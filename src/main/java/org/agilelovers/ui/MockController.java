@@ -3,7 +3,7 @@ package org.agilelovers.ui;
 import javafx.event.ActionEvent;
 import org.agilelovers.ui.object.Question;
 
-/*
+/**
  * This class is used to test the Controller class; more specifically, it is used to test the purpose of the newQuestion() method.
  * We don't want to test the newQuestion() method directly, because it calls the endRecording() method which calls
  * the getAnswer() method within the backend. This would call the OpenAI API, which we don't want to do since it would consume

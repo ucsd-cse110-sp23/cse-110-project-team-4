@@ -11,6 +11,12 @@ import java.io.IOException;
 
 public class Main extends Application {
 
+    /**
+     * Starts the application, loads the UI and initializes the controller.
+     *
+     * @param stage the stage
+     * @throws IOException if any I/O error occurs
+     */
     @Override
     public void start(Stage stage) throws IOException {
         var fxmlLoader = new FXMLLoader();

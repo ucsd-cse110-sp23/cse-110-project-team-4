@@ -48,6 +48,7 @@ class ControllerTest extends ApplicationTest {
         stage.show();
         System.out.println("start() called and finished");
     }
+
     @BeforeEach
     void setup() throws IOException {
         assistant = mock(SayItAssistant.class);
@@ -156,19 +157,19 @@ class ControllerTest extends ApplicationTest {
 
     /*
      * New User uses SayIt Assistant and is unhappy with all the responses they receive (US1, US3, US4).
-Open the “SayIt Assistant” app. You should see that there are no questions on the page since this is a new user.
-Click the “+” to ask a new question.
-Begin speaking my question out loud for the application to generate audio-to-text.
-When finished speaking, click the “STOP” button.
-Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You should see the question appear on the questions-list as well.
-You are not happy with the response so you delete the question. You should see that there are no questions nor responses on the page anymore.
-Click the “+” to ask another question.
-You ask another question out loud for the application to generate audio-to-text.
-Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You like this response to the question so you keep it.
-Click the “+” to ask another question.
-You ask another question out loud for the application to generate audio-to-text.
-Suddenly, you’re worried someone may think you’re up to no good using this “SayIt Assistant '' app, so you want to clear your history. You click the “CLEAR ALL” button. Now, your page should have no questions nor responses being displayed.
-You close the app.
+     * Open the “SayIt Assistant” app. You should see that there are no questions on the page since this is a new user.
+     * Click the “+” to ask a new question.
+     * Begin speaking my question out loud for the application to generate audio-to-text.
+     * When finished speaking, click the “STOP” button.
+     * Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You should see the question appear on the questions-list as well.
+     * You are not happy with the response so you delete the question. You should see that there are no questions nor responses on the page anymore.
+     * Click the “+” to ask another question.
+     * You ask another question out loud for the application to generate audio-to-text.
+     * Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You like this response to the question so you keep it.
+     * Click the “+” to ask another question.
+     * You ask another question out loud for the application to generate audio-to-text.
+     * Suddenly, you’re worried someone may think you’re up to no good using this “SayIt Assistant '' app, so you want to clear your history. You click the “CLEAR ALL” button. Now, your page should have no questions nor responses being displayed.
+     * You close the app.
      */
     @Test
     void testSBST4() {
