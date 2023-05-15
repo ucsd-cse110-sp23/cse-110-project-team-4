@@ -39,8 +39,12 @@ public class Controller {
     @FXML
     TextArea answerTextArea;
 
+    /**
+     * initialize() will be called before the UI is displayed.
+     * This will load all saved data (on the User's local machine) to the UI.
+     */
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
         System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
         pastQuestions.addAll(SayItAssistant.assistant.getDatabaseQuestions());
@@ -159,10 +163,9 @@ public class Controller {
 
     /**
      * Deletes the current selected question.
-     *
+     * <p>
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
-     * TODO: implement this
      *
      * @param event event triggered by the "delete" button click
      */
@@ -180,15 +183,14 @@ public class Controller {
 
     /**
      * Allows the user to ask a question to SayIt Assistant.
-     *
+     * <p>
      * When "new question" button is clicked, starts a new recording for
      * the user question and changes the button label to "stop recording".
      * The "delete" and "clear all" buttons are disabled while recording.
-     *
+     * <p>
      * Clicking the "stop recording" button will stop the recording and change
      * the button label to "new question". Adds new question to history list and
      * sets as current. Re-enables the "delete" and "clear all" buttons.
-     * TODO: move initialization to different method
      *
      * @param event event triggered by the "new question" button click
      */
@@ -199,7 +201,7 @@ public class Controller {
         }
 
         if (this.isRecording) {
-            // wait for chatgpt to response
+            // wait for ChatGPT to response
             // Question stopRecording()
             var currentQuestion = SayItAssistant.assistant.endRecording();
             this.pastQuestions.remove(this.pastQuestions.size() - 1);

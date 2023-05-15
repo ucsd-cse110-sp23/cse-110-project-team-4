@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import org.agilelovers.backend.MockDatabase;
 import org.agilelovers.ui.object.Question;
 
+import java.io.IOException;
+
 /**
  * This class is used to test the Controller class; more specifically, it is used to test the purpose of the newQuestion() method.
  * We don't want to test the newQuestion() method directly, because it calls the endRecording() method which calls
@@ -14,12 +16,34 @@ import org.agilelovers.ui.object.Question;
  */
 public class MockController extends Controller {
 
+    private static final MockDatabase mockDatabase;
+
+    static {
+        try {
+            mockDatabase = new MockDatabase();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean getAnswer = false;
 
+    /**
+     * addQuestion(...) differs from superclass because we need some way to actually add to pastQuestions(...)
+     * outside of the controller. To achieve this, we create a method so that we can invoke this to happen.
+     *
+     * @param question : the question to add to "pastQuestions" list
+     */
     public void addQuestion(Question question) {
         Platform.runLater(() -> this.pastQuestions.add(question));
     }
 
+    /**
+     * Overriding newQuestion(...) method from superclass. We invoke a mock "newQuestion" method so that we can add fake
+     * titles and questions and answers to the controller and adjust the UI accordingly.
+     *
+     * @param event : event triggered by the "new question" button click
+     */
     @Override
     public void newQuestion(ActionEvent event) {
         System.out.println("isRecording: " + this.isRecording);
@@ -46,11 +70,15 @@ public class MockController extends Controller {
         this.isRecording = !this.isRecording;
     }
 
+
+    /**
+     * mock controller gets its own mockdatabase in order to test persistence
+     */
     @FXML
     void initialize() {
         System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
-        pastQuestions.addAll(MockDatabase.obtainQuestions());
+        pastQuestions.addAll(mockDatabase.obtainQuestions());
         for (Question question : pastQuestions) {
             System.out.println(question);
         }

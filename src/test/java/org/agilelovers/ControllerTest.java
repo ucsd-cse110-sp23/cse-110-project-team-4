@@ -23,21 +23,11 @@ import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.control.ListViewMatchers.hasItems;
 
 class ControllerTest extends ApplicationTest {
-
     @Mock
     private SayItAssistant assistant;
     private MockController controller;
-    private String title1 = "title1";
-    private String title2 = "title2";
-    private String question1 = "question1";
-    private String question2 = "question2";
-    private String answer1 = "answer1";
-    private String answer2 = "answer2";
-
     private MockDatabase mockDatabase;
     private List<Question> questions;
-    private Question testQuestion1;
-    private Question testQuestion2;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -55,15 +45,24 @@ class ControllerTest extends ApplicationTest {
     }
 
     @BeforeEach
-    void setup() throws IOException {
+    void setup() {
         assistant = mock(SayItAssistant.class);
         questions = mockDatabase.obtainQuestions();
         System.out.println("setup() called and finished");
     }
 
+    /*
+     * Helper method to add questions to "controller" question list and to "questions" list
+     */
     private void addQuestions() {
-        testQuestion1 = new Question(title1, question1, answer1);
-        testQuestion2 = new Question(title2, question2, answer2);
+        String title1 = "title1";
+        String question1 = "question1";
+        String answer1 = "answer1";
+        Question testQuestion1 = new Question(title1, question1, answer1);
+        String title2 = "title2";
+        String question2 = "question2";
+        String answer2 = "answer2";
+        Question testQuestion2 = new Question(title2, question2, answer2);
         controller.addQuestion(testQuestion1);
         questions.add(testQuestion1);
         controller.addQuestion(testQuestion2);

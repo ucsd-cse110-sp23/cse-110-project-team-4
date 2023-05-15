@@ -29,15 +29,13 @@ public class Database {
 
     /**
      * Writes a specified query and its answer to the database file.
-     *
+     * <p>
      * Reads the queryDatabase file and adds the query and its answer to the file.
      * @param encodedKey the encoded key of the query
      * @param jsonObject the JSONObject of the query and its answer
      *
-     * @throws IOException if the file is not found/cannot be opened
      */
-    private void writeToFile(String encodedKey, JSONObject jsonObject)
-            throws IOException {
+    private void writeToFile(String encodedKey, JSONObject jsonObject) {
 
         // for multi-thread - if we ever wanted to
         /*
@@ -56,89 +54,68 @@ public class Database {
 
         synchronized (queryDatabase) {
             // Read existing contents of file into a JSONObject
-            JSONObject existingData = new JSONObject();
-            if (queryDatabase.exists()) {
-                try (BufferedReader reader = new BufferedReader(
-                        new FileReader(queryDatabase))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        JSONObject data = new JSONObject(line);
-
-                        Iterator<String> keys = data.keys();
-                        while (keys.hasNext()) {
-                            String key = keys.next();
-                            JSONObject answer = data.getJSONObject(key);
-                            existingData.put(key, answer);
-                        }
-
-                    }
-                } catch (IOException e) { e.printStackTrace();}
-
-            }
+            JSONObject existingData = readJSON();
 
             // Update or add new key-value pair to JSONObject
             existingData.put(encodedKey, jsonObject);
 
             // Write updated JSONObject to file
-            try (BufferedWriter writer = new BufferedWriter(
-                    new FileWriter(queryDatabase))) {
-                for (String existingKey : existingData.keySet()) {
-                    JSONObject currLine = new JSONObject();
-                    currLine.put(existingKey,
-                            existingData.getJSONObject(existingKey));
-                    writer.write(currLine.toString());
-                    writer.newLine();
+            writeToJSON(existingData);
+        }
+    }
+
+    private JSONObject readJSON() {
+        JSONObject existingData = new JSONObject();
+        if (queryDatabase.exists()) {
+            try (BufferedReader reader = new BufferedReader(
+                    new FileReader(queryDatabase))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    JSONObject data = new JSONObject(line);
+
+                    Iterator<String> keys = data.keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        JSONObject answer = data.getJSONObject(key);
+                        existingData.put(key, answer);
+                    }
                 }
             } catch (IOException e) { e.printStackTrace();}
         }
+        return existingData;
     }
 
     /**
      * Deletes a specified query from the database file.
-     *
+     * <p>
      * It reads the queryDatabase file and deletes the query that matches the questionQuery.
      * @param questionQuery the question query to be deleted from the file
-     *
-     * @throws IOException if the file is not found/cannot be opened
      */
-    private void deleteFromFile(String questionQuery) throws IOException {
+    private void deleteFromFile(String questionQuery) {
         synchronized (queryDatabase) {
             // Read existing contents of file into a JSONObject
-            JSONObject existingData = new JSONObject();
-            if (queryDatabase.exists()) {
-                try (BufferedReader reader = new BufferedReader(
-                        new FileReader(queryDatabase))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        JSONObject data = new JSONObject(line);
-
-                        Iterator<String> keys = data.keys();
-                        while (keys.hasNext()) {
-                            String key = keys.next();
-                            JSONObject answer = data.getJSONObject(key);
-                            existingData.put(key, answer);
-                        }
-
-                    }
-                } catch (IOException e) { e.printStackTrace();}
-            }
+            JSONObject existingData = readJSON();
 
             String encodedKey = encodeQuery(questionQuery);
             // Update or add new key-value pair to JSONObject
             existingData.remove(encodedKey);
 
             // Write updated JSONObject to file
-            try (BufferedWriter writer = new BufferedWriter(
-                    new FileWriter(queryDatabase))) {
-                for (String existingKey : existingData.keySet()) {
-                    JSONObject currLine = new JSONObject();
-                    currLine.put(existingKey,
-                            existingData.getJSONObject(existingKey));
-                    writer.write(currLine.toString());
-                    writer.newLine();
-                }
-            } catch (IOException e) { e.printStackTrace();}
+            writeToJSON(existingData);
         }
+    }
+
+    private void writeToJSON(JSONObject existingData) {
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter(queryDatabase))) {
+            for (String existingKey : existingData.keySet()) {
+                JSONObject currLine = new JSONObject();
+                currLine.put(existingKey,
+                        existingData.getJSONObject(existingKey));
+                writer.write(currLine.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) { e.printStackTrace();}
     }
 
     /**
@@ -189,6 +166,7 @@ public class Database {
     void deleteQueryFromFile(String questionQuery) throws IOException {
         deleteFromFile(questionQuery);
     }
+
     /*
      * obtainQuery() returns a Question object that contains the title, question and answer of the query.
      *
