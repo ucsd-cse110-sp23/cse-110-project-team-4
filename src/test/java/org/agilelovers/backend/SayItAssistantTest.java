@@ -42,8 +42,6 @@ class SayItAssistantTest {
         //mocks startRecording method
         mock = mock(SayItAssistant.class);
         queryDatabase = new MockDatabase();
-
-
         assistant = SayItAssistant.assistant;
         file = new File("assets/recording.wav");
         mock.audioFile = file;
@@ -90,7 +88,7 @@ class SayItAssistantTest {
 
         queryDatabase.deleteQueryFromFile("question1");
         List<Question> actualQuestions = queryDatabase.obtainQuestions();
-        Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size());
+        Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size()-1);
         Assertions.assertThat(actualQuestions.get(0).toString()).hasToString(expectedQuestions.get(0).toString());
         Assertions.assertThat(actualQuestions.get(1).toString()).hasToString(expectedQuestions.get(1).toString());
     }
@@ -114,7 +112,7 @@ class SayItAssistantTest {
         queryDatabase.deleteQueryFromFile("question1");
 
         actualQuestions = queryDatabase.obtainQuestions();
-        Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size());
+        Assertions.assertThat(actualQuestions.size()).isEqualTo(expectedQuestions.size()-1);
         Assertions.assertThat(actualQuestions.get(0).toString()).hasToString(expectedQuestions.get(0).toString());
         Assertions.assertThat(actualQuestions.get(1).toString()).hasToString(expectedQuestions.get(1).toString());
     }

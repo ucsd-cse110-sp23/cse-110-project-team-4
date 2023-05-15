@@ -10,15 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MockDatabase {
-    private final File queryDatabase;
+    private static File queryDatabase;
 
     public MockDatabase() throws IOException {
-        this.queryDatabase = new File("MockDatabase.JSON");
+        queryDatabase = new File("MockDatabase.JSON");
         //write mock data to file
-        transcribeQueryIntoFile("title1", "answer1", "question1");
-        transcribeQueryIntoFile("title2", "answer2", "question2");
-        transcribeQueryIntoFile("title3", "answer3", "question3");
-
+        transcribeQueryIntoFile("title1", "question1", "answer1");
+        transcribeQueryIntoFile("title2", "question2", "answer2");
+        transcribeQueryIntoFile("title3", "question3", "answer3");
     }
 
     /*
@@ -203,7 +202,7 @@ public class MockDatabase {
     }
     */
 
-    public List<Question> obtainQuestions() {
+    public static List<Question> obtainQuestions() {
         List<Question> questions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(queryDatabase))) {
             String line;
