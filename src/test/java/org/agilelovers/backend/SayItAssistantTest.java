@@ -10,9 +10,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 class SayItAssistantTest {
@@ -34,8 +34,6 @@ class SayItAssistantTest {
     private String question;
     private String answer;
 
-    SayItAssistantTest() {
-    }
 
     @BeforeEach
     void setUp() {
@@ -58,14 +56,10 @@ class SayItAssistantTest {
 
 
     @Test
-    void testObtainQuery() throws IOException {
-        //mocks obtainQuery method
-        question = "Who's in the CSE 110 Spring 2023 Team 4?";
-        when(mock.obtainQuery(question)).thenReturn(new Question("Who's in the CSE 110 Spring 2023 Team 4?",
-                "Who's in the CSE 110 Spring 2023 Team 4?",
-                "The team members are: Billy, Lilian, Louie, Anish, Shera, and Nicholas."));
-        String query = String.valueOf(mock.obtainQuery(question));
-        Assertions.assertThat(query).isEqualTo("Who's in the CSE 110 Spring 2023 Team 4?");
+    void testObtainQuestions() throws IOException {
+        List<Question> questions = assistant.getDatabaseQuestions();
+        Assertions.assertThat(questions).isNotNull();
+
     }
 
 
