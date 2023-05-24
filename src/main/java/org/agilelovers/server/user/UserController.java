@@ -12,7 +12,7 @@ public class UserController {
 
     @GetMapping("/api/users")
     public UserDocument getUser(@RequestBody UserDocument user) {
-        return users.findByEmailAndPassword(user.getEmail(), user.getPassword())
+        return users.findByUsernameAndPassword(user.getUsername(), user.getPassword())
                 .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
     }
 

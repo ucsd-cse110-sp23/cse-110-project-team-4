@@ -1,5 +1,6 @@
 package org.agilelovers.server.user;
 
+import com.mongodb.lang.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -7,8 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserDocument {
     @Id
     private String id;
+    @NonNull
     private String username;
+    @NonNull
     private String email;
+    @NonNull
     private String password;
 
     public UserDocument(String id, String username, String email,
