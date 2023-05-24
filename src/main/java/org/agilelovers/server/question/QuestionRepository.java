@@ -1,10 +1,14 @@
-package org.agilelovers.server;
+package org.agilelovers.server.question;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
-public interface QuestionRepository extends MongoRepository<QuestionItem,
+import java.util.List;
+import java.util.Optional;
+
+public interface QuestionRepository extends MongoRepository<QuestionDocument,
         String> {
 
-    @Query('{}')
+    public Optional<QuestionDocument> findByUserId(String userId);
+
+    public Optional<List<QuestionDocument>> findAllByUserId(String userId);
 }

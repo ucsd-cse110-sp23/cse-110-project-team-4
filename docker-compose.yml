@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name : sayit-db
+#    environment:
+#      - MONGO_INITDB_ROOT_USERNAME=cse110
+#      - MONGO_INITDB_ROOT_PASSWORD=cse110pass
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodbdata:/data/db
+
+volumes:
+  mongodbdata:
+    driver: local

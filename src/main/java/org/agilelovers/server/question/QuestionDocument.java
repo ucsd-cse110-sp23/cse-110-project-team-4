@@ -4,17 +4,26 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("sayit-questions")
-public class QuestionItem {
+public class QuestionDocument {
     @Id private String id;
     private String userId;
     private String question;
     private String answer;
 
-    public QuestionItem(String id, String question, String answer) {
-        super();
+    public QuestionDocument(String id, String userId, String question,
+                            String answer) {
         this.id = id;
+        this.userId = userId;
         this.question = question;
         this.answer = answer;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getId() {
