@@ -1,18 +1,19 @@
 package org.agilelovers.server.user;
 
-import com.mongodb.lang.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotNull;
 
 @Document("sayit-users")
 public class UserDocument {
     @Id
     private String id;
-    @NonNull
+    @NotNull
     private String username;
-    @NonNull
+    @NotNull
     private String email;
-    @NonNull
+    @NotNull
     private String password;
 
     public UserDocument(String id, String username, String email,

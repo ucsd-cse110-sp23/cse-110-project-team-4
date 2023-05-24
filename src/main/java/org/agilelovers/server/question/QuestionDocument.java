@@ -3,11 +3,16 @@ package org.agilelovers.server.question;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
+
 @Document("sayit-questions")
 public class QuestionDocument {
     @Id private String id;
+    @NotNull
     private String userId;
+    @NotNull
     private String question;
+    @NotNull
     private String answer;
 
     public QuestionDocument(String id, String userId, String question,
