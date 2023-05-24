@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="553.0" prefWidth="406.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="16.0" prefWidth="106.0" text="First Name" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
+      <Label layoutX="203.0" layoutY="14.0" prefHeight="16.0" prefWidth="106.0" text="Last Name" AnchorPane.rightAnchor="97.0" AnchorPane.topAnchor="14.0" />
+      <TextField layoutX="14.0" layoutY="30.0" prefHeight="16.0" prefWidth="170.0" promptText="Johnny" AnchorPane.leftAnchor="14.0" />
+      <TextField layoutX="203.0" layoutY="30.0" prefHeight="16.0" prefWidth="170.0" promptText="Appleseed" AnchorPane.rightAnchor="33.0" />
+      <Label layoutX="14.0" layoutY="78.0" prefHeight="16.0" prefWidth="106.0" text="Display Name" />
+      <TextField layoutX="14.0" layoutY="94.0" prefHeight="24.0" prefWidth="361.0" promptText="Johnny Appleseed" />
+   </children>
+</AnchorPane>
