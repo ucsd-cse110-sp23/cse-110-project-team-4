@@ -16,6 +16,13 @@ public class UserDocument {
     @NotNull
     private String password;
 
+    public UserDocument(String username, String email, String password) {
+        super();
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
     public UserDocument(String id, String username, String email,
                         String password) {
         super();
@@ -35,6 +42,10 @@ public class UserDocument {
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
