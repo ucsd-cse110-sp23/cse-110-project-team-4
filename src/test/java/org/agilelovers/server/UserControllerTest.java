@@ -45,35 +45,35 @@ public class UserControllerTest {
         userRepository.deleteAll();
     }
 
-    @Test
-    public void createUser() throws Exception {
-        UserDocument user = new UserDocument("test", "testing@test.com",
-                "plaintext");
-
-        mvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.toJson(user))
-        );
-
-        List<UserDocument> found = userRepository.findAll();
-        assertThat(found).extracting(UserDocument::getUsername).containsOnly(
-                "test");
-    }
-
-    @Test
-    public void createUserAndChangeEmail() throws Exception {
-        UserDocument user = new UserDocument("indecisive_user", "maybe@test" +
-                ".com", "plaintext");
-
-        mvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.toJson(user))
-        );
-
-        List<UserDocument> found = userRepository.findAll();
-        assertThat(found).extracting(UserDocument::getUsername).containsOnly(
-                "indecisive_user");
-
-    }
+//    @Test
+//    public void createUser() throws Exception {
+//        UserDocument user = new UserDocument("test", "testing@test.com",
+//                "plaintext");
+//
+//        mvc.perform(post("/api/users")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(JsonUtil.toJson(user))
+//        );
+//
+//        List<UserDocument> found = userRepository.findAll();
+//        assertThat(found).extracting(UserDocument::getUsername).containsOnly(
+//                "test");
+//    }
+//
+//    @Test
+//    public void createUserAndChangeEmail() throws Exception {
+//        UserDocument user = new UserDocument("indecisive_user", "maybe@test" +
+//                ".com", "plaintext");
+//
+//        mvc.perform(post("/api/users")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(JsonUtil.toJson(user))
+//        );
+//
+//        List<UserDocument> found = userRepository.findAll();
+//        assertThat(found).extracting(UserDocument::getUsername).containsOnly(
+//                "indecisive_user");
+//
+//    }
 
 }

@@ -1,8 +1,6 @@
 package org.agilelovers.server.question;
 
-import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
-import org.agilelovers.ui.object.Question;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,10 +15,10 @@ public class QuestionController {
         this.questions = questions;
     }
 
-    @GetMapping("/api/questions")
-    public List<QuestionDocument> getAllQuestionsFromUserId(@RequestBody String userId) {
-        return questions.findAllByUserId(userId)
-                .orElseThrow(() -> new QuestionNotFoundError(userId));
+    @GetMapping("/api/questions/{uid}")
+    public List<QuestionDocument> getAllQuestionsFromUserId(@PathVariable String uid) {
+        return questions.findAllByUserId(uid)
+                .orElseThrow(() -> new QuestionNotFoundError(uid, true));
     }
 
     @PostMapping("/api/questions")
@@ -28,11 +26,17 @@ public class QuestionController {
         if (users.existsById(question.getUserId()))
             return questions.save(question);
         else
-            throw new QuestionNotFoundError(question.getUserId());
+            throw new QuestionNotFoundError(question.getUserId(), true);
     }
 
-    @DeleteMapping("/api/questions/")
-    public void deleteQuestion(@RequestBody String questionId) {
-        questions.deleteById(questionId);
+    @DeleteMapping("/api/questions/delete/{id}")
+    public void deleteQuestion(@PathVariable String id) {
+        questions.deleteById(id);
+    }
+
+    @DeleteMapping("/api/questions/delete-all/{uid}")
+    public void deleteAllQuestionsFromUser(@PathVariable String uid) {
+        questions.deleteAll(questions.findAllByUserId(uid)
+                .orElseThrow(() -> new QuestionNotFoundError(uid, true)));
     }
 }
