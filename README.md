@@ -44,6 +44,39 @@ On our application, there are several buttons the user should know about:
 
 ---
 
+## Project Structure
+Source Code:
+```bash
+src
+├── backend
+│   ├── Assistant.java
+│   ├── AudioRecorder.java
+│   ├── ChatGPTHelper.java
+│   ├── Database.java
+│   ├── SayItAssistant.java
+│   └── WhisperAPIHelper.java
+├── mock
+│   └── ui
+│       └── MockController.java
+└── ui
+    ├── Controller.java
+    ├── Main.java
+    └── object
+        └── Question.java
+
+```
+
+Resources:
+```bash
+resources
+├── EmailSetup.fxml
+├── Login.fxml
+├── Main.fxml
+└── MockMain.fxml
+```
+
+---
+
 ## Milestone 1 Delivery Checklist
 
 #### Software design – 10 points
@@ -101,3 +134,4 @@ On our application, there are several buttons the user should know about:
 - [ ] Each push labelled with its GitHub Project issue number (2 pts) 
 - [ ] Protected master branch (pull requests passed tests on GitHub Actions and passed code review) (2 pts)
 - [ ] Merged protected branch story-by-story (2 pts)
+

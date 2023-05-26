@@ -6,8 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import org.agilelovers.backend.SayItAssistant;
-import org.agilelovers.ui.Controller;
-import org.agilelovers.ui.MockController;
+import org.agilelovers.ui.MainController;
+import org.agilelovers.mock.ui.MockMainController;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,11 +21,11 @@ import static org.mockito.Mockito.mock;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.control.ListViewMatchers.hasItems;
 
-class ControllerTest extends ApplicationTest {
+class MainControllerTest extends ApplicationTest {
 
     @Mock
     private SayItAssistant assistant;
-    private MockController controller;
+    private MockMainController controller;
     private String title1 = "title1";
     private String title2 = "title2";
     private String question1 = "question1";
@@ -41,8 +41,8 @@ class ControllerTest extends ApplicationTest {
         var fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
         Parent root = fxmlLoader.load();
-        Controller.instance = fxmlLoader.getController();
-        controller = (MockController) Controller.instance;
+        MainController.instance = fxmlLoader.getController();
+        controller = (MockMainController) MainController.instance;
         Scene scene = new Scene(root); //??
         stage.setScene(scene);
         stage.show();

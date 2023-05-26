@@ -1,6 +1,7 @@
-package org.agilelovers.ui;
+package org.agilelovers.mock.ui;
 
 import javafx.event.ActionEvent;
+import org.agilelovers.ui.MainController;
 import org.agilelovers.ui.object.Question;
 
 /*
@@ -9,7 +10,7 @@ import org.agilelovers.ui.object.Question;
  * the getAnswer() method within the backend. This would call the OpenAI API, which we don't want to do since it would consume
  * tokens every time we want to test our class(es).
  */
-public class MockController extends Controller {
+public class MockMainController extends MainController {
 
     public boolean getAnswer = false;
 

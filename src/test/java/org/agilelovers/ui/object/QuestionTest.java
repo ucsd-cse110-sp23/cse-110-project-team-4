@@ -4,8 +4,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.agilelovers.ui.Controller;
-import org.agilelovers.ui.MockController;
+import org.agilelovers.ui.MainController;
+import org.agilelovers.mock.ui.MockMainController;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.testfx.framework.junit5.ApplicationTest;
 import java.io.IOException;
 
 class QuestionTest extends ApplicationTest {
-    MockController controller;
+    MockMainController controller;
     String title = "title";
     String question = "question";
     String answer = "answer";
@@ -25,8 +25,8 @@ class QuestionTest extends ApplicationTest {
         var fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
         Parent root = fxmlLoader.load();
-        Controller.instance = fxmlLoader.getController();
-        this.controller = (MockController) Controller.instance;
+        MainController.instance = fxmlLoader.getController();
+        this.controller = (MockMainController) MainController.instance;
         Scene scene = new Scene(root);
         stage.setScene(scene);
         System.out.println("start() called and finished");

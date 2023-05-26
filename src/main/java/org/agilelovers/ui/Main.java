@@ -18,7 +18,7 @@ public class Main extends Application {
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, Color.WHITE);
 
-        Controller.instance = fxmlLoader.getController();
+        MainController.instance = fxmlLoader.getController();
 
         stage.setTitle("SayIt Assistant");
 

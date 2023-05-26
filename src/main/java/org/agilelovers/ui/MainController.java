@@ -22,22 +22,22 @@ import java.io.IOException;
  * The backend is defined in the SayItAssistant.java file.
  * The Question object is defined in the Question.java file.
  */
-public class Controller {
+public class MainController {
     /**
      * The History list. This is the list of past questions.
      */
     @FXML
-    ListView historyList;
+    protected ListView historyList;
     /**
      * The Question label. This label displays the most recently asked or selected question.
      */
     @FXML
-    Label questionLabel;
+    protected Label questionLabel;
     /**
      * The Answer label. This label displays the answer to the most recently asked or selected question.
      */
     @FXML
-    TextArea answerTextArea;
+    protected TextArea answerTextArea;
 
     @FXML
     private void initialize() throws IOException {
@@ -54,24 +54,24 @@ public class Controller {
      * The Record button.
      */
     @FXML
-    Button recordButton;
+    protected Button recordButton;
     /**
      * The Delete button.
      */
     @FXML
-    Button deleteButton;
+    protected Button deleteButton;
     /**
      * The Clear all button.
      */
     @FXML
-    Button clearAllButton;
+    protected Button clearAllButton;
 
-    ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
+    protected ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
     private boolean isInitialized = false;
 
-    public static Controller instance;
+    public static MainController instance;
 
-    boolean isRecording = false;
+    protected boolean isRecording = false;
 
     /**
      * Initiates the history list.
