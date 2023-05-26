@@ -1,11 +1,12 @@
 package org.agilelovers.server.command;
 
-import org.agilelovers.server.question.QuestionDocument;
-import org.agilelovers.server.question.QuestionNotFoundError;
-import org.agilelovers.server.question.QuestionRepository;
+import org.agilelovers.server.command.errors.CommandNotFoundError;
+import org.agilelovers.server.question.common.OpenAIClient;
+import org.agilelovers.server.question.common.errors.NoAudioError;
 import org.agilelovers.server.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.agilelovers.server.question.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,12 +27,33 @@ public class CommandController {
                 .orElseThrow(() -> new CommandNotFoundError(uid, true));
     }
 
-    @PostMapping("/api/commands")
-    public CommandDocument createQuestion(@RequestBody CommandDocument command) {
-        if (users.existsById(command.getUserId()))
+    @PostMapping("/api/commands/{uid}")
+    public CommandDocument createCommand(@RequestParam("file") MultipartFile file, @PathVariable String uid) {
+
+        if (!users.existsById(uid))
+            throw new UserNotFoundError(uid);
+
+        String command = OpenAIClient.getTranscription(file);
+
+        if (command != null && !command.isEmpty()) {
+
+            CommandDocument commandDocument = CommandDocument.builder()
+                    .command(command)
+                    .userId(uid)
+                    .build();
+
+            return commands.save(commandDocument);
+        } else {
+            throw new NoAudioError();
+        }
+    }
+
+    @PutMapping("/api/commands/{id}")
+    public CommandDocument updateCommandResponse(@PathVariable String id, @RequestBody String output) {
+        return commands.findById(id).map(command -> {
+            command.setOutput(output);
             return commands.save(command);
-        else
-            throw new CommandNotFoundError(command.getUserId(), true);
+        }).orElseThrow(() -> new CommandNotFoundError(id, false));
     }
 
     @DeleteMapping("/api/commands/delete/{id}")

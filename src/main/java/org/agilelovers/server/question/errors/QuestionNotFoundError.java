@@ -1,4 +1,4 @@
-package org.agilelovers.server.question;
+package org.agilelovers.server.question.errors;
 
 public class QuestionNotFoundError extends RuntimeException{
     public QuestionNotFoundError(String id, boolean isUserId) {

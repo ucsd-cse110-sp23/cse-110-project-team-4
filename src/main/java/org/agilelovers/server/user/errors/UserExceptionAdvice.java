@@ -1,5 +1,6 @@
-package org.agilelovers.server.question;
+package org.agilelovers.server.user.errors;
 
+import org.agilelovers.server.question.common.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,11 +10,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
-public class QuestionExceptionAdvice {
+public class UserExceptionAdvice {
     @ResponseBody
-    @ExceptionHandler(QuestionNotFoundError.class)
+    @ExceptionHandler(UserNotFoundError.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String questionNotFoundError(QuestionNotFoundError err) {
+    String userNotFoundHandler(UserNotFoundError err) {
         return err.getMessage();
     }
 

@@ -1,5 +1,6 @@
 package org.agilelovers.server.user;
 
+import org.agilelovers.server.question.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
@@ -13,7 +14,7 @@ public class UserController {
     @GetMapping("/api/users")
     public UserDocument getUser(@RequestBody UserDocument user) {
         return users.findByUsernameAndPassword(user.getUsername(), user.getPassword())
-                .orElseThrow(() -> new UserNotFoundException(user.getUsername()));
+                .orElseThrow(() -> new UserNotFoundError(user.getUsername()));
     }
 
     @PostMapping("/api/users")
@@ -28,6 +29,6 @@ public class UserController {
                 .map(user -> {
                     user.setEmail(email);
                     return users.save(user);
-                }).orElseThrow(() -> new UserNotFoundException(id));
+                }).orElseThrow(() -> new UserNotFoundError(id));
     }
 }

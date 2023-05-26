@@ -1,7 +1,12 @@
 package org.agilelovers.server.question;
 
+import org.agilelovers.server.question.common.OpenAIClient;
+import org.agilelovers.server.question.common.errors.NoAudioError;
+import org.agilelovers.server.question.errors.QuestionNotFoundError;
+import org.agilelovers.server.question.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,12 +26,28 @@ public class QuestionController {
                 .orElseThrow(() -> new QuestionNotFoundError(uid, true));
     }
 
-    @PostMapping("/api/questions")
-    public QuestionDocument createQuestion(@RequestBody QuestionDocument question) {
-        if (users.existsById(question.getUserId()))
-            return questions.save(question);
-        else
-            throw new QuestionNotFoundError(question.getUserId(), true);
+    @PostMapping("/api/questions/{uid}")
+    public QuestionDocument createQuestion(@RequestParam("file")MultipartFile file, @PathVariable String uid) {
+
+        if (!users.existsById(uid))
+            throw new UserNotFoundError(uid);
+
+        String question = OpenAIClient.getTranscription(file);
+
+        if (question != null && !question.isEmpty()) {
+
+            String answer = OpenAIClient.getAnswer(question);
+
+            QuestionDocument questionDocument = QuestionDocument.builder()
+                    .question(question)
+                    .answer(answer)
+                    .userId(uid)
+                    .build();
+
+            return questions.save(questionDocument);
+        } else {
+            throw new NoAudioError();
+        }
     }
 
     @DeleteMapping("/api/questions/delete/{id}")

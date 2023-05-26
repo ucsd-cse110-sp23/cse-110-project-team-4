@@ -1,5 +1,7 @@
-package org.agilelovers.server.command;
+package org.agilelovers.server.command.errors;
 
+import org.agilelovers.server.question.common.errors.NoAudioError;
+import org.agilelovers.server.question.common.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +19,19 @@ public class CommandExceptionAdvice {
         return err.getMessage();
     }
 
+    @ResponseBody
+    @ExceptionHandler(UserNotFoundError.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String userNotFoundError(UserNotFoundError err) {
+        return err.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(NoAudioError.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String noAudioError(NoAudioError err) {
+        return err.getMessage();
+    }
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
