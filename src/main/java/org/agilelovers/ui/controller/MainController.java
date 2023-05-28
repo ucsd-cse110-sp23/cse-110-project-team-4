@@ -1,4 +1,4 @@
-package org.agilelovers.ui;
+package org.agilelovers.ui.controller;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -39,17 +39,6 @@ public class MainController {
     @FXML
     protected TextArea answerTextArea;
 
-    @FXML
-    private void initialize() throws IOException {
-        System.out.println("Initializing Controller");
-        answerTextArea.setEditable(false);
-        pastQuestions.addAll(SayItAssistant.assistant.getDatabaseQuestions());
-        for (Question question : pastQuestions) {
-            System.out.println(question);
-        }
-        initHistoryList();
-    }
-
     /**
      * The Record button.
      */
@@ -66,12 +55,26 @@ public class MainController {
     @FXML
     protected Button clearAllButton;
 
+    /**
+     * A list that contains all the question objects.
+     */
     protected ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
-    private boolean isInitialized = false;
 
     public static MainController instance;
 
     protected boolean isRecording = false;
+
+    @FXML
+    private void initialize() throws IOException {
+        System.out.println("Initializing Controller");
+        answerTextArea.setEditable(false);
+        pastQuestions.addAll(SayItAssistant.assistant.getDatabaseQuestions());
+        for (Question question : pastQuestions) {
+            System.out.println(question);
+        }
+        initHistoryList();
+    }
+
 
     /**
      * Initiates the history list.
@@ -193,11 +196,6 @@ public class MainController {
      * @param event event triggered by the "new question" button click
      */
     public void newQuestion(ActionEvent event) {
-        if (!this.isInitialized) {
-            this.isInitialized = true;
-            this.initHistoryList();
-        }
-
         if (this.isRecording) {
             // wait for chatgpt to response
             // Question stopRecording()

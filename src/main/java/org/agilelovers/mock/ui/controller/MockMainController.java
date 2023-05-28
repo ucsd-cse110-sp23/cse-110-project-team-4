@@ -1,7 +1,7 @@
-package org.agilelovers.mock.ui;
+package org.agilelovers.mock.ui.controller;
 
 import javafx.event.ActionEvent;
-import org.agilelovers.ui.MainController;
+import org.agilelovers.ui.controller.MainController;
 import org.agilelovers.ui.object.Question;
 
 /*

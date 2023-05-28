@@ -1,6 +1,6 @@
 package org.agilelovers.ui.object;
 
-import org.agilelovers.ui.MainController;
+import org.agilelovers.ui.controller.MainController;
 
 public class Question {
      private String question = "";
