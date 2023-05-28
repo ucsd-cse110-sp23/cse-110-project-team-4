@@ -1,9 +1,9 @@
 package org.agilelovers.server.question;
 
-import org.agilelovers.server.question.common.OpenAIClient;
-import org.agilelovers.server.question.common.errors.NoAudioError;
+import org.agilelovers.server.common.OpenAIClient;
+import org.agilelovers.server.common.errors.NoAudioError;
 import org.agilelovers.server.question.errors.QuestionNotFoundError;
-import org.agilelovers.server.question.common.errors.UserNotFoundError;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +14,12 @@ import java.util.List;
 public class QuestionController {
     private final UserRepository users;
     private final QuestionRepository questions;
+    private final OpenAIClient client;
     public QuestionController(QuestionRepository questions,
                               UserRepository users) {
         this.users = users;
         this.questions = questions;
+        this.client = new OpenAIClient();
     }
 
     @GetMapping("/api/questions/{uid}")
@@ -32,11 +34,11 @@ public class QuestionController {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        String question = OpenAIClient.getTranscription(file);
+        String question = this.client.getTranscription(file);
 
         if (question != null && !question.isEmpty()) {
 
-            String answer = OpenAIClient.getAnswer(question);
+            String answer = this.client.getAnswer(question);
 
             QuestionDocument questionDocument = QuestionDocument.builder()
                     .question(question)

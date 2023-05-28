@@ -1,6 +1,7 @@
 package org.agilelovers.server.user.errors;
 
-import org.agilelovers.server.question.common.errors.UserNotFoundError;
+import com.mongodb.MongoWriteException;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,11 @@ public class UserExceptionAdvice {
     String userNotFoundHandler(UserNotFoundError err) {
         return err.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(MongoWriteException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String duplicateUser(MongoWriteException err) { return err.getMessage(); }
 
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)

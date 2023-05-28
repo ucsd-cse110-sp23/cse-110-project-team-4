@@ -1,7 +1,7 @@
 package org.agilelovers.server.command.errors;
 
-import org.agilelovers.server.question.common.errors.NoAudioError;
-import org.agilelovers.server.question.common.errors.UserNotFoundError;
+import org.agilelovers.server.common.errors.NoAudioError;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
