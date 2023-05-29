@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM --platform=linux/x86_64 eclipse-temurin:17-jre-alpine
 RUN mkdir -p "/sayit-server"
 RUN addgroup -S server && adduser -S server -G server
 RUN chown server "/sayit-server"
