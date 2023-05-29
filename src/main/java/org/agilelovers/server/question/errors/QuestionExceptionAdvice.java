@@ -1,6 +1,6 @@
 package org.agilelovers.server.question.errors;
 
-import org.agilelovers.server.common.errors.NoAudioError;
+import org.agilelovers.server.transcribe.errors.NoAudioError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,9 +27,9 @@ public class QuestionExceptionAdvice {
     }
 
     @ResponseBody
-    @ExceptionHandler(NoAudioError.class)
+    @ExceptionHandler(NoQuestionError.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String noAudioError(NoAudioError err) {
+    String noAudioError(NoQuestionError err) {
         return err.getMessage();
     }
 
