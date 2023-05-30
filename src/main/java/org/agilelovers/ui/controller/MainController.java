@@ -43,22 +43,12 @@ public class MainController {
      * The Record button.
      */
     @FXML
-    protected Button recordButton;
-    /**
-     * The Delete button.
-     */
-    @FXML
-    protected Button deleteButton;
-    /**
-     * The Clear all button.
-     */
-    @FXML
-    protected Button clearAllButton;
+    protected Button startButton;
 
     /**
      * A list that contains all the question objects.
      */
-    protected ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
+    protected ObservableList<Question> pastQueries = FXCollections.observableArrayList();
 
     public static MainController instance;
 
@@ -68,8 +58,8 @@ public class MainController {
     private void initialize() throws IOException {
         System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
-        pastQuestions.addAll(SayItAssistant.assistant.getDatabaseQuestions());
-        for (Question question : pastQuestions) {
+        pastQueries.addAll(SayItAssistant.assistant.getDatabaseQuestions());
+        for (Question question : pastQueries) {
             System.out.println(question);
         }
         initHistoryList();
@@ -86,7 +76,7 @@ public class MainController {
      * If not, the question and answer labels will be empty.
      */
     public void initHistoryList() {
-        this.historyList.setItems(this.pastQuestions);
+        this.historyList.setItems(this.pastQueries);
         this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 questionLabel.setText("");
@@ -111,7 +101,7 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = this.pastQuestions.get(index);
+            Question currentQuestion = this.pastQueries.get(index);
             questionLabel.setText(currentQuestion.question());
             answerTextArea.setText(currentQuestion.answer());
         });
@@ -148,15 +138,13 @@ public class MainController {
      * Removes all questions from the history list.
      *
      * If no questions are in the list, nothing will happen.
-     *
-     * @param event event triggered by the "clear all" button click
      */
-    public void clearAll(ActionEvent event) throws IOException {
+    public void clearAll() throws IOException {
         System.out.println("Clear All");
-        for (Question pastQuestion : this.pastQuestions) {
+        for (Question pastQuestion : this.pastQueries) {
             SayItAssistant.assistant.deleteDatabaseQuestion(pastQuestion);
         }
-        this.pastQuestions.clear();
+        this.pastQueries.clear();
         this.historyList.getSelectionModel().select(null);
     }
 
@@ -165,17 +153,14 @@ public class MainController {
      *
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
-     * TODO: implement this
-     *
-     * @param event event triggered by the "delete" button click
      */
-    public void deleteQuestion(ActionEvent event) throws IOException {
+    public void deleteQuestion() throws IOException {
         System.out.println("Delete Question");
-        if (!this.pastQuestions.isEmpty()) {
-            SayItAssistant.assistant.deleteDatabaseQuestion(this.pastQuestions.get(
+        if (!this.pastQueries.isEmpty()) {
+            SayItAssistant.assistant.deleteDatabaseQuestion(this.pastQueries.get(
                     this.historyList.getFocusModel().getFocusedIndex())
             );
-            this.pastQuestions.remove(this.historyList.getFocusModel().getFocusedIndex());
+            this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
             this.historyList.getSelectionModel().select(null);
             System.out.println("Successfully deleted question");
         }
@@ -191,30 +176,33 @@ public class MainController {
      * Clicking the "stop recording" button will stop the recording and change
      * the button label to "new question". Adds new question to history list and
      * sets as current. Re-enables the "delete" and "clear all" buttons.
-     * TODO: move initialization to different method
      *
      * @param event event triggered by the "new question" button click
      */
-    public void newQuestion(ActionEvent event) {
+    public void newQuery(ActionEvent event) {
         if (this.isRecording) {
             // wait for chatgpt to response
             // Question stopRecording()
             var currentQuestion = SayItAssistant.assistant.endRecording();
-            this.pastQuestions.remove(this.pastQuestions.size() - 1);
-            this.pastQuestions.add(currentQuestion);
-            this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            this.pastQueries.remove(this.pastQueries.size() - 1);
+            this.pastQueries.add(currentQuestion);
+            this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
             // change back to new question
-            this.recordButton.setText("New Question");
-            this.deleteButton.setDisable(false);
-            this.clearAllButton.setDisable(false);
+            this.startButton.setText("New Question");
         } else {
-            this.pastQuestions.add(new Question("", "RECORDING", ""));
+            this.pastQueries.add(new Question("", "RECORDING", ""));
             // call a method that starts recording
             SayItAssistant.assistant.startRecording();
-            this.recordButton.setText("Stop Recording");
-            this.deleteButton.setDisable(true);
-            this.clearAllButton.setDisable(true);
+            this.startButton.setText("Stop Recording");
         }
         this.isRecording = !this.isRecording;
+    }
+
+    /**
+     * Runs the command specified by the user.
+     * @param command string that specifies which command to run
+     */
+    public void runCommand(String command) {
+        // logic for determining which command to run
     }
 }

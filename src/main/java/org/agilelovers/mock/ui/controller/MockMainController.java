@@ -15,30 +15,26 @@ public class MockMainController extends MainController {
     public boolean getAnswer = false;
 
     public void addQuestion(Question question) {
-        this.pastQuestions.add(question);
+        this.pastQueries.add(question);
     }
 
     @Override
-    public void newQuestion(ActionEvent event) {
+    public void newQuery(ActionEvent event) {
         System.out.println("isRecording: " + this.isRecording);
-        System.out.println("pastQuestions: " + this.pastQuestions);
+        System.out.println("pastQuestions: " + this.pastQueries);
         if (this.isRecording) {
-            Question currentQuestion = pastQuestions.get(pastQuestions.size() - 1);
+            Question currentQuestion = pastQueries.get(pastQueries.size() - 1);
             currentQuestion.setTitle("title");
-            this.pastQuestions.remove(this.pastQuestions.size() - 1);
+            this.pastQueries.remove(this.pastQueries.size() - 1);
             currentQuestion.setQuestion("question");
-            this.pastQuestions.add(currentQuestion);
-            this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            this.pastQueries.add(currentQuestion);
+            this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
             // change back to new question
-            this.recordButton.setText("New Question");
-            this.deleteButton.setDisable(false);
-            this.clearAllButton.setDisable(false);
+            this.startButton.setText("New Question");
         } else {
-            this.pastQuestions.add(new Question("", "RECORDING", ""));
+            this.pastQueries.add(new Question("", "RECORDING", ""));
             // call a method that starts recording
-            this.recordButton.setText("Stop Recording");
-            this.deleteButton.setDisable(true);
-            this.clearAllButton.setDisable(true);
+            this.startButton.setText("Stop Recording");
         }
         this.isRecording = !this.isRecording;
     }
