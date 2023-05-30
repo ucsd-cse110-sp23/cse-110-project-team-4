@@ -6,10 +6,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.agilelovers.server.question.QuestionRepository;
 import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
+import org.apache.catalina.User;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +23,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
@@ -46,8 +49,38 @@ public class UserControllerTest {
         userRepository.deleteAll();
     }
 
+//    @Test
+//    public void retrieveUserInformation() throws Exception {
+//        // Create a user for testing
+//        String username = "testing@get.com";
+//        String password = "getplaintext";
+//
+//        UserDocument user = UserDocument.builder()
+//                .username(username)
+//                .password(password)
+//                .build();
+//
+//        mvc.perform(post("/api/users")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(JsonUtil.toJson(user))
+//        );
+//
+//        MvcResult mvcResult = mvc.perform(get("/api/users")
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                        .andReturn();
+//
+//        String responseContent = mvcResult.getResponse().getContentAsString();
+//        UserDocument result = JsonUtil.fromJson(responseContent, UserDocument.class);
+//
+//
+//        // Perform assertions to verify the retrieved user
+//        assertThat(result).extracting(UserDocument::getUsername).isEqualTo(username);
+//        assertThat(result).extracting(UserDocument::getPassword).isEqualTo(password);
+//    }
+
+
     @Test
-    public void createUser() throws Exception {
+    public void createUserWithValidInputs() throws Exception {
         UserDocument user = UserDocument.builder()
                 .username("testing@test.com")
                 .password("plaintext")
@@ -64,7 +97,66 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUserAndChangeEmail() throws Exception {
+    public void CreateUserWithInvalidInput_NoAtSignUsername() throws Exception {
+        String invalidUsername = "nosign.com";
+        String password = "plaintext";
+
+        UserDocument user = UserDocument.builder()
+                .username(invalidUsername)
+                .password(password)
+                .build();
+
+        mvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(user)))
+                .andExpect(status().isNotFound()); // Expecting a 404 error
+
+    }
+
+    @Test
+    public void CreateUserWithInvalidInput_noPassword() throws Exception {
+        String validUsername = "good@username.com";
+        String invalidPassword = "";
+
+        UserDocument user = UserDocument.builder()
+                .username(validUsername)
+                .password(invalidPassword)
+                .build();
+
+        mvc.perform(post("/api/users")
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .content(JsonUtil.toJson(user)))
+                 .andExpect(status().isNotFound() // Expecting a 404 error
+        );
+    }
+
+//    @Test
+//    public void createTwoUsers_SameUsername() throws Exception {
+//        String validUsername = "good@username.com";
+//        String validPassword = "greatpasswordnothackableatall";
+//
+//        UserDocument user = UserDocument.builder()
+//                .username(validUsername)
+//                .password(validPassword)
+//                .build();
+//
+//        mvc.perform(post("/api/users")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(JsonUtil.toJson(user))
+//        );
+//
+//        mvc.perform(post("/api/users")
+//                 .contentType(MediaType.APPLICATION_JSON)
+//                 .content(JsonUtil.toJson(user)))
+//                 .andExpect(status().isNotFound() // Expecting a 404 error
+//        );
+//
+//    }
+
+
+
+    @Test
+    public void createUserAndChangeEmailWithValidInputs() throws Exception {
 
         String username = "unsure_testing@test.com";
         String email = "now_sure_testing@test.com";
