@@ -1,10 +1,10 @@
 package org.agilelovers.server.command;
 
 import org.agilelovers.server.command.errors.CommandNotFoundError;
-import org.agilelovers.server.question.common.OpenAIClient;
-import org.agilelovers.server.question.common.errors.NoAudioError;
+import org.agilelovers.server.common.OpenAIClient;
+import org.agilelovers.server.transcribe.errors.NoAudioError;
 import org.agilelovers.server.user.UserRepository;
-import org.agilelovers.server.question.common.errors.UserNotFoundError;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,10 +15,12 @@ public class CommandController {
     private final UserRepository users;
 
     private final CommandRepository commands;
+    private final OpenAIClient client;
 
     public CommandController(UserRepository users, CommandRepository commands) {
         this.users = users;
         this.commands = commands;
+        this.client = new OpenAIClient();
     }
 
     @GetMapping("/api/commands/{uid}")
@@ -28,24 +30,13 @@ public class CommandController {
     }
 
     @PostMapping("/api/commands/{uid}")
-    public CommandDocument createCommand(@RequestParam("file") MultipartFile file, @PathVariable String uid) {
+    public CommandDocument createCommand(@RequestBody CommandDocument command, @PathVariable String uid) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        String command = OpenAIClient.getTranscription(file);
-
-        if (command != null && !command.isEmpty()) {
-
-            CommandDocument commandDocument = CommandDocument.builder()
-                    .command(command)
-                    .userId(uid)
-                    .build();
-
-            return commands.save(commandDocument);
-        } else {
-            throw new NoAudioError();
-        }
+        command.setUserId(uid);
+        return commands.save(command);
     }
 
     @PutMapping("/api/commands/{id}")

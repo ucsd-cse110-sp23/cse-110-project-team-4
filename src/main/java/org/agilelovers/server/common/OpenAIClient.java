@@ -1,5 +1,6 @@
-package org.agilelovers.server.question.common;
+package org.agilelovers.server.common;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.github.jetkai.openai.api.CreateChatCompletion;
 import io.github.jetkai.openai.api.CreateTranscription;
 import io.github.jetkai.openai.api.data.audio.AudioData;
@@ -14,7 +15,14 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class OpenAIClient {
-    public static String getAnswer(String question) {
+
+    private final String API_KEY;
+
+    public OpenAIClient() {
+        Dotenv dotenv = Dotenv.load();
+        this.API_KEY = dotenv.get("OPENAI_API_KEY");
+    }
+    public String getAnswer(String question) {
         ChatCompletionMessageData messageData = ChatCompletionMessageData.builder()
                 .setRole("user")
                 .setContent(question)
@@ -26,7 +34,7 @@ public class OpenAIClient {
                 .build();
 
         OpenAI chatgpt = OpenAI.builder()
-                .setApiKey("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")
+                .setApiKey(this.API_KEY)
                 .createChatCompletion(completionData)
                 .build()
                 .sendRequest();
@@ -36,7 +44,7 @@ public class OpenAIClient {
         return createChatCompletion.asText();
     }
 
-    public static String getTranscription(MultipartFile file) {
+    public String getTranscription(MultipartFile file) {
         File audioFile = new File("audio.wav");
         try (FileOutputStream outputStream = new FileOutputStream(audioFile)) {
             outputStream.write(file.getBytes());
@@ -45,7 +53,7 @@ public class OpenAIClient {
         }
 
         OpenAI whisper = OpenAI.builder()
-                .setApiKey("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")
+                .setApiKey(this.API_KEY)
                 .createTranscription(AudioData.create(audioFile.toPath()))
                 .build()
                 .sendRequest();

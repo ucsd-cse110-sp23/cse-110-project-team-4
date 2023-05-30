@@ -1,33 +1,26 @@
-package org.agilelovers.server.user.errors;
+package org.agilelovers.server.transcribe.errors;
 
-import com.mongodb.MongoWriteException;
 import org.agilelovers.server.common.errors.UserNotFoundError;
+import org.agilelovers.server.transcribe.errors.NoAudioError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.validation.ConstraintViolationException;
-
 @ControllerAdvice
-public class UserExceptionAdvice {
+public class TranscribeExceptionAdvice {
     @ResponseBody
     @ExceptionHandler(UserNotFoundError.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String userNotFoundHandler(UserNotFoundError err) {
+    String userNotFoundError(UserNotFoundError err) {
         return err.getMessage();
     }
 
     @ResponseBody
-    @ExceptionHandler(MongoWriteException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String duplicateUser(MongoWriteException err) { return err.getMessage(); }
-
-    @ResponseBody
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String invalidDataHandler(ConstraintViolationException err) {
+    String noAudioError(NoAudioError err) {
         return err.getMessage();
     }
 }
