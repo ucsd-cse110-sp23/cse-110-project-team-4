@@ -23,7 +23,7 @@
       <PasswordField fx:id="passwordField" layoutX="131.0" layoutY="149.0" prefHeight="24.0" prefWidth="197.0" />
       <Button fx:id="createAccButton" layoutX="133.0" layoutY="204.0" mnemonicParsing="false" onAction="#createAccount" prefHeight="48.0" prefWidth="93.0" text="Create Account" textAlignment="CENTER" wrapText="true" />
       <Button fx:id="loginButton" layoutX="237.0" layoutY="204.0" mnemonicParsing="false" onAction="#login" prefHeight="48.0" prefWidth="93.0" text="Login" textAlignment="CENTER" />
-      <Label fx:id="warningLabel" layoutX="131.0" layoutY="177.0" prefHeight="25.0" prefWidth="197.0" text="hfsdklah" textFill="RED" wrapText="true">
+      <Label fx:id="warningLabel" layoutX="131.0" layoutY="177.0" prefHeight="25.0" prefWidth="197.0" textFill="RED" wrapText="true">
          <font>
             <Font size="9.0" />
          </font>
