@@ -1,4 +1,4 @@
-package org.agilelovers.ui.controller;
+package org.agilelovers.ui;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -9,13 +9,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import org.agilelovers.ui.Constants;
+import org.agilelovers.backend.SayItAssistant;
 import org.agilelovers.ui.object.Question;
-import org.agilelovers.ui.util.FrontEndAPIUtils;
-import org.agilelovers.ui.util.RecordingUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 /**
  * Controller class for the UI.
@@ -25,77 +22,72 @@ import java.net.URISyntaxException;
  * The backend is defined in the SayItAssistant.java file.
  * The Question object is defined in the Question.java file.
  */
-public class MainController {
+public class Controller {
     /**
      * The History list. This is the list of past questions.
      */
     @FXML
-    protected ListView historyList;
+    ListView historyList;
     /**
      * The Question label. This label displays the most recently asked or selected question.
      */
     @FXML
-    protected Label questionLabel;
+    Label questionLabel;
     /**
      * The Answer label. This label displays the answer to the most recently asked or selected question.
      */
     @FXML
-    protected TextArea answerTextArea;
+    TextArea answerTextArea;
 
     /**
-     * The Record button.
+     * initialize() will be called before the UI is displayed.
+     * This will load all saved data (on the User's local machine) to the UI.
      */
     @FXML
-    protected Button startButton;
-
-    public static String getId() {
-        return id;
-    }
-
-    public static void setId(String id) {
-        MainController.id = id;
-    }
-
-    private static String id;
-
-    /**
-     * A list that contains all the question objects.
-     */
-    protected ObservableList<Question> pastQueries = FXCollections.observableArrayList();
-
-    public static MainController instance;
-
-    protected boolean isRecording = false;
-
-    @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
         System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
-        Platform.runLater(() -> {
-            try {
-                FrontEndAPIUtils.fetchHistory(MainController.id);
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        for (Question question : pastQueries) {
+        pastQuestions.addAll(SayItAssistant.assistant.getDatabaseQuestions());
+        for (Question question : pastQuestions) {
             System.out.println(question);
         }
         initHistoryList();
     }
 
+    /**
+     * The Record button.
+     */
+    @FXML
+    Button recordButton;
+    /**
+     * The Delete button.
+     */
+    @FXML
+    Button deleteButton;
+    /**
+     * The Clear all button.
+     */
+    @FXML
+    Button clearAllButton;
+
+    ObservableList<Question> pastQuestions = FXCollections.observableArrayList();
+    private boolean isInitialized = false;
+
+    public static Controller instance;
+
+    boolean isRecording = false;
 
     /**
      * Initiates the history list.
      * If there are any questions from a previous session, they will be loaded into the list.
      * If not, the list will be empty.
-     * <p>
+     *
      * Specifies the behavior of the display when a question is selected.
      * If a question is selected, the question and answer labels will be updated to reflect the selected question.
      * If not, the question and answer labels will be empty.
      */
     public void initHistoryList() {
-        this.historyList.setItems(this.pastQueries);
+        this.historyList.setItems(this.pastQuestions);
         this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 questionLabel.setText("");
@@ -103,8 +95,8 @@ public class MainController {
                 return;
             }
             Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.getQuestion());
-            answerTextArea.setText(currentQuestion.getAnswer());
+            questionLabel.setText(currentQuestion.question());
+            answerTextArea.setText(currentQuestion.answer());
         });
     }
 
@@ -120,9 +112,9 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = this.pastQueries.get(index);
-            questionLabel.setText(currentQuestion.getQuestion());
-            answerTextArea.setText(currentQuestion.getAnswer());
+            Question currentQuestion = this.pastQuestions.get(index);
+            questionLabel.setText(currentQuestion.question());
+            answerTextArea.setText(currentQuestion.answer());
         });
     }
 
@@ -155,21 +147,17 @@ public class MainController {
 
     /**
      * Removes all questions from the history list.
-     * <p>
+     *
      * If no questions are in the list, nothing will happen.
+     *
+     * @param event event triggered by the "clear all" button click
      */
-    public void clearAll() {
+    public void clearAll(ActionEvent event) throws IOException {
         System.out.println("Clear All");
-        for (Question pastQuestion : this.pastQueries) {
-            Platform.runLater(() -> {
-                try {
-                    FrontEndAPIUtils.deleteAll(MainController.id);
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+        for (Question pastQuestion : this.pastQuestions) {
+            SayItAssistant.assistant.deleteDatabaseQuestion(pastQuestion);
         }
-        this.pastQueries.clear();
+        this.pastQuestions.clear();
         this.historyList.getSelectionModel().select(null);
     }
 
@@ -178,19 +166,16 @@ public class MainController {
      * <p>
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
+     *
+     * @param event event triggered by the "delete" button click
      */
-    public void deleteQuestion() {
+    public void deleteQuestion(ActionEvent event) throws IOException {
         System.out.println("Delete Question");
-        if (!this.pastQueries.isEmpty()) {
-            Platform.runLater(() -> {
-                try {
-                    FrontEndAPIUtils.deleteQuestion(this.pastQueries.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
+        if (!this.pastQuestions.isEmpty()) {
+            SayItAssistant.assistant.deleteDatabaseQuestion(this.pastQuestions.get(
+                    this.historyList.getFocusModel().getFocusedIndex())
+            );
+            this.pastQuestions.remove(this.historyList.getFocusModel().getFocusedIndex());
             this.historyList.getSelectionModel().select(null);
             System.out.println("Successfully deleted question");
         }
@@ -209,51 +194,31 @@ public class MainController {
      *
      * @param event event triggered by the "new question" button click
      */
-    public void newQuery(ActionEvent event) throws IOException {
+    public void newQuestion(ActionEvent event) {
+        if (!this.isInitialized) {
+            this.isInitialized = true;
+            this.initHistoryList();
+        }
+
         if (this.isRecording) {
-            // wait for chatgpt to response
+            // wait for ChatGPT to response
             // Question stopRecording()
-            var currentQuestion = RecordingUtils.endRecording(MainController.id, new Question());
-            this.runCommand(currentQuestion.getQuestion(), currentQuestion);
+            var currentQuestion = SayItAssistant.assistant.endRecording();
+            this.pastQuestions.remove(this.pastQuestions.size() - 1);
+            this.pastQuestions.add(currentQuestion);
+            this.historyList.getSelectionModel().select(this.pastQuestions.size() - 1);
+            // change back to new question
+            this.recordButton.setText("New Question");
+            this.deleteButton.setDisable(false);
+            this.clearAllButton.setDisable(false);
         } else {
-            this.pastQueries.add(new Question("", "", "RECORDING", ""));
+            this.pastQuestions.add(new Question("", "RECORDING", ""));
             // call a method that starts recording
-            RecordingUtils.startRecording();
-            this.startButton.setText("Stop Recording");
+            SayItAssistant.assistant.startRecording();
+            this.recordButton.setText("Stop Recording");
+            this.deleteButton.setDisable(true);
+            this.clearAllButton.setDisable(true);
         }
         this.isRecording = !this.isRecording;
-    }
-    public void newQuestion(Question currentQuestion) {
-        this.pastQueries.remove(this.pastQueries.size() - 1);
-        this.pastQueries.add(currentQuestion);
-        this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
-        // change back to new question
-        Platform.runLater(() -> {
-            try {
-                FrontEndAPIUtils.readQuestion(MainController.id, currentQuestion);
-            } catch (IOException | InterruptedException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        this.startButton.setText("New Question");
-    }
-    /**
-     * Runs the command specified by the user.
-     *
-     * @param command string that specifies which command to run
-     */
-    public void runCommand(String command, Question currentQuestion) throws IOException {
-        // logic for determining which command to run
-        if (command.isEmpty()) return;
-
-        command = command.toLowerCase();
-        if (command.startsWith(Constants.NEW_QUESTION_COMMAND)) {
-            currentQuestion.setQuestion(command.substring(Constants.NEW_QUESTION_COMMAND.length()));
-            this.newQuestion(currentQuestion);
-        } else if (command.startsWith(Constants.DELETE_PROMPT_COMMAND)) {
-            this.deleteQuestion();
-        } else if (command.startsWith(Constants.DELETE_ALL_PROMPTS_COMMAND)) {
-            this.clearAll();
-        }
     }
 }

@@ -5,9 +5,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import org.agilelovers.backend.MockDatabase;
 import org.agilelovers.backend.SayItAssistant;
-import org.agilelovers.ui.controller.MainController;
-import org.agilelovers.mock.ui.controller.MockMainController;
+import org.agilelovers.ui.MockController;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,49 +16,58 @@ import org.mockito.Mock;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.control.ListViewMatchers.hasItems;
 
-class MainControllerTest extends ApplicationTest {
-
+class ControllerTest extends ApplicationTest {
     @Mock
     private SayItAssistant assistant;
-    private MockMainController controller;
-    private String title1 = "title1";
-    private String title2 = "title2";
-    private String question1 = "question1";
-    private String question2 = "question2";
-    private String answer1 = "answer1";
-    private String answer2 = "answer2";
-
-    private Question testQuestion1;
-    private Question testQuestion2;
+    private MockController controller;
+    private MockDatabase mockDatabase;
+    private List<Question> questions;
 
     @Override
     public void start(Stage stage) throws IOException {
+        mockDatabase = new MockDatabase();
         var fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/MockMain.fxml"));
         Parent root = fxmlLoader.load();
-        MainController.instance = fxmlLoader.getController();
-        controller = (MockMainController) MainController.instance;
+        //Controller.instance = fxmlLoader.getController();
+        //controller = (MockController) Controller.instance;
+        controller = fxmlLoader.getController();
         Scene scene = new Scene(root); //??
         stage.setScene(scene);
         stage.show();
         System.out.println("start() called and finished");
     }
+
     @BeforeEach
-    void setup() throws IOException {
+    void setup() {
         assistant = mock(SayItAssistant.class);
-
-        testQuestion1 = new Question(title1, question1, answer1);
-        testQuestion2 = new Question(title2, question2, answer2);
-
-        controller.addQuestion(testQuestion1);
-        controller.addQuestion(testQuestion2);
-        controller.initHistoryList();
+        questions = mockDatabase.obtainQuestions();
         System.out.println("setup() called and finished");
+    }
+
+    /*
+     * Helper method to add questions to "controller" question list and to "questions" list
+     */
+    private void addQuestions() {
+        String title1 = "title1";
+        String question1 = "question1";
+        String answer1 = "answer1";
+        Question testQuestion1 = new Question(title1, question1, answer1);
+        String title2 = "title2";
+        String question2 = "question2";
+        String answer2 = "answer2";
+        Question testQuestion2 = new Question(title2, question2, answer2);
+        controller.addQuestion(testQuestion1);
+        questions.add(testQuestion1);
+        controller.addQuestion(testQuestion2);
+        questions.add(testQuestion2);
+        controller.initHistoryList();
     }
 
     @Test
@@ -83,11 +92,12 @@ class MainControllerTest extends ApplicationTest {
 
     @Test
     void testDeleteQuestion() {
-        clickOn("#historyList").clickOn(testQuestion2.toString());
+        clickOn("#historyList").clickOn("title2");
         clickOn("#deleteButton");
         //sleep(1000);
-        Assertions.assertThat(controller.getHistoryList().getItems()).containsExactly(testQuestion1);
-        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(1);
+        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(2);
+        Assertions.assertThat(controller.getHistoryList().getItems().get(0).toString()).isEqualTo("title3");
+        Assertions.assertThat(controller.getHistoryList().getItems().get(1).toString()).isEqualTo("title1");
     }
 
     @Test
@@ -130,21 +140,27 @@ class MainControllerTest extends ApplicationTest {
     }
 
     //clicking on an existing question shouldn't change anything
+    //covers sbst5
     @Test
     void testClickingOnExistingQuestion() {
-        clickOn("#historyList").clickOn(testQuestion1.toString());
+        //clickOn("#clearAllButton");
+        clickOn("#historyList").clickOn("title2");
         controller.refreshLabels();
-        clickOn("#historyList").clickOn(testQuestion2.toString());
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question2");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer2");
+        clickOn("#historyList").clickOn("title1");
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question1");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer1");
         controller.refreshLabels();
-        clickOn("#historyList").clickOn(testQuestion2.toString());
+        clickOn("#historyList").clickOn("title3");
         controller.refreshLabels();
-        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo(testQuestion2.question());
-        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo(testQuestion2.getAnswer());
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question3");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer3");
     }
 
     @Test
     void testDeleteCurrentDisplayedQuestion() {
-        clickOn("#historyList").clickOn(testQuestion1.toString());
+        clickOn("#historyList").clickOn("title1");
         controller.refreshLabels();
         clickOn("#deleteButton");
         controller.refreshLabels();
@@ -156,19 +172,19 @@ class MainControllerTest extends ApplicationTest {
 
     /*
      * New User uses SayIt Assistant and is unhappy with all the responses they receive (US1, US3, US4).
-Open the “SayIt Assistant” app. You should see that there are no questions on the page since this is a new user.
-Click the “+” to ask a new question.
-Begin speaking my question out loud for the application to generate audio-to-text.
-When finished speaking, click the “STOP” button.
-Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You should see the question appear on the questions-list as well.
-You are not happy with the response so you delete the question. You should see that there are no questions nor responses on the page anymore.
-Click the “+” to ask another question.
-You ask another question out loud for the application to generate audio-to-text.
-Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You like this response to the question so you keep it.
-Click the “+” to ask another question.
-You ask another question out loud for the application to generate audio-to-text.
-Suddenly, you’re worried someone may think you’re up to no good using this “SayIt Assistant '' app, so you want to clear your history. You click the “CLEAR ALL” button. Now, your page should have no questions nor responses being displayed.
-You close the app.
+     * Open the “SayIt Assistant” app. You should see that there are no questions on the page since this is a new user.
+     * Click the “+” to ask a new question.
+     * Begin speaking my question out loud for the application to generate audio-to-text.
+     * When finished speaking, click the “STOP” button.
+     * Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You should see the question appear on the questions-list as well.
+     * You are not happy with the response so you delete the question. You should see that there are no questions nor responses on the page anymore.
+     * Click the “+” to ask another question.
+     * You ask another question out loud for the application to generate audio-to-text.
+     * Wait for “SayIt Assistant” to generate and display a response to the question. You should only see one question and response on the page at this time. You like this response to the question so you keep it.
+     * Click the “+” to ask another question.
+     * You ask another question out loud for the application to generate audio-to-text.
+     * Suddenly, you’re worried someone may think you’re up to no good using this “SayIt Assistant '' app, so you want to clear your history. You click the “CLEAR ALL” button. Now, your page should have no questions nor responses being displayed.
+     * You close the app.
      */
     @Test
     void testSBST4() {
@@ -204,5 +220,29 @@ You close the app.
         clickOn("#clearAllButton");
         controller.refreshLabels();
         Assertions.assertThat(controller.getHistoryList().getItems()).isEmpty();
+    }
+
+    //second SBST6 test
+    @Test
+    void testSBST6() {
+        ListView<Question> historyList = lookup("#historyList").query();
+        clickOn("#historyList").clickOn("title1");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question1");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer1");
+        clickOn("#deleteButton");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("");
+        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(2);
+        clickOn("#recordButton");
+        controller.refreshLabels();
+        clickOn("#recordButton");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getHistoryList().getItems().size()).isEqualTo(3);
+        clickOn("#historyList").clickOn("title");
+        controller.refreshLabels();
+        Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo("question");
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo("answer");
     }
 }

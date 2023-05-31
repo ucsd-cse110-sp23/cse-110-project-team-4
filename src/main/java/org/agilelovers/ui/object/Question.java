@@ -43,13 +43,23 @@ public class Question {
     }
 
     public void setQuestion(String newQuestion) {
-        MainController.instance.refreshLabels();
+        if (Controller.instance != null) MainController.instance.refreshLabels();
         this.question = newQuestion;
     }
 
     public void setAnswer(String newAnswer) {
-        MainController.instance.refreshLabels();
+        if (Controller.instance != null) { MainController.instance.refreshLabels(); }
         this.answer = newAnswer;
+    }
+
+    public void setQuestion(String newQuestion) {
+        if (Controller.instance != null) { MainController.instance.refreshLabels(); }
+        this.question = newQuestion;
+    }
+
+    public void setTitle(String newTitle) {
+        if (Controller.instance != null) { MainController.instance.getHistoryList().refresh(); }
+        this.title = newTitle;
     }
 
     @Override
