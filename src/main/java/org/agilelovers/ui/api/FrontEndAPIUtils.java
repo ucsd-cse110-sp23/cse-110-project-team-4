@@ -2,6 +2,7 @@ package org.agilelovers.ui.api;
 
 import com.google.gson.Gson;
 import org.agilelovers.ui.Constants;
+import org.agilelovers.ui.object.Question;
 import org.agilelovers.ui.object.UserCredential;
 
 import java.io.IOException;
@@ -48,6 +49,11 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) throw new IllegalArgumentException("Incorrect user credentials.");
 
         return new Gson().fromJson(response.body(), UserCredential.class);
+    }
+
+    protected static Question getQuestion(String id) throws IOException, InterruptedException {
+        // TODO: implement this method
+        return null;
     }
 
 
