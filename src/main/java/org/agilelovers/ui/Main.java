@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.agilelovers.ui.controller.MainController;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -21,7 +20,8 @@ public class Main extends Application {
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, Color.WHITE);
 
-        //MainController.instance = fxmlLoader.getController();
+
+
 
         stage.setTitle("SayIt Assistant");
         stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/icon.jpg"))));

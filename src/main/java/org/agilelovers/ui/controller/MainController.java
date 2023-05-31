@@ -9,10 +9,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import org.agilelovers.backend.SayItAssistant;
+import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.util.FrontEndAPIUtils;
+import org.agilelovers.ui.util.RecordingUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * Controller class for the UI.
@@ -45,6 +48,16 @@ public class MainController {
     @FXML
     protected Button startButton;
 
+    public static String getId() {
+        return id;
+    }
+
+    public static void setId(String id) {
+        MainController.id = id;
+    }
+
+    private static String id;
+
     /**
      * A list that contains all the question objects.
      */
@@ -58,7 +71,13 @@ public class MainController {
     private void initialize() throws IOException {
         System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
-        pastQueries.addAll(SayItAssistant.assistant.getDatabaseQuestions());
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.fetchHistory(MainController.id);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         for (Question question : pastQueries) {
             System.out.println(question);
         }
@@ -70,7 +89,7 @@ public class MainController {
      * Initiates the history list.
      * If there are any questions from a previous session, they will be loaded into the list.
      * If not, the list will be empty.
-     *
+     * <p>
      * Specifies the behavior of the display when a question is selected.
      * If a question is selected, the question and answer labels will be updated to reflect the selected question.
      * If not, the question and answer labels will be empty.
@@ -84,7 +103,7 @@ public class MainController {
                 return;
             }
             Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.question());
+            questionLabel.setText(currentQuestion.getQuestion());
             answerTextArea.setText(currentQuestion.getAnswer());
         });
     }
@@ -102,7 +121,7 @@ public class MainController {
                 return;
             }
             Question currentQuestion = this.pastQueries.get(index);
-            questionLabel.setText(currentQuestion.question());
+            questionLabel.setText(currentQuestion.getQuestion());
             answerTextArea.setText(currentQuestion.getAnswer());
         });
     }
@@ -136,13 +155,19 @@ public class MainController {
 
     /**
      * Removes all questions from the history list.
-     *
+     * <p>
      * If no questions are in the list, nothing will happen.
      */
-    public void clearAll() throws IOException {
+    public void clearAll() {
         System.out.println("Clear All");
         for (Question pastQuestion : this.pastQueries) {
-            SayItAssistant.assistant.deleteDatabaseQuestion(pastQuestion);
+            Platform.runLater(() -> {
+                try {
+                    FrontEndAPIUtils.deleteAll(MainController.id);
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
         this.pastQueries.clear();
         this.historyList.getSelectionModel().select(null);
@@ -150,16 +175,21 @@ public class MainController {
 
     /**
      * Deletes the current selected question.
-     *
+     * <p>
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
      */
-    public void deleteQuestion() throws IOException {
+    public void deleteQuestion() {
         System.out.println("Delete Question");
         if (!this.pastQueries.isEmpty()) {
-            SayItAssistant.assistant.deleteDatabaseQuestion(this.pastQueries.get(
-                    this.historyList.getFocusModel().getFocusedIndex())
-            );
+            Platform.runLater(() -> {
+                try {
+                    FrontEndAPIUtils.deleteQuestion(this.pastQueries.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
             this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
             this.historyList.getSelectionModel().select(null);
             System.out.println("Successfully deleted question");
@@ -168,41 +198,62 @@ public class MainController {
 
     /**
      * Allows the user to ask a question to SayIt Assistant.
-     *
+     * <p>
      * When "new question" button is clicked, starts a new recording for
      * the user question and changes the button label to "stop recording".
      * The "delete" and "clear all" buttons are disabled while recording.
-     *
+     * <p>
      * Clicking the "stop recording" button will stop the recording and change
      * the button label to "new question". Adds new question to history list and
      * sets as current. Re-enables the "delete" and "clear all" buttons.
      *
      * @param event event triggered by the "new question" button click
      */
-    public void newQuery(ActionEvent event) {
+    public void newQuery(ActionEvent event) throws IOException {
         if (this.isRecording) {
             // wait for chatgpt to response
             // Question stopRecording()
-            var currentQuestion = SayItAssistant.assistant.endRecording();
-            this.pastQueries.remove(this.pastQueries.size() - 1);
-            this.pastQueries.add(currentQuestion);
-            this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
-            // change back to new question
-            this.startButton.setText("New Question");
+            var currentQuestion = RecordingUtils.endRecording(MainController.id, new Question());
+            this.runCommand(currentQuestion.getQuestion(), currentQuestion);
         } else {
-            this.pastQueries.add(new Question("", "RECORDING", ""));
+            this.pastQueries.add(new Question("", "", "RECORDING", ""));
             // call a method that starts recording
-            SayItAssistant.assistant.startRecording();
+            RecordingUtils.startRecording();
             this.startButton.setText("Stop Recording");
         }
         this.isRecording = !this.isRecording;
     }
-
+    public void newQuestion(Question currentQuestion) {
+        this.pastQueries.remove(this.pastQueries.size() - 1);
+        this.pastQueries.add(currentQuestion);
+        this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
+        // change back to new question
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.readQuestion(MainController.id, currentQuestion);
+            } catch (IOException | InterruptedException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        this.startButton.setText("New Question");
+    }
     /**
      * Runs the command specified by the user.
+     *
      * @param command string that specifies which command to run
      */
-    public void runCommand(String command) {
+    public void runCommand(String command, Question currentQuestion) throws IOException {
         // logic for determining which command to run
+        if (command.isEmpty()) return;
+
+        command = command.toLowerCase();
+        if (command.startsWith(Constants.NEW_QUESTION_COMMAND)) {
+            currentQuestion.setQuestion(command.substring(Constants.NEW_QUESTION_COMMAND.length()));
+            this.newQuestion(currentQuestion);
+        } else if (command.startsWith(Constants.DELETE_PROMPT_COMMAND)) {
+            this.deleteQuestion();
+        } else if (command.startsWith(Constants.DELETE_ALL_PROMPTS_COMMAND)) {
+            this.clearAll();
+        }
     }
 }

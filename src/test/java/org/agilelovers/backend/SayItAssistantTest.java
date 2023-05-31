@@ -1,5 +1,6 @@
 package org.agilelovers.backend;
 
+import org.agilelovers.ui.util.WhisperAPIUtils;
 import org.agilelovers.ui.object.Question;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,7 +99,7 @@ class SayItAssistantTest {
 
     }
 
-    static class TestWhisper extends WhisperAPIHelper{
+    static class TestWhisper extends WhisperAPIUtils {
         public static String getTextFromAudio(APIData data, String token, String organization, File file) {
             return "Who's in the CSE 110 Spring 2023 Team 4?";
         }

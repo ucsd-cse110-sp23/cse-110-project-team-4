@@ -1,5 +1,6 @@
-package org.agilelovers.backend;
+package org.agilelovers.ui.util;
 
+import org.agilelovers.ui.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -7,19 +8,15 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class WhisperAPIHelper {
+public class WhisperAPIUtils {
     private static void writeParameterToOutputStream(
             OutputStream outputStream,
-            String parameterName,
-            String parameterValue,
             String boundary
     ) throws IOException {
         outputStream.write(("--" + boundary + "\r\n").getBytes());
         outputStream.write(
-                ("Content-Disposition: form-data; name=\"" + parameterName +
-                        "\"\r\n\r\n").getBytes()
+                ("Content-Disposition: form-data").getBytes()
         );
-        outputStream.write((parameterValue + "\r\n").getBytes());
     }
 
     private static void writeFileToOutputStream(
@@ -78,9 +75,8 @@ public class WhisperAPIHelper {
         System.err.println("Error Result: " + errorResult);
     }
 
-    public static String getTextFromAudio(APIData WHISPER, String token,
-                                   String organization, File file) throws IOException {
-        URL url = new URL(WHISPER.endpoint());
+    public static String getTextFromAudio(String id, File file) throws IOException {
+        URL url = new URL(Constants.SERVER_URL + Constants.API_TRANSCRIBE_ENDPOINT + "?uid=" + id);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
@@ -90,15 +86,11 @@ public class WhisperAPIHelper {
                 "Content-Type",
                 "multipart/form-data; boundary=" + boundary
         );
-        connection.setRequestProperty("Authorization", "Bearer " + token);
-        connection.setRequestProperty("OpenAI-Organization", organization);
 
         OutputStream outputStream = connection.getOutputStream();
 
-        WhisperAPIHelper.writeParameterToOutputStream(outputStream,
-                "model", WHISPER.model(),
-                boundary);
-        WhisperAPIHelper.writeFileToOutputStream(outputStream, file,
+        WhisperAPIUtils.writeParameterToOutputStream(outputStream, boundary);
+        WhisperAPIUtils.writeFileToOutputStream(outputStream, file,
                 boundary);
 
         outputStream.write(("\r\n--" + boundary + "--\r\n").getBytes());
@@ -109,9 +101,9 @@ public class WhisperAPIHelper {
         int responseCode = connection.getResponseCode();
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            return WhisperAPIHelper.handleSuccessResponse(connection);
+            return WhisperAPIUtils.handleSuccessResponse(connection);
         } else {
-            WhisperAPIHelper.handleErrorResponse(connection);
+            WhisperAPIUtils.handleErrorResponse(connection);
             return null;
         }
     }

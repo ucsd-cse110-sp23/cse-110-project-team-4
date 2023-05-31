@@ -7,9 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.agilelovers.ui.Constants;
+import org.agilelovers.ui.object.UserCredential;
+import org.agilelovers.ui.util.FrontEndAPIUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 /**
@@ -44,42 +47,19 @@ public class LoginController {
     protected Label warningLabel;
 
     /**
-     * userToken for making calls to server
-     */
-    private static String userToken;
-
-
-    /**
      * Initializes the login UI.
+     *
      * @throws IOException
      */
     @FXML
     private void initialize() throws IOException {
         // check if autologin is enabled
-        File f = new File("verified.txt");
-        if(f.exists() && !f.isDirectory()) {
+        File f = new File(Constants.USER_TOKEN_PATH);
+        if (f.exists() && !f.isDirectory()) {
+            MainController.setId(new BufferedReader(new FileReader(Constants.USER_TOKEN_PATH)).readLine());
             switchToMainUI();
         }
 
-    }
-
-    /**
-     * Sets the user token.
-     * @param userToken to be set
-     */
-    public static void setUserToken(String userToken) {
-        LoginController.userToken = userToken;
-    }
-
-    /**
-     * Gets the user token.
-     * @return userToken
-     */
-    public static String getUserToken() {
-        if (userToken == null || userToken.isEmpty()) {
-            throw new NullPointerException("User token is null or empty.");
-        }
-        return userToken;
     }
 
     /**
@@ -96,11 +76,7 @@ public class LoginController {
         }
     }
 
-    private void saveAutoLogin() {
-
-    }
-
-    private void promptAutoLogin() throws IOException {
+    private void promptAutoLogin(String uid) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Auto Login");
         alert.setContentText("Do you want to enable auto login on this device?");
@@ -111,11 +87,13 @@ public class LoginController {
         alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonTypeOne){
-            System.out.println("yes");
-        } else {
-            System.out.println("no");
+        if (result.get() == buttonTypeOne) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(Constants.USER_TOKEN_PATH));
+            writer.write(uid);
+            writer.close();
         }
+
+        MainController.setId(uid);
 
         switchToMainUI();
     }
@@ -125,12 +103,27 @@ public class LoginController {
      *
      * @param event event triggered by the "Login" button click
      */
-    public void login(ActionEvent event) throws IOException {
-        if (areFieldsEmpty()){
+    public void login(ActionEvent event) {
+        if (areFieldsEmpty()) {
             return;
         }
-        // TODO: something API
-        promptAutoLogin();
+        new Thread(() -> {
+            try {
+                UserCredential credential = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText(), MainController.getId());
+                this.promptAutoLogin(credential.getId());
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalArgumentException e) {
+                this.loginFailed();
+            }
+        }).start();
+    }
+
+    private void loginFailed() {
+        this.warningLabel.setText("Login Failed. Incorrect user credentials.");
+    }
+    private void createAccountFailed() {
+        this.warningLabel.setText("Username already exists. Try again.");
     }
 
     /**
@@ -139,12 +132,20 @@ public class LoginController {
      * @param event event triggered by the "Create Account" button click
      */
     public void createAccount(ActionEvent event) throws IOException {
-        if (areFieldsEmpty()){
+        if (areFieldsEmpty()) {
             return;
         }
-        // TODO: something API
         // add username and password to database
-        promptAutoLogin();
+        new Thread(() -> {
+            try {
+                UserCredential credential = FrontEndAPIUtils.createAccount(this.usernameField.getText(), this.passwordField.getText());
+                this.promptAutoLogin(credential.getId());
+            } catch (IOException | InterruptedException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalArgumentException e) {
+                this.createAccountFailed();
+            }
+        }).start();
     }
 
     /**
@@ -156,13 +157,15 @@ public class LoginController {
         Stage stage = (Stage) this.loginButton.getScene().getWindow();
         stage.close();
 
-        Parent root = FXMLLoader.load(getClass().getResource("/MainExperimental.fxml"));
+        var fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("/MainExperimental.fxml"));
+        Parent root = fxmlLoader.load();
+        MainController.instance = fxmlLoader.getController();
         stage = new Stage();
         stage.setTitle("SayItAssistant");
         stage.setScene(new Scene(root, 600, 400));
         stage.show();
     }
-
 
 
 }
