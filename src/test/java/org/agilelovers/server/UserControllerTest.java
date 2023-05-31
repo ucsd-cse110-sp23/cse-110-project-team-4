@@ -1,17 +1,7 @@
 package org.agilelovers.server;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.agilelovers.server.question.QuestionRepository;
 import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
-import org.apache.catalina.User;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,13 +9,17 @@ import org.opentest4j.TestAbortedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -49,34 +43,38 @@ public class UserControllerTest {
         userRepository.deleteAll();
     }
 
-//    @Test
-//    public void retrieveUserInformation() throws Exception {
-//        // Create a user for testing
-//        String username = "testing@get.com";
-//        String password = "getplaintext";
-//
-//        UserDocument user = UserDocument.builder()
-//                .username(username)
-//                .password(password)
-//                .build();
-//
-//        mvc.perform(post("/api/users")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(JsonUtil.toJson(user))
-//        );
-//
-//        MvcResult mvcResult = mvc.perform(get("/api/users")
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                        .andReturn();
-//
-//        String responseContent = mvcResult.getResponse().getContentAsString();
-//        UserDocument result = JsonUtil.fromJson(responseContent, UserDocument.class);
-//
-//
-//        // Perform assertions to verify the retrieved user
-//        assertThat(result).extracting(UserDocument::getUsername).isEqualTo(username);
-//        assertThat(result).extracting(UserDocument::getPassword).isEqualTo(password);
-//    }
+    @Test
+    public void retrieveUserInformation() throws Exception {
+        // Create a user for testing
+        String username = "testing@get.com";
+        String password = "getplaintext";
+
+        UserDocument user = UserDocument.builder()
+                .username(username)
+                .password(password)
+                .build();
+
+        mvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(user))
+        );
+
+        ResultActions grabUser = mvc.perform(get("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(user))
+               );
+
+        //get HttpResponse object
+        var httpResponse = grabUser.andReturn().getResponse();
+        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
+        String str = httpResponse.getContentAsString();
+
+        UserDocument result = JsonUtil.fromJson(str, UserDocument.class);
+
+        //Perform assertions to verify the retrieved user
+        assertThat(result).extracting(UserDocument::getUsername).isEqualTo(username);
+        assertThat(result).extracting(UserDocument::getPassword).isEqualTo(password);
+    }
 
 
     @Test

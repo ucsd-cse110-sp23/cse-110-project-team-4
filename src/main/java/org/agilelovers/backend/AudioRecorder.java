@@ -1,7 +1,7 @@
 package org.agilelovers.backend;
 
-import java.io.*;
 import javax.sound.sampled.*;
+import java.io.File;
 
 /**
  * The type Audio recorder.
@@ -90,6 +90,10 @@ public class AudioRecorder {
 
     /**
      * Stops and closes the TargetDataLine to end the recording
+     */
+
+    /**
+     * add into MS2 testing, audio recorder testing
      */
     public void stop() {
         targetDataLine.stop();
