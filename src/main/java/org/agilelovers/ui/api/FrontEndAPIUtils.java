@@ -21,10 +21,12 @@ public class FrontEndAPIUtils {
      */
     private FrontEndAPIUtils() {}
 
-    protected static UserCredential createAccount(String username, String password, String id)
+    protected static UserCredential createAccount(String username, String password)
             throws URISyntaxException, IOException, InterruptedException, IllegalArgumentException {
         HttpRequest postRequest = HttpRequest.newBuilder().uri(new URI(Constants.SERVER_URL + "/api/users"))
-                .POST(HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, id).toString()))
+                .header("Content-Type", "application/json")
+                .method("POST",
+                        HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, null).toString()))
                 .build();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -35,13 +37,15 @@ public class FrontEndAPIUtils {
         return new Gson().fromJson(response.body(), UserCredential.class);
     }
 
-    protected static UserCredential login(String username, String password) throws IOException, InterruptedException,
+    protected static UserCredential login(String username, String password, String id) throws IOException,
+            InterruptedException,
             IllegalArgumentException {
         // send a get request to the api endpoint
-        String queryString = String.format("?username=%s&password=%s", URLEncoder.encode(username,
-                StandardCharsets.UTF_8), URLEncoder.encode(password, StandardCharsets.UTF_8));
-        HttpRequest getRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + "/api/users/" + queryString))
-                .GET().build();
+        HttpRequest getRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + "/api/users/"))
+                .header("Content-Type", "application/json")
+                .method("GET",
+                        HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, id).toString()))
+                .build();
 
         HttpClient client = HttpClient.newHttpClient();
 
