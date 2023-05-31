@@ -44,7 +44,7 @@ class QuestionTest extends ApplicationTest {
 
     @Test
     void testAnswer() {
-        Assertions.assertThat(testQuestion.answer()).isEqualTo("answer");
+        Assertions.assertThat(testQuestion.getAnswer()).isEqualTo("answer");
     }
 
     @Test
@@ -55,7 +55,7 @@ class QuestionTest extends ApplicationTest {
     @Test
     void setTestAnswer() {
         testQuestion.setAnswer("newAnswer");
-        Assertions.assertThat(testQuestion.answer()).isEqualTo("newAnswer");
+        Assertions.assertThat(testQuestion.getAnswer()).isEqualTo("newAnswer");
     }
 
     @Test
@@ -84,7 +84,7 @@ class QuestionTest extends ApplicationTest {
     @Test
     void testEmptyAnswer() {
         Question emptyAnswer = new Question();
-        Assertions.assertThat(emptyAnswer.answer()).isEmpty();
+        Assertions.assertThat(emptyAnswer.getAnswer()).isEmpty();
     }
 
     @Test
@@ -96,7 +96,7 @@ class QuestionTest extends ApplicationTest {
     @Test
     void testSetNullAnswer() {
         testQuestion.setAnswer(null);
-        Assertions.assertThat(testQuestion.answer()).isNull();
+        Assertions.assertThat(testQuestion.getAnswer()).isNull();
     }
 
     @Test

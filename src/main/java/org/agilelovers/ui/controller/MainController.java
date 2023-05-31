@@ -85,7 +85,7 @@ public class MainController {
             }
             Question currentQuestion = (Question) newValue;
             questionLabel.setText(currentQuestion.question());
-            answerTextArea.setText(currentQuestion.answer());
+            answerTextArea.setText(currentQuestion.getAnswer());
         });
     }
 
@@ -103,7 +103,7 @@ public class MainController {
             }
             Question currentQuestion = this.pastQueries.get(index);
             questionLabel.setText(currentQuestion.question());
-            answerTextArea.setText(currentQuestion.answer());
+            answerTextArea.setText(currentQuestion.getAnswer());
         });
     }
 

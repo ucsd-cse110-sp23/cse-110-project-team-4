@@ -139,7 +139,7 @@ class MainControllerTest extends ApplicationTest {
         clickOn("#historyList").clickOn(testQuestion2.toString());
         controller.refreshLabels();
         Assertions.assertThat(controller.getQuestionLabel().getText()).isEqualTo(testQuestion2.question());
-        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo(testQuestion2.answer());
+        Assertions.assertThat(controller.getAnswerTextArea().getText()).isEqualTo(testQuestion2.getAnswer());
     }
 
     @Test
