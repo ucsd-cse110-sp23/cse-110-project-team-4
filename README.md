@@ -44,39 +44,6 @@ On our application, there are several buttons the user should know about:
 
 ---
 
-## Project Structure
-Source Code:
-```bash
-src
-├── backend
-│   ├── Assistant.java
-│   ├── AudioRecorder.java
-│   ├── ChatGPTHelper.java
-│   ├── Database.java
-│   ├── SayItAssistant.java
-│   └── WhisperAPIHelper.java
-├── mock
-│   └── ui
-│       └── MockController.java
-└── ui
-    ├── Controller.java
-    ├── Main.java
-    └── object
-        └── Question.java
-
-```
-
-Resources:
-```bash
-resources
-├── EmailSetup.fxml
-├── Login.fxml
-├── Main.fxml
-└── MockMain.fxml
-```
-
----
-
 ## Milestone 1 Delivery Checklist
 
 #### Software design – 10 points
