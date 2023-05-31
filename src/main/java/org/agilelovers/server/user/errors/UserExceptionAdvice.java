@@ -1,7 +1,6 @@
 package org.agilelovers.server.user.errors;
 
 import com.mongodb.MongoWriteException;
-import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

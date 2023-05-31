@@ -1,42 +1,23 @@
 package org.agilelovers.server.command;
 
 import org.agilelovers.server.command.errors.CommandNotFoundError;
-import org.agilelovers.server.common.OpenAIClient;
-import org.agilelovers.server.transcribe.errors.NoAudioError;
-import org.agilelovers.server.user.UserRepository;
-import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 public class CommandController {
-    private final UserRepository users;
 
     private final CommandRepository commands;
-    private final OpenAIClient client;
 
-    public CommandController(UserRepository users, CommandRepository commands) {
-        this.users = users;
+    public CommandController(CommandRepository commands) {
         this.commands = commands;
-        this.client = new OpenAIClient();
     }
 
     @GetMapping("/api/commands/{uid}")
     public List<CommandDocument> getAllQuestionsFromUserId(@PathVariable String uid) {
         return commands.findAllByUserId(uid)
                 .orElseThrow(() -> new CommandNotFoundError(uid, true));
-    }
-
-    @PostMapping("/api/commands/{uid}")
-    public CommandDocument createCommand(@RequestBody CommandDocument command, @PathVariable String uid) {
-
-        if (!users.existsById(uid))
-            throw new UserNotFoundError(uid);
-
-        command.setUserId(uid);
-        return commands.save(command);
     }
 
     @PutMapping("/api/commands/{id}")

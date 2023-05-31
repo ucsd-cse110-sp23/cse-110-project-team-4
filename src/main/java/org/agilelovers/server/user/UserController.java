@@ -1,6 +1,6 @@
 package org.agilelovers.server.user;
 
-import org.agilelovers.server.common.errors.UserNotFoundError;
+import org.agilelovers.server.user.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
