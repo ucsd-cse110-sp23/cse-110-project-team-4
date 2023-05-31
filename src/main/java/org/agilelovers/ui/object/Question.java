@@ -1,5 +1,6 @@
 package org.agilelovers.ui.object;
 
+
 import org.agilelovers.ui.controller.MainController;
 
 public class Question {
@@ -43,23 +44,13 @@ public class Question {
     }
 
     public void setQuestion(String newQuestion) {
-        if (Controller.instance != null) MainController.instance.refreshLabels();
+        if (MainController.instance != null) MainController.instance.refreshLabels();
         this.question = newQuestion;
     }
 
     public void setAnswer(String newAnswer) {
-        if (Controller.instance != null) { MainController.instance.refreshLabels(); }
+        if (MainController.instance != null) { MainController.instance.refreshLabels(); }
         this.answer = newAnswer;
-    }
-
-    public void setQuestion(String newQuestion) {
-        if (Controller.instance != null) { MainController.instance.refreshLabels(); }
-        this.question = newQuestion;
-    }
-
-    public void setTitle(String newTitle) {
-        if (Controller.instance != null) { MainController.instance.getHistoryList().refresh(); }
-        this.title = newTitle;
     }
 
     @Override

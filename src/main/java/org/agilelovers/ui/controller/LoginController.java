@@ -1,5 +1,6 @@
 package org.agilelovers.ui.controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -76,6 +77,16 @@ public class LoginController {
         }
     }
 
+    private void disableButtons() {
+        this.createAccButton.setDisable(true);
+        this.loginButton.setDisable(true);
+    }
+
+    private void enableButtons() {
+        this.createAccButton.setDisable(false);
+        this.loginButton.setDisable(false);
+    }
+
     private void promptAutoLogin(String uid) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Auto Login");
@@ -107,7 +118,8 @@ public class LoginController {
         if (areFieldsEmpty()) {
             return;
         }
-        new Thread(() -> {
+        this.disableButtons();
+        Platform.runLater(() -> {
             try {
                 UserCredential credential = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText(), MainController.getId());
                 this.promptAutoLogin(credential.getId());
@@ -116,14 +128,16 @@ public class LoginController {
             } catch (IllegalArgumentException e) {
                 this.loginFailed();
             }
-        }).start();
+        });
     }
 
     private void loginFailed() {
         this.warningLabel.setText("Login Failed. Incorrect user credentials.");
+        this.enableButtons();
     }
     private void createAccountFailed() {
         this.warningLabel.setText("Username already exists. Try again.");
+        this.enableButtons();
     }
 
     /**
@@ -135,8 +149,9 @@ public class LoginController {
         if (areFieldsEmpty()) {
             return;
         }
+        this.disableButtons();
         // add username and password to database
-        new Thread(() -> {
+        Platform.runLater(() -> {
             try {
                 UserCredential credential = FrontEndAPIUtils.createAccount(this.usernameField.getText(), this.passwordField.getText());
                 this.promptAutoLogin(credential.getId());
@@ -145,7 +160,7 @@ public class LoginController {
             } catch (IllegalArgumentException e) {
                 this.createAccountFailed();
             }
-        }).start();
+        });
     }
 
     /**

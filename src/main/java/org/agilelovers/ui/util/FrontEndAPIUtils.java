@@ -26,14 +26,16 @@ public class FrontEndAPIUtils {
             throws URISyntaxException, IOException, InterruptedException, IllegalArgumentException {
         HttpRequest postRequest = HttpRequest.newBuilder().uri(new URI(Constants.SERVER_URL + Constants.USER_ENDPOINT))
                 .header("Content-Type", "application/json")
-                .method("POST",
-                        HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, null).toString()))
+                .POST(HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, null).toString()))
                 .build();
 
         HttpClient client = HttpClient.newHttpClient();
 
         HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200) throw new IllegalArgumentException("Username already exists");
+        if (response.statusCode() != 200) {
+            System.err.println("Response code: " + response.statusCode());
+            throw new IllegalArgumentException("Username already exists");
+        }
 
         return new Gson().fromJson(response.body(), UserCredential.class);
     }
@@ -42,16 +44,21 @@ public class FrontEndAPIUtils {
             InterruptedException,
             IllegalArgumentException {
         // send a get request to the api endpoint
-        HttpRequest getRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.USER_ENDPOINT))
-                .header("Content-Type", "application/json")
-                .method("GET",
-                        HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, id).toString()))
-                .build();
+        HttpRequest getRequest =
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.USER_ENDPOINT))
+                        .header("Content-Type", "application/json")
+                        .method("GET",
+                                HttpRequest.BodyPublishers.ofString(
+                                        new UserCredential(username, password, id).toString()))
+                        .build();
 
         HttpClient client = HttpClient.newHttpClient();
 
         HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200) throw new IllegalArgumentException("Incorrect user credentials.");
+        if (response.statusCode() != 200) {
+            System.err.println("Response code: " + response.statusCode());
+            throw new IllegalArgumentException("Incorrect user credentials.");
+        }
 
         return new Gson().fromJson(response.body(), UserCredential.class);
     }

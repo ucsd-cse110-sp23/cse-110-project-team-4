@@ -211,7 +211,7 @@ public class Database {
                 String question = queryValue.getJSONObject(key).getString("Question");
                 String answer = queryValue.getJSONObject(key).getString("Answer");
 
-                questions.add(new Question(title, question, answer));
+                questions.add(new Question(null, null, question, answer));
             }
         } catch (IOException e) { e.printStackTrace();}
 
