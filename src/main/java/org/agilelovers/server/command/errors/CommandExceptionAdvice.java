@@ -27,7 +27,7 @@ public class CommandExceptionAdvice {
 
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     String invalidDataHandler(ConstraintViolationException err) {
         return err.getMessage();
     }

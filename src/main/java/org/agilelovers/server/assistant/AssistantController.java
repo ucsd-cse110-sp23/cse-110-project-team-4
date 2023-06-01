@@ -1,5 +1,9 @@
 package org.agilelovers.server.assistant;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.command.CommandDocument;
 import org.agilelovers.server.command.CommandRepository;
 import org.agilelovers.server.common.OpenAIClient;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@ApiOperation("Assistant API")
 public class AssistantController {
     private final UserRepository users;
     private final QuestionRepository questions;
@@ -37,8 +42,16 @@ public class AssistantController {
         return result;
     }
 
+    @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will save " +
+            "it either as a command or as a question")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created question/command"),
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 406, message = "The audio file doesn't have any transcribe-able audio or its empty")
+    })
     @PostMapping("/api/assistant/{uid}")
-    public AssistantData save(@RequestParam("file") MultipartFile file, @PathVariable String uid) {
+    public AssistantData transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
+                                           @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 

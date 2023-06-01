@@ -11,24 +11,11 @@ import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class QuestionExceptionAdvice {
-    @ResponseBody
-    @ExceptionHandler(QuestionNotFoundError.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    String questionNotFoundError(QuestionNotFoundError err) {
-        return err.getMessage();
-    }
 
     @ResponseBody
     @ExceptionHandler(UserNotFoundError.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     String userNotFoundError(UserNotFoundError err) {
-        return err.getMessage();
-    }
-
-    @ResponseBody
-    @ExceptionHandler(NoQuestionError.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    String noAudioError(NoQuestionError err) {
         return err.getMessage();
     }
 
