@@ -3,7 +3,6 @@
 
 *Team 4: Louie Cai, Anish Govind, Lilian Kong, Nicholas Lam, Billy Phan, Shera Zhong*
 
----
 ## Documentations
 - [Frontend/UI Code Documentation](./docs/frontend.md)
 
