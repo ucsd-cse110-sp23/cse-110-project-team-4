@@ -7,9 +7,9 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
-public interface UserRepository extends MongoRepository<UserDocument,
-        String> {
+public interface UserRepository extends MongoRepository<UserDocument, String>, UserRepositoryInterface {
 
-    Optional<UserDocument> findByUsernameAndPassword(String username,
-                                                         String password);
+    Optional<UserDocument> findByUsernameAndPassword(String username, String password);
+
+    UserDocument saveUsernameAndPassword(String username, String password);
 }

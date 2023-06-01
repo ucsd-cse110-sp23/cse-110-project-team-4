@@ -30,7 +30,7 @@ public class UserController {
     @ApiOperation(value = "Sign up", notes = "Sign up with a username and password")
     @PostMapping("/api/users")
     public UserDocument createUser(@RequestBody UserDocument user) {
-        return users.save(user);
+        return users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
     }
 
     @ApiOperation(value = "Update email", notes = "Update a user's email")
