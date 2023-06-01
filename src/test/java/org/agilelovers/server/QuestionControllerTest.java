@@ -6,6 +6,7 @@ import org.agilelovers.server.question.QuestionDocument;
 import org.agilelovers.server.question.QuestionRepository;
 import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
+import org.agilelovers.ui.object.Question;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
