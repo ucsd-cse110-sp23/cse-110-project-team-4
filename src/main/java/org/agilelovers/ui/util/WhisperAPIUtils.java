@@ -76,7 +76,7 @@ public class WhisperAPIUtils {
     }
 
     public static String getTextFromAudio(String id, File file) throws IOException {
-        URL url = new URL(Constants.SERVER_URL + Constants.API_TRANSCRIBE_ENDPOINT + "?uid=" + id);
+        URL url = new URL(Constants.SERVER_URL + Constants.API_TRANSCRIBE_ENDPOINT + id);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);

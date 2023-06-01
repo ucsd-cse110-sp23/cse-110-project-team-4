@@ -214,6 +214,7 @@ public class MainController {
             // wait for chatgpt to response
             // Question stopRecording()
             var currentQuestion = RecordingUtils.endRecording(MainController.id, new Question());
+            System.err.println(currentQuestion);
             this.runCommand(currentQuestion.getQuestion(), currentQuestion);
         } else {
             this.pastQueries.add(new Question("", "", "RECORDING", ""));
@@ -243,6 +244,7 @@ public class MainController {
      * @param command string that specifies which command to run
      */
     public void runCommand(String command, Question currentQuestion) throws IOException {
+        System.err.println("RUNNING COMMAND");
         // logic for determining which command to run
         if (command.isEmpty()) return;
 

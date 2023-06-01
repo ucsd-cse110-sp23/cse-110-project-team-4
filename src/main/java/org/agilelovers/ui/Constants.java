@@ -11,4 +11,5 @@ public class Constants {
     public final static String DELETE_PROMPT_COMMAND = "delete prompt";
     public final static String DELETE_ALL_PROMPTS_COMMAND = "delete all prompts";
     public final static String USER_TOKEN_PATH = "./user_token.txt";
+    public final static String RECORDING_PATH = ".//recording.wav";
 }
