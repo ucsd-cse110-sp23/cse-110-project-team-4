@@ -47,5 +47,5 @@ build/
 AgileLovers_DB
 
 ### Audio ###
-src/*.wav
-src/*.mp3
+*.wav
+*.mp3

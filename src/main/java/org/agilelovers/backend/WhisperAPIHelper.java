@@ -126,7 +126,7 @@ public class WhisperAPIHelper {
      * @throws IOException if any I/O error occurs
      */
     public static String getTextFromAudio(APIData WHISPER, String token,
-                                   String organization, File file) throws IOException {
+                                          String organization, File file) throws IOException {
         URL url = new URL(WHISPER.endpoint());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");

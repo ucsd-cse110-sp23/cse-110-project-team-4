@@ -1,6 +1,7 @@
 package org.agilelovers.backend;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.agilelovers.ui.object.AudioRecorder;
 import org.agilelovers.ui.object.Question;
 
 import java.io.File;
@@ -145,7 +146,6 @@ public class SayItAssistant {
             System.out.println(answerToQuestion);
             System.out.println(title);
             ques.setAnswer(answerToQuestion);
-            ques.setTitle(title);
         });
 
         thread.start();
@@ -169,6 +169,6 @@ public class SayItAssistant {
      * @throws IOException if the file is not found/cannot be opened
      */
     public void deleteDatabaseQuestion(Question question) throws IOException {
-        queryDatabase.deleteQueryFromFile(question.question());
+        queryDatabase.deleteQueryFromFile(question.getQuestion());
     }
 }

@@ -4,10 +4,12 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
 
@@ -20,13 +22,15 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         var fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("/Main.fxml"));
+        fxmlLoader.setLocation(getClass().getResource("/Login.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, Color.WHITE);
 
-        Controller.instance = fxmlLoader.getController();
+
+
 
         stage.setTitle("SayIt Assistant");
+        stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/icon.jpg"))));
 
         stage.setScene(scene);
         stage.show();

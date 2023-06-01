@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.agilelovers.ui.controller.MainController">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <ListView fx:id="historyList" prefHeight="748.0" prefWidth="378.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <SplitPane layoutY="747.0" prefHeight="51.0" prefWidth="378.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <items>
+                  <Button fx:id="startButton" mnemonicParsing="false" onAction="#newQuery" prefHeight="51.0" prefWidth="1020.0" text="Start" />
+               </items>
+            </SplitPane>
+         </children></AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <Label fx:id="questionLabel" alignment="TOP_LEFT" layoutX="25.0" layoutY="22.0" prefHeight="237.0" prefWidth="844.0" text="Make a command" wrapText="true" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="25.0" />
+            <TextArea fx:id="answerTextArea" layoutX="51.0" layoutY="285.0" prefHeight="493.0" prefWidth="844.0" text="A: Your SayIt Assistant response will display here." wrapText="true" AnchorPane.bottomAnchor="29.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="276.0" />
+         </children></AnchorPane>
+  </items>
+</SplitPane>

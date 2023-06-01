@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  sayit-server:
+    container_name: sayit-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sayit-server:latest
+    depends_on:
+      - sayit-db
+    ports:
+      - "8080:8080"
+
+  sayit-db:
+    image: mongo:latest
+    container_name : sayit-db
+#    environment:
+#      - MONGO_INITDB_ROOT_USERNAME=cse110
+#      - MONGO_INITDB_ROOT_PASSWORD=cse110pass
+    volumes:
+      - mongodbdata:/data/db
+
+volumes:
+  mongodbdata:
+    driver: local
