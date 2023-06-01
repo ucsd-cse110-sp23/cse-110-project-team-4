@@ -1,10 +1,8 @@
 package org.agilelovers.server.user;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Document("sayit-users")
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDocument {
@@ -39,4 +37,16 @@ public class UserDocument {
     @NotNull
     @NotBlank
     private String password;
+}
+
+@Data
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+class UserDocumentSecured extends UserDocument {
+    @ApiModelProperty(notes = "The secret required to use this API", required = true)
+    @NotNull
+    @NotBlank
+    private String apiPassword;
 }

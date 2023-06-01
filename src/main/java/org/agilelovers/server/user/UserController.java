@@ -1,19 +1,26 @@
 package org.agilelovers.server.user;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.server.user.errors.NotAuthorizedException;
 import org.agilelovers.server.user.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
+
 @RestController
 @ApiOperation("Users API")
 public class UserController {
 
     private final UserRepository users;
 
+    private final String apiPassword;
+
     public UserController(UserRepository users) {
+        Dotenv dotenv = Dotenv.load();
         this.users = users;
+        this.apiPassword = dotenv.get("API_SECRET");
     }
 
     @ApiOperation(value = "Sign in", notes = "Get the User ID with a username and password")
@@ -29,8 +36,11 @@ public class UserController {
 
     @ApiOperation(value = "Sign up", notes = "Sign up with a username and password")
     @PostMapping("/api/users")
-    public UserDocument createUser(@RequestBody UserDocument user) {
-        return users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
+    public UserDocument createUser(@RequestBody UserDocumentSecured user) {
+        if (user.getApiPassword() != null && user.getApiPassword().equals(this.apiPassword))
+            return users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
+        else
+            throw new NotAuthorizedException();
     }
 
     @ApiOperation(value = "Update email", notes = "Update a user's email")

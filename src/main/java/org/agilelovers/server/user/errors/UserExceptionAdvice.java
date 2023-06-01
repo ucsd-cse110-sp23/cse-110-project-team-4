@@ -21,7 +21,16 @@ public class UserExceptionAdvice {
     @ResponseBody
     @ExceptionHandler(MongoWriteException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    String duplicateUser(MongoWriteException err) { return err.getMessage(); }
+    String duplicateUser(MongoWriteException err) {
+        return err.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(NotAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    String unauthorizedAccess(NotAuthorizedException err) {
+        return err.getMessage();
+    }
 
     @ResponseBody
     @ExceptionHandler(ConstraintViolationException.class)
