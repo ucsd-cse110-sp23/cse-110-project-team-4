@@ -4,6 +4,8 @@
 *Team 4: Louie Cai, Anish Govind, Lilian Kong, Nicholas Lam, Billy Phan, Shera Zhong*
 
 ---
+## Documentations
+- [Frontend/UI Code Documentation](./docs/frontend.md)
 
 ## Prerequisite installations
 Our project is running on **JDK 20** and utilizes **Maven** as our package manager. Please make sure you have these installed on your machine before running our project ( *If you're running Linux or MacOS, you can use Homebrew to install Maven (https://maven.apache.org))*.
