@@ -49,8 +49,11 @@ public class LoginController {
 
     /**
      * Initializes the login UI.
+     * This method is called when the login UI is first loaded. It checks if the user has enabled auto login and
+     * automatically logs the user in if they have.
+     * If auto login is not enabled, the user is prompted to enter their credentials.
      *
-     * @throws IOException
+     * @throws IOException if the user token file cannot be read
      */
     @FXML
     private void initialize() throws IOException {
@@ -64,11 +67,11 @@ public class LoginController {
     }
 
     /**
-     * Checks if username and password fields are empty.
+     * Checks if username and password fields are empty. If they are, a warning message is displayed.
      *
-     * @return true if either are emtpy
+     * @return true if either fields are empty
      */
-    private boolean areFieldsEmpty() {
+    private boolean verifyEmptyFields() {
         if (this.usernameField.getText().isEmpty() || this.passwordField.getText().isEmpty()) {
             this.warningLabel.setText("Please enter a username and password.");
             return true;
@@ -77,16 +80,31 @@ public class LoginController {
         }
     }
 
+    /**
+     * Disables the login and create account buttons.
+     * Should be called when the login or create account buttons are already pressed to prevent multiple requests from
+     * being sent to the backend.
+     */
     private void disableButtons() {
         this.createAccButton.setDisable(true);
         this.loginButton.setDisable(true);
     }
 
+    /**
+     * Enables the login and create account buttons. Should be called if the login or create account request fails.
+     */
     private void enableButtons() {
         this.createAccButton.setDisable(false);
         this.loginButton.setDisable(false);
     }
 
+    /**
+     * Prompts the user to enable auto login. If the user accepts, their user token is saved to a file.
+     * The user is then logged in.
+     * TODO: switching to main UI should be done in a separate method, by a different class (Not SRP rn)
+     * @param uid the user's unique ID
+     * @throws IOException if the user token file cannot be written to
+     */
     private void promptAutoLogin(String uid) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Auto Login");
@@ -110,12 +128,15 @@ public class LoginController {
     }
 
     /**
+     * Triggered when the user clicks the "Login" button.
      * Checks the login credentials and logs the user in if they are valid.
+     * If the credentials are invalid, a warning message is displayed.
+     * If the credentials are valid, the user is prompted to enable auto login.
      *
      * @param event event triggered by the "Login" button click
      */
     public void login(ActionEvent event) {
-        if (areFieldsEmpty()) {
+        if (verifyEmptyFields()) {
             return;
         }
         this.disableButtons();
@@ -131,22 +152,33 @@ public class LoginController {
         });
     }
 
+    /**
+     * Helper method that handles login failure.
+     * Displays an error message and re-enables the login and create account buttons.
+     */
     private void loginFailed() {
         this.warningLabel.setText("Login Failed. Incorrect user credentials.");
         this.enableButtons();
     }
+
+    /**
+     * Helper method that handles create account failure.
+     * Displays an error message and re-enables the login and create account buttons.
+     */
     private void createAccountFailed() {
         this.warningLabel.setText("Username already exists. Try again.");
         this.enableButtons();
     }
 
     /**
-     * Creates a new account with the given credentials (if valid)
+     * Triggered when the user clicks the "Create Account" button.
+     * Creates a new account with the given credentials.
+     * If the username already exists, an error message is displayed.
      *
      * @param event event triggered by the "Create Account" button click
      */
-    public void createAccount(ActionEvent event) throws IOException {
-        if (areFieldsEmpty()) {
+    public void createAccount(ActionEvent event) {
+        if (verifyEmptyFields()) {
             return;
         }
         this.disableButtons();
@@ -164,9 +196,11 @@ public class LoginController {
     }
 
     /**
-     * Switches to the main UI. (logs user in)
+     * Switches to the main UI. This method is called when the user is successfully logged in.
+     * Removes the current login UI and loads the main UI.
+     * TODO: switching to main UI should be done in a separate method, by a different class (Not SRP rn)
      *
-     * @throws IOException
+     * @throws IOException if the main UI cannot be loaded
      */
     public void switchToMainUI() throws IOException {
         Stage stage = (Stage) this.loginButton.getScene().getWindow();

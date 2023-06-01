@@ -224,6 +224,18 @@ public class MainController {
         }
         this.isRecording = !this.isRecording;
     }
+
+    /**
+     * Adds a new question to the history list.
+     * This method is called when the user stops recording a question.
+     * The new question is added to the history list and set as the current question.
+     * The "new question" button label is changed to "new question".
+     * The "delete" and "clear all" buttons are re-enabled.
+     * The question and answer labels are updated to reflect the new question.
+     * The new question is sent to the backend to be processed.
+     *
+     * @param currentQuestion the question to be added to the history list
+     */
     public void newQuestion(Question currentQuestion) {
         this.pastQueries.remove(this.pastQueries.size() - 1);
         this.pastQueries.add(currentQuestion);

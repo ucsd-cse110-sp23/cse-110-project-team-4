@@ -26,9 +26,6 @@ public class Main extends Application {
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, Color.WHITE);
 
-
-
-
         stage.setTitle("SayIt Assistant");
         stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/icon.jpg"))));
 
