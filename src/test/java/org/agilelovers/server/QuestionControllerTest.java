@@ -1,12 +1,12 @@
 package org.agilelovers.server;
 
 import org.agilelovers.server.mock.mockOpenAI;
-import org.agilelovers.server.mock.mockRecording;
 import org.agilelovers.server.question.QuestionDocument;
 import org.agilelovers.server.question.QuestionRepository;
 import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.agilelovers.ui.object.Question;
+import org.agilelovers.server.mock.mockRecording;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,11 +19,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 
 @RunWith(SpringRunner.class)

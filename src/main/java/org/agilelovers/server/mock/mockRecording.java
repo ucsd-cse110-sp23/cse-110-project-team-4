@@ -1,6 +1,5 @@
 package org.agilelovers.server.mock;
 
-
 import org.agilelovers.ui.object.Question;
 
 public class mockRecording {
