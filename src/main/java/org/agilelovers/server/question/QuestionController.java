@@ -1,10 +1,11 @@
 package org.agilelovers.server.question;
 
 import org.agilelovers.server.common.OpenAIClient;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.question.errors.NoQuestionError;
 import org.agilelovers.server.question.errors.QuestionNotFoundError;
-import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +15,16 @@ public class QuestionController {
     private final UserRepository users;
     private final QuestionRepository questions;
     private final OpenAIClient client;
+
+    @Autowired
+    public QuestionController(QuestionRepository questions,
+                              UserRepository users,
+                              OpenAIClient client) {
+        this.users = users;
+        this.questions = questions;
+        this.client = client;
+    }
+
     public QuestionController(QuestionRepository questions,
                               UserRepository users) {
         this.users = users;

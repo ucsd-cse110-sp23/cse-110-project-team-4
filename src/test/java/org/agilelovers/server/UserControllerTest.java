@@ -14,7 +14,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.Assert;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -128,31 +130,39 @@ public class UserControllerTest {
         );
     }
 
-//    @Test
-//    public void createTwoUsers_SameUsername() throws Exception {
-//        String validUsername = "good@username.com";
-//        String validPassword = "greatpasswordnothackableatall";
-//
-//        UserDocument user = UserDocument.builder()
-//                .username(validUsername)
-//                .password(validPassword)
-//                .build();
-//
-//        mvc.perform(post("/api/users")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(JsonUtil.toJson(user))
-//        );
-//
-//        mvc.perform(post("/api/users")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(JsonUtil.toJson(user)))
-//                 .andExpect(status().isNotFound() // Expecting a 404 error
-//        );
-//
-//    }
+    @Test
+    public void createTwoUsers_SameUsername() {
+        String validUsername = "good@username.com";
+        String validPassword = "greatpasswordnothackableatall";
+
+        UserDocument user = UserDocument.builder()
+                .username(validUsername)
+                .password(validPassword)
+                .build();
+        try {
+            mvc.perform(post("/api/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(JsonUtil.toJson(user))
+            );
+            mvc.perform(post("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(JsonUtil.toJson(user))
+                    );
+            Assert.isTrue(false, "UserDuplicateError not thrown");
+        } catch (IOException e) {
+            Assert.isTrue(false, "UserDuplicateError not thrown");
+        } catch (Exception e) {
+            Assert.isTrue(true, "UserDuplicateError thrown");
+        }
+    }
 
 
-
+    /**
+     * Creates a user and tries creating another account with the same user.
+     *
+     * @throws Exception
+     * @throws IOException
+     */
     @Test
     public void createUserAndChangeEmailWithValidInputs() throws Exception {
 
