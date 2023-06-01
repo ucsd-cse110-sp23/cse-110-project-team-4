@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.object.Transcription;
 import org.agilelovers.ui.object.UserCredential;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -13,8 +14,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -23,7 +24,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.io.File;
 
 public class FrontEndAPIUtils {
 
@@ -155,7 +155,9 @@ public class FrontEndAPIUtils {
         uploadFile.setEntity(multipart);
         CloseableHttpResponse response = httpClient.execute(uploadFile);
         HttpEntity responseEntity = response.getEntity();
-        return new Gson().fromJson(responseEntity.getContent().toString(), String.class);
+        String question = new String(responseEntity.getContent().readAllBytes());
+        System.err.println(question);
+        return new Gson().fromJson(question, Transcription.class).getTranscribed();
     }
 
 
