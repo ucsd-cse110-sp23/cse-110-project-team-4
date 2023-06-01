@@ -1,6 +1,7 @@
 package org.agilelovers.server;
 
 import org.agilelovers.server.mock.mockOpenAI;
+import org.agilelovers.server.mock.mockRecording;
 import org.agilelovers.server.question.QuestionDocument;
 import org.agilelovers.server.question.QuestionRepository;
 import org.agilelovers.server.user.UserDocument;
@@ -17,10 +18,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 
 @RunWith(SpringRunner.class)
@@ -44,6 +46,8 @@ public class QuestionControllerTest {
 
     @Autowired
     private mockOpenAI fakeAi = new mockOpenAI();
+
+    private mockRecording mockRecord = new mockRecording();
 
     @After
     public void resetDb() {
@@ -75,8 +79,9 @@ public class QuestionControllerTest {
 
         String id = foundUser.getId();
 
-        //mock call
-        String question = fakeAi.getTranscription(null);
+        mockRecord.startRecording();
+        Question mockedQuestionObject = mockRecord.endRecording();
+        String question = mockedQuestionObject.getQuestion();
 
         mvc.perform(post("/api/questions/"+id)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +92,5 @@ public class QuestionControllerTest {
         assertThat(foundQuestion.map(QuestionDocument::getQuestion).toString())
                 .isEqualTo("Optional[\"Question, How tall is Nicholas Lam\"]");
     }
-
-
 
 }
