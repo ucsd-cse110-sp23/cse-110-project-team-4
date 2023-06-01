@@ -49,3 +49,6 @@ AgileLovers_DB
 ### Audio ###
 src/*.wav
 src/*.mp3
+
+### Certs ###
+certbot/
