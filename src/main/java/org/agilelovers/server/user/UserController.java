@@ -1,5 +1,6 @@
 package org.agilelovers.server.user;
 
+import org.agilelovers.server.common.errors.UserDuplicateError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
 @RestController
@@ -18,8 +19,10 @@ public class UserController {
     }
 
     @PostMapping("/api/users")
-    public UserDocument createUser(@RequestBody UserDocument user) {
-        return users.save(user);
+    public UserDocument createUser(@RequestBody UserDocument user) throws UserDuplicateError {
+        if (users.findByUsername(user.getUsername()).isPresent()) {
+            throw new UserDuplicateError(user.getUsername());
+        }else { return users.save(user); }
     }
 
     @PutMapping("/api/users/{id}")

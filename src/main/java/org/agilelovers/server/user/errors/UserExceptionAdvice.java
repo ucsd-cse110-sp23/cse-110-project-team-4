@@ -20,8 +20,9 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ExceptionHandler(MongoWriteException.class)
+    @ExceptionHandler(MongoWriteException.class) //might need to change to UserDuplicateError.class
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    //might need to change argument to UserDuplicateError err
     String duplicateUser(MongoWriteException err) { return err.getMessage(); }
 
     @ResponseBody
