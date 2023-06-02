@@ -16,9 +16,11 @@ services:
     image: mongo:latest
     container_name : sayit-db
     command: mongod
+    env_file:
+      - .env
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=cse110
-      - MONGO_INITDB_ROOT_PASSWORD=cse110pass
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongodb:/data/db
 

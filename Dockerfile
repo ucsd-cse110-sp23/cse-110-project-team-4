@@ -21,4 +21,5 @@ VOLUME "/tmp"
 EXPOSE 8080
 COPY --from=build ./target/sayitassistant-2.0.jar /sayit-server/server.jar
 ADD .env /sayit-server/.env
+ENV spring_profiles_active=prod
 ENTRYPOINT ["java", "-jar", "/sayit-server/server.jar"]

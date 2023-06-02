@@ -37,13 +37,15 @@ services:
   sayit-db:
     image: mongo:latest
     container_name : sayit-db
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=cse110
-#      - MONGO_INITDB_ROOT_PASSWORD=cse110pass
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     restart: unless-stopped
     volumes:
-      - mongodbdata:/data/db
+      - mongodb:/data/db
 
 volumes:
-  mongodbdata:
+  mongodb:
     driver: local
