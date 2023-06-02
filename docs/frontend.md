@@ -38,5 +38,28 @@ or it can be found by using the `getScene` method on any current UI element (`No
 Stage stage = (Stage) button.getScene().getWindow();
 ```
 
-### API Calls
-...
+### Why multithreading?
+Multithreading is used to allow the UI to be responsive while the backend is processing the user's query.
+Here's an example of the workflow without multithreading, i.e. everything runs on the UI thread:
+```java
+void buttonPressed(ActionEvent event) {
+    // 1. pre-API call logic (e.g. disable buttons, show loading animation, etc)
+    // 2. call the necessary API endpoint and get the response
+    // 3. do something the response (e.g. display the response on the UI)
+    // 3. post-API call logic (e.g. enable buttons, hide loading animation, etc)
+}
+```
+The problem with this is that the UI will be unresponsive while step 2, the API call, is being made. 
+Now, we can put the API call on a separate thread so that the UI thread would return without the API call being finished. 
+But now, we need to also put step 3, 4 on the same thread as the UI thread so that the UI can be updated, like this:
+```java
+void buttonPressed(ActionEvent event) {
+    // 1. pre-API call logic (e.g. disable buttons, show loading animation, etc)
+    Platform.runLater(() -> {
+        // 2. call the necessary API endpoint and get the response
+        // 3. do something the response (e.g. display the response on the UI)
+        // 3. post-API call logic (e.g. enable buttons, hide loading animation, etc)
+    });
+}
+```
+**So whenever you're dealing with sending calls on an UI event, always make your API calls on a separate thread.**
