@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.user.UserRepository;
-import org.agilelovers.server.user.errors.UserNotFoundError;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

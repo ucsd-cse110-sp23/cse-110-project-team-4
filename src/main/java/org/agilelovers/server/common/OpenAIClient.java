@@ -7,8 +7,6 @@ import io.github.jetkai.openai.api.data.audio.AudioData;
 import io.github.jetkai.openai.api.data.completion.chat.ChatCompletionData;
 import io.github.jetkai.openai.api.data.completion.chat.message.ChatCompletionMessageData;
 import io.github.jetkai.openai.openai.OpenAI;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
