@@ -27,15 +27,6 @@ public class AssistantController {
         this.client = new OpenAIClient();
     }
 
-    // Question -> return "QUESTION" and the question in command_arguments
-    // Delete Prompt -> return "DELETE_PROMPT"
-    // Clear all -> return "CLEAR_ALL"
-
-    // Setup email is done purely on the frontend -> return command "SETUP_EMAIL"
-    // Create email -> Send command "CREATE_EMAIL" & return the command_arguments after the command in the transcription,
-    // then combine it back in the Email creation endpoint.
-    // Send email -> Send command "SEND_EMAIL" & return the email it provided (use email regex)
-
     private String getCommand(String transcription) {
         if (transcription.startsWith(CommandIdentifier.QUESTION_COMMAND))
             return CommandType.ASK_QUESTION;
@@ -75,10 +66,9 @@ public class AssistantController {
         return result;
     }
 
-    @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will save " +
-            "it either as a command or as a question")
+    @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will " +
+            "transcribe the output and provide a command and its arguments if any")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully created question/command"),
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 406, message = "The audio file doesn't have any transcribe-able audio or its empty")
     })

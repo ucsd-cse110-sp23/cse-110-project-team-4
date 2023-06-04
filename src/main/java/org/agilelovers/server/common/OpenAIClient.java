@@ -1,5 +1,6 @@
 package org.agilelovers.server.common;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.github.jetkai.openai.api.CreateChatCompletion;
 import io.github.jetkai.openai.api.CreateTranscription;
 import io.github.jetkai.openai.api.data.audio.AudioData;
@@ -15,11 +16,12 @@ import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Optional;
 
-@NoArgsConstructor
 public class OpenAIClient {
+    private final String API_KEY;
 
-    @Value("${sayit.OPENAI_API_KEY}")
-    private String API_KEY;
+    public OpenAIClient() {
+        this.API_KEY = Dotenv.load().get("OPENAI_API_KEY");
+    }
 
     public String getAnswer(String question) {
         ChatCompletionMessageData messageData = ChatCompletionMessageData.builder()

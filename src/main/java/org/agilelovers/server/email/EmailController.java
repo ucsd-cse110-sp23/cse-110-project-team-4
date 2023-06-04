@@ -30,7 +30,9 @@ public class EmailController {
     }
 
     @PostMapping("/api/emails/{uid}")
-    public EmailDocument createEmail(@PathVariable String uid, @RequestBody String prompt) {
+    public EmailDocument createEmail(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
+                                     @RequestBody @ApiParam(name = "prompt",
+                                             value = "Email prompt used to generate the email body") String prompt) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
@@ -45,7 +47,7 @@ public class EmailController {
         );
     }
 
-    @ApiOperation(value = "Delete a question", notes = "Deletes a question")
+    @ApiOperation(value = "Delete an email", notes = "Deletes an email")
     @DeleteMapping("/api/emails/delete/{id}")
     public void deleteEmail(@PathVariable @ApiParam(name = "id", value = "Email ID") String id) {
         emails.deleteById(id);

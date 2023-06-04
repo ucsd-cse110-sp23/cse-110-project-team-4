@@ -36,7 +36,9 @@ public class QuestionController {
     }
 
     @PostMapping("/api/questions/{uid}")
-    public QuestionDocument createQuestion(@PathVariable String uid, @RequestBody String question) {
+    public QuestionDocument createQuestion(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
+                                           @RequestBody @ApiParam(name = "question",
+                                                   value = "Question to get the answer of") String question) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
