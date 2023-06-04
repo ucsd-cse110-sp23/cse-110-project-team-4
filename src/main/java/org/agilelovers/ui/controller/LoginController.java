@@ -63,7 +63,6 @@ public class LoginController {
             MainController.setId(new BufferedReader(new FileReader(Constants.USER_TOKEN_PATH)).readLine());
             switchToMainUI();
         }
-
     }
 
     /**

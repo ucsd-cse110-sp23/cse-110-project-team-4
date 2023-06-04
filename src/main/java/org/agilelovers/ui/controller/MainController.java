@@ -9,14 +9,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import org.agilelovers.ui.Constants;
+import org.agilelovers.ui.object.Query;
 import org.agilelovers.ui.object.Question;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
+// TODO: redo documentaiton
 /**
  * Controller class for the UI.
  * This class is responsible for handling user input and updating the UI accordingly. It also handles the interaction
@@ -58,6 +58,7 @@ public class MainController {
 
     private static String id;
 
+    // TODO: deal with email draft type
     /**
      * A list that contains all the question objects.
      */
@@ -67,6 +68,7 @@ public class MainController {
 
     protected boolean isRecording = false;
 
+    // TODO: chronological ordering
     @FXML
     private void initialize() throws IOException {
         System.out.println("Initializing Controller");
@@ -103,8 +105,8 @@ public class MainController {
                 return;
             }
             Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.getQuestion());
-            answerTextArea.setText(currentQuestion.getAnswer());
+            questionLabel.setText(currentQuestion.getPrompt());
+            answerTextArea.setText(currentQuestion.getResponse());
         });
     }
 
@@ -121,8 +123,8 @@ public class MainController {
                 return;
             }
             Question currentQuestion = this.pastQueries.get(index);
-            questionLabel.setText(currentQuestion.getQuestion());
-            answerTextArea.setText(currentQuestion.getAnswer());
+            questionLabel.setText(currentQuestion.getPrompt());
+            answerTextArea.setText(currentQuestion.getResponse());
         });
     }
 
@@ -153,69 +155,27 @@ public class MainController {
         return this.answerTextArea;
     }
 
-    /**
-     * Removes all questions from the history list.
-     * <p>
-     * If no questions are in the list, nothing will happen.
-     */
-    public void clearAll() {
-        System.out.println("Clear All");
-        for (Question pastQuestion : this.pastQueries) {
-            Platform.runLater(() -> {
-                try {
-                    FrontEndAPIUtils.deleteAll(MainController.id);
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-        this.pastQueries.clear();
-        this.historyList.getSelectionModel().select(null);
-    }
-
-    /**
-     * Deletes the current selected question.
-     * <p>
-     * After deleting, no question will be selected from the history list. If no
-     * question is selected or in the list, nothing will happen.
-     */
-    public void deleteQuestion() {
-        System.out.println("Delete Question");
-        if (!this.pastQueries.isEmpty()) {
-            Platform.runLater(() -> {
-                try {
-                    FrontEndAPIUtils.deleteQuestion(this.pastQueries.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
-            this.historyList.getSelectionModel().select(null);
-            System.out.println("Successfully deleted question");
-        }
-    }
-
-    /**
-     * Allows the user to ask a question to SayIt Assistant.
-     * <p>
-     * When "new question" button is clicked, starts a new recording for
-     * the user question and changes the button label to "stop recording".
-     * The "delete" and "clear all" buttons are disabled while recording.
-     * <p>
-     * Clicking the "stop recording" button will stop the recording and change
-     * the button label to "new question". Adds new question to history list and
-     * sets as current. Re-enables the "delete" and "clear all" buttons.
-     *
-     * @param event event triggered by the "new question" button click
-     */
     public void newQuery(ActionEvent event) throws IOException {
         if (this.isRecording) {
             // wait for chatgpt to response
             // Question stopRecording()
-            var currentQuestion = RecordingUtils.endRecording(MainController.id, new Question());
-            System.err.println(currentQuestion);
-            this.runCommand(currentQuestion.getQuestion(), currentQuestion);
+            Platform.runLater(() -> {
+                this.startButton.setDisable(true);
+                Query currentQuery = null;
+                try {
+                    currentQuery = RecordingUtils.endRecording(MainController.id, new Question());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.err.println(currentQuery);
+                try {
+                    this.runCommand(currentQuery);
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                this.startButton.setDisable(false);
+            });
+            this.startButton.setText("Start");
         } else {
             this.pastQueries.add(new Question("", "", "RECORDING", ""));
             // call a method that starts recording
@@ -223,6 +183,31 @@ public class MainController {
             this.startButton.setText("Stop Recording");
         }
         this.isRecording = !this.isRecording;
+    }
+
+    public void runCommand(Query query) throws IOException, InterruptedException {
+        switch (query.getQueryType()) {
+            case QUESTION:
+                newQuestion(query.getQuestion());
+                break;
+            case DELETE_PROMPT:
+                deleteQuery();
+                break;
+            case CLEAR_ALL:
+                clearAll();
+                break;
+            case SETUP_EMAIL:
+                setupEmail();
+                break;
+            case CREATE_EMAIL:
+                createEmail();
+                break;
+            case SEND_EMAIL:
+                sendEmail();
+                break;
+            default:
+                throw new IllegalStateException("Please give a valid command");
+        }
     }
 
     /**
@@ -240,34 +225,47 @@ public class MainController {
         this.pastQueries.remove(this.pastQueries.size() - 1);
         this.pastQueries.add(currentQuestion);
         this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
-        // change back to new question
-        Platform.runLater(() -> {
-            try {
-                FrontEndAPIUtils.readQuestion(MainController.id, currentQuestion);
-            } catch (IOException | InterruptedException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        this.startButton.setText("New Question");
     }
-    /**
-     * Runs the command specified by the user.
-     *
-     * @param command string that specifies which command to run
-     */
-    public void runCommand(String command, Question currentQuestion) throws IOException {
-        System.err.println("RUNNING COMMAND");
-        // logic for determining which command to run
-        if (command.isEmpty()) return;
 
-        command = command.toLowerCase();
-        if (command.startsWith(Constants.NEW_QUESTION_COMMAND)) {
-            currentQuestion.setQuestion(command.substring(Constants.NEW_QUESTION_COMMAND.length()));
-            this.newQuestion(currentQuestion);
-        } else if (command.startsWith(Constants.DELETE_PROMPT_COMMAND)) {
-            this.deleteQuestion();
-        } else if (command.startsWith(Constants.DELETE_ALL_PROMPTS_COMMAND)) {
-            this.clearAll();
+    /**
+     * Deletes the current selected question.
+     * <p>
+     * After deleting, no question will be selected from the history list. If no
+     * question is selected or in the list, nothing will happen.
+     */
+    public void deleteQuery() throws IOException, InterruptedException {
+        System.out.println("Delete Question");
+        if (!this.pastQueries.isEmpty()) {
+            FrontEndAPIUtils.deleteQuestion(this.pastQueries.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
+            this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
+            this.historyList.getSelectionModel().select(null);
+            System.out.println("Successfully deleted question");
         }
     }
+
+    /**
+     * Removes all questions from the history list.
+     * <p>
+     * If no questions are in the list, nothing will happen.
+     */
+    public void clearAll() throws IOException, InterruptedException {
+        System.out.println("Clear All");
+        FrontEndAPIUtils.clearAll(MainController.id);
+        this.pastQueries.clear();
+        this.historyList.getSelectionModel().select(null);
+    }
+
+    private void setupEmail() {
+        System.out.println("Setup Email");
+
+    }
+
+    private void createEmail() {
+        System.out.println("Create Email");
+    }
+
+    private void sendEmail() {
+        System.out.println("Send Email");
+    }
 }
+

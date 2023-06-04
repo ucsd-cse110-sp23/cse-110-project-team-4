@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.Question;
-import org.agilelovers.ui.object.Transcription;
+import org.agilelovers.ui.object.Query;
 import org.agilelovers.ui.object.UserCredential;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -106,41 +106,6 @@ public class FrontEndAPIUtils {
     }
 
     /**
-     * Upload user question to the backend API and get the response from ChatGPT.
-     * Send a POST request to the backend API to upload the user question.
-     * If the user credentials are invalid, an exception is thrown.
-     * If the user credentials are valid, the question object parameter is populated with the response from the
-     * backend.
-     *
-     * @param id       id of the account
-     * @param question the question object
-     * @return the question object
-     * @throws IOException          thrown if the request cannot be sent
-     * @throws InterruptedException thrown if the request is interrupted
-     * @throws URISyntaxException   thrown if the URI is invalid
-     */
-    public static Question readQuestion(String id, Question question)
-            throws IOException, InterruptedException, URISyntaxException {
-        HttpRequest postRequest =
-                HttpRequest.newBuilder().uri(new URI(Constants.SERVER_URL + Constants.QUESTION_ENDPOINT + id))
-                        .header("Content-Type", "text/plain")
-                        .method("POST",
-                                HttpRequest.BodyPublishers.ofString(question.getQuestion()))
-                        .build();
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200) throw new IllegalArgumentException("Username already exists");
-
-        Question output = new Gson().fromJson(response.body(), Question.class);
-        question.setAnswer(output.getAnswer());
-        question.setUserId(output.getUserId());
-        question.setId(output.getId());
-        return question;
-    }
-
-    /**
      * Fetch history list.
      *
      * @param id the id
@@ -170,13 +135,6 @@ public class FrontEndAPIUtils {
         return new Gson().fromJson(response.body(), listType);
     }
 
-    /**
-     * Delete question.
-     *
-     * @param id the id
-     * @throws IOException          the io exception
-     * @throws InterruptedException the interrupted exception
-     */
     public static void deleteQuestion(String id) throws IOException, InterruptedException {
         HttpRequest deleteRequest =
                 HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.DELETION_ENDPOINT + id))
@@ -189,14 +147,7 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) throw new RuntimeException("Question deletion failed.");
     }
 
-    /**
-     * Delete all.
-     *
-     * @param uid the uid
-     * @throws IOException          the io exception
-     * @throws InterruptedException the interrupted exception
-     */
-    public static void deleteAll(String uid) throws IOException, InterruptedException {
+    public static void clearAll(String uid) throws IOException, InterruptedException {
         HttpRequest deleteRequest =
                 HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.DELETE_ALL_ENDPOINT + uid))
                         .DELETE()
@@ -215,7 +166,7 @@ public class FrontEndAPIUtils {
      * @return the string
      * @throws IOException the io exception
      */
-    public static String sendAudio(String uid) throws IOException {
+    public static Query sendAudio(String uid) throws IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost uploadFile = new HttpPost(Constants.SERVER_URL + Constants.API_TRANSCRIBE_ENDPOINT + uid);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -235,8 +186,6 @@ public class FrontEndAPIUtils {
         HttpEntity responseEntity = response.getEntity();
         String question = new String(responseEntity.getContent().readAllBytes());
         System.err.println(question);
-        return new Gson().fromJson(question, Transcription.class).getTranscribed();
+        return new Gson().fromJson(question, Query.class);
     }
-
-
 }

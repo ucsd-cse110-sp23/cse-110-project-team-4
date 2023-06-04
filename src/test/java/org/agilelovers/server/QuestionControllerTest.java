@@ -81,7 +81,7 @@ public class QuestionControllerTest {
 
         mockRecord.startRecording();
         Question mockedQuestionObject = mockRecord.endRecording();
-        String question = mockedQuestionObject.getQuestion();
+        String question = mockedQuestionObject.getPrompt();
 
         mvc.perform(post("/api/questions/"+id)
                 .contentType(MediaType.APPLICATION_JSON)

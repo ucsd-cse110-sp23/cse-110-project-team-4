@@ -6,25 +6,26 @@ import org.agilelovers.ui.controller.MainController;
 public class Question {
     private String id = "";
     private String userId = "";
-    private String question = "";
-    private String answer = "";
+    private String queryType = "";
+    private String prompt = "";
+    private String response = "";
 
     public Question() {
     }
 
-    public Question(String id, String userId, String question, String answer) {
+    public Question(String id, String userId, String prompt, String response) {
         this.id = id;
         this.userId = userId;
-        this.question = question;
-        this.answer = answer;
+        this.prompt = prompt;
+        this.response = response;
     }
 
-    public String getQuestion() {
-        return this.question;
+    public String getPrompt() {
+        return this.prompt;
     }
 
-    public String getAnswer() {
-        return this.answer;
+    public String getResponse() {
+        return this.response;
     }
 
     public String getId() {
@@ -35,6 +36,13 @@ public class Question {
         return userId;
     }
 
+    public String getQueryType() {
+        return queryType;
+    }
+
+    public void setQueryType(String queryType) {
+        this.queryType = queryType;
+    }
     public void setId(String id) {
         this.id = id;
     }
@@ -43,18 +51,18 @@ public class Question {
         this.userId = userId;
     }
 
-    public void setQuestion(String newQuestion) {
+    public void setPrompt(String newQuestion) {
         if (MainController.instance != null) MainController.instance.refreshLabels();
-        this.question = newQuestion;
+        this.prompt = newQuestion;
     }
 
-    public void setAnswer(String newAnswer) {
+    public void setResponse(String newAnswer) {
         if (MainController.instance != null) { MainController.instance.refreshLabels(); }
-        this.answer = newAnswer;
+        this.response = newAnswer;
     }
 
     @Override
     public String toString() {
-        return this.question;
+        return this.prompt;
     }
 }

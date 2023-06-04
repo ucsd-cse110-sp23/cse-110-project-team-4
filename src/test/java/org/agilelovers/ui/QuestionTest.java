@@ -20,12 +20,12 @@ class QuestionTest {
 
     @Test
     void testQuestion() {
-        Assertions.assertThat(testQuestion.getQuestion()).isEqualTo("question");
+        Assertions.assertThat(testQuestion.getPrompt()).isEqualTo("question");
     }
 
     @Test
     void testAnswer() {
-        Assertions.assertThat(testQuestion.getAnswer()).isEqualTo("answer");
+        Assertions.assertThat(testQuestion.getResponse()).isEqualTo("answer");
     }
 
     @Test
@@ -35,14 +35,14 @@ class QuestionTest {
 
     @Test
     void setTestAnswer() {
-        testQuestion.setAnswer("newAnswer");
-        Assertions.assertThat(testQuestion.getAnswer()).isEqualTo("newAnswer");
+        testQuestion.setResponse("newAnswer");
+        Assertions.assertThat(testQuestion.getResponse()).isEqualTo("newAnswer");
     }
 
     @Test
     void setTestQuestion() {
-        testQuestion.setQuestion("newQuestion");
-        Assertions.assertThat(testQuestion.getQuestion()).isEqualTo("newQuestion");
+        testQuestion.setPrompt("newQuestion");
+        Assertions.assertThat(testQuestion.getPrompt()).isEqualTo("newQuestion");
     }
 
     @Test
@@ -60,13 +60,13 @@ class QuestionTest {
     @Test
     void testEmptyQuestion() {
         Question emptyQuestion = new Question();
-        Assertions.assertThat(emptyQuestion.getQuestion()).isEmpty();
+        Assertions.assertThat(emptyQuestion.getPrompt()).isEmpty();
     }
 
     @Test
     void testEmptyAnswer() {
         Question emptyAnswer = new Question();
-        Assertions.assertThat(emptyAnswer.getAnswer()).isEmpty();
+        Assertions.assertThat(emptyAnswer.getResponse()).isEmpty();
     }
 
     @Test
@@ -77,14 +77,14 @@ class QuestionTest {
 
     @Test
     void testSetNullAnswer() {
-        testQuestion.setAnswer(null);
-        Assertions.assertThat(testQuestion.getAnswer()).isNull();
+        testQuestion.setResponse(null);
+        Assertions.assertThat(testQuestion.getResponse()).isNull();
     }
 
     @Test
     void testSetNullQuestion() {
-        testQuestion.setQuestion(null);
-        Assertions.assertThat(testQuestion.getQuestion()).isNull();
+        testQuestion.setPrompt(null);
+        Assertions.assertThat(testQuestion.getPrompt()).isNull();
     }
 
     @Test
