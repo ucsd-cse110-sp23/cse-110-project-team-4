@@ -164,7 +164,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>org.agilelovers.ui.Main</mainClass>
+                    <mainClass>org.agilelovers.ui.MainApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>

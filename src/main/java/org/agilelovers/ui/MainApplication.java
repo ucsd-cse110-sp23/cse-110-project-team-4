@@ -11,7 +11,11 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Main extends Application {
+public class MainApplication extends Application {
+
+    private static MainApplication instance;
+
+    private Stage currentStage;
 
     /**
      * Starts the application, loads the UI and initializes the controller.
@@ -27,10 +31,21 @@ public class Main extends Application {
         Scene scene = new Scene(root, Color.WHITE);
 
         stage.setTitle("SayIt Assistant");
-        stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/icon.jpg"))));
+        stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResourceAsStream("/icon.jpg"))));
 
         stage.setScene(scene);
         stage.show();
+        this.currentStage = stage;
+
+        instance = this;
+    }
+
+    public static MainApplication getInstance() {
+        return instance;
+    }
+
+    public Stage getCurrentStage() {
+        return currentStage;
     }
 
     public static void main(String[] args) {
