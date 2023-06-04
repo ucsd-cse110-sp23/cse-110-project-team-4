@@ -9,12 +9,10 @@ import org.agilelovers.server.question.QuestionDocument;
 @Data
 @Builder
 public class AssistantData {
-    @ApiModelProperty(notes = "If the response is a command or a question.")
-    private boolean isCommand;
 
-    @ApiModelProperty(notes = "Command data if the audio file contains a command, null otherwise")
-    private CommandDocument command;
+    private String transcribed;
 
-    @ApiModelProperty(notes = "Question data if the audio file contains a question, null otherwise")
-    private QuestionDocument question;
+    private String command;
+
+    private String command_arguments;
 }

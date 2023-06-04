@@ -4,11 +4,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.server.common.OpenAIClient;
+import org.agilelovers.server.user.UserRepository;
 import org.agilelovers.server.user.errors.UserNotFoundError;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,8 +15,13 @@ import java.util.List;
 @ApiOperation("Questions API")
 public class QuestionController {
     private final QuestionRepository questions;
-    public QuestionController(QuestionRepository questions) {
+    private final UserRepository users;
+    private final OpenAIClient client;
+
+    public QuestionController(QuestionRepository questions, UserRepository users) {
+        this.users = users;
         this.questions = questions;
+        this.client = new OpenAIClient();
     }
 
     @ApiOperation(value = "Get all questions", notes = "Get all the questions corresponding to a user")
@@ -31,9 +35,25 @@ public class QuestionController {
                 .orElseThrow(() -> new UserNotFoundError(uid));
     }
 
+    @PostMapping("/api/questions/{uid}")
+    public QuestionDocument createQuestion(@PathVariable String uid, @RequestBody String question) {
+
+        if (!users.existsById(uid))
+            throw new UserNotFoundError(uid);
+
+        String answer = this.client.getAnswer(question);
+
+        return questions.save(QuestionDocument.builder()
+                .question(question)
+                .answer(answer)
+                .userId(uid)
+                .build()
+        );
+    }
+
     @ApiOperation(value = "Delete a question", notes = "Deletes a question")
     @DeleteMapping("/api/questions/delete/{id}")
-    public void deleteQuestion(@PathVariable  @ApiParam(name = "id", value = "Question ID") String id) {
+    public void deleteQuestion(@PathVariable @ApiParam(name = "id", value = "Question ID") String id) {
         questions.deleteById(id);
     }
 
