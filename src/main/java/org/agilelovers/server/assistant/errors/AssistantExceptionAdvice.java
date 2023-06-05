@@ -1,7 +1,6 @@
-package org.agilelovers.server.transcribe.errors;
+package org.agilelovers.server.assistant.errors;
 
-import org.agilelovers.server.common.errors.UserNotFoundError;
-import org.agilelovers.server.transcribe.errors.NoAudioError;
+import org.agilelovers.server.user.errors.UserNotFoundError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-public class TranscribeExceptionAdvice {
+public class AssistantExceptionAdvice {
     @ResponseBody
     @ExceptionHandler(UserNotFoundError.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -18,7 +17,7 @@ public class TranscribeExceptionAdvice {
     }
 
     @ResponseBody
-    @ExceptionHandler
+    @ExceptionHandler(NoAudioError.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     String noAudioError(NoAudioError err) {
         return err.getMessage();

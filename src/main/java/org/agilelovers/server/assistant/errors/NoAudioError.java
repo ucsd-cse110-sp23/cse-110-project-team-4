@@ -1,4 +1,4 @@
-package org.agilelovers.server.transcribe.errors;
+package org.agilelovers.server.assistant.errors;
 
 public class NoAudioError extends RuntimeException{
     public NoAudioError() {

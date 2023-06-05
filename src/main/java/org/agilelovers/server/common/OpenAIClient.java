@@ -1,12 +1,13 @@
 package org.agilelovers.server.common;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import io.github.jetkai.openai.api.CreateChatCompletion;
 import io.github.jetkai.openai.api.CreateTranscription;
 import io.github.jetkai.openai.api.data.audio.AudioData;
 import io.github.jetkai.openai.api.data.completion.chat.ChatCompletionData;
 import io.github.jetkai.openai.api.data.completion.chat.message.ChatCompletionMessageData;
 import io.github.jetkai.openai.openai.OpenAI;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -14,14 +15,12 @@ import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Optional;
 
+@NoArgsConstructor
 public class OpenAIClient {
 
-    private final String API_KEY;
+    @Value("${sayit.OPENAI_API_KEY}")
+    private String API_KEY;
 
-    public OpenAIClient() {
-        Dotenv dotenv = Dotenv.load();
-        this.API_KEY = dotenv.get("OPENAI_API_KEY");
-    }
     public String getAnswer(String question) {
         ChatCompletionMessageData messageData = ChatCompletionMessageData.builder()
                 .setRole("user")
