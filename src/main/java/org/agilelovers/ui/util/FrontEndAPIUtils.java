@@ -3,8 +3,8 @@ package org.agilelovers.ui.util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.ui.Constants;
+import org.agilelovers.ui.object.Command;
 import org.agilelovers.ui.object.Question;
-import org.agilelovers.ui.object.Query;
 import org.agilelovers.ui.object.UserCredential;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -135,6 +135,11 @@ public class FrontEndAPIUtils {
         return new Gson().fromJson(response.body(), listType);
     }
 
+    // TODO: implement this method
+    public static Question newQuestion(String id) throws IOException, InterruptedException {
+        return new Question();
+    }
+
     public static void deleteQuestion(String id) throws IOException, InterruptedException {
         HttpRequest deleteRequest =
                 HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.DELETION_ENDPOINT + id))
@@ -166,7 +171,7 @@ public class FrontEndAPIUtils {
      * @return the string
      * @throws IOException the io exception
      */
-    public static Query sendAudio(String uid) throws IOException {
+    public static Command sendAudio(String uid) throws IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost uploadFile = new HttpPost(Constants.SERVER_URL + Constants.API_TRANSCRIBE_ENDPOINT + uid);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -186,6 +191,6 @@ public class FrontEndAPIUtils {
         HttpEntity responseEntity = response.getEntity();
         String question = new String(responseEntity.getContent().readAllBytes());
         System.err.println(question);
-        return new Gson().fromJson(question, Query.class);
+        return new Gson().fromJson(question, Command.class);
     }
 }

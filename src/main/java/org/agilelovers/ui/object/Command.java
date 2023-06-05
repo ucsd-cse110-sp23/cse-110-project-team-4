@@ -1,48 +1,50 @@
 package org.agilelovers.ui.object;
 
+import org.agilelovers.ui.Constants;
+import org.agilelovers.ui.enums.CommandType;
+
 public class Command {
-    private String id = "";
-    private String userId = "";
-    private String command = "";
-    private String output = "";
+    private String transcribed;
+    private String command;
+    private String commandPrompt;
 
-
-    public Command(String id, String userId, String command, String output) {
-        this.id = id;
-        this.userId = userId;
+    public Command(String transcribed, String command, String commandPrompt) {
+        this.transcribed = transcribed;
         this.command = command;
-        this.output = output;
+        this.commandPrompt = commandPrompt;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getTranscribed() {
+        return transcribed;
     }
 
     public String getCommand() {
         return command;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    public String getCommandPrompt() {
+        return commandPrompt;
     }
 
-    public String getOutput() {
-        return output;
-    }
-
-    public void setOutput(String output) {
-        this.output = output;
+    public CommandType getQueryType() {
+        if (this.command.equals(Constants.QUESTION_COMMAND)) {
+            return CommandType.QUESTION;
+        }
+        if (this.command.equals(Constants.DELETE_PROMPT_COMMAND)) {
+            return CommandType.DELETE_PROMPT;
+        }
+        if (this.command.equals(Constants.CLEAR_ALL_COMMAND)) {
+            return CommandType.CLEAR_ALL;
+        }
+        if (this.command.equals(Constants.SETUP_EMAIL_COMMAND)) {
+            return CommandType.SETUP_EMAIL;
+        }
+        if (this.command.equals(Constants.CREATE_EMAIL_COMMAND)) {
+            return CommandType.CREATE_EMAIL;
+        }
+        if (this.command.equals(Constants.SEND_EMAIL_COMMAND)) {
+            return CommandType.SEND_EMAIL;
+        }
+        return CommandType.INVALID;
     }
 }

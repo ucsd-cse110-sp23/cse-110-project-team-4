@@ -9,7 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import org.agilelovers.ui.object.Query;
+import org.agilelovers.ui.object.Command;
 import org.agilelovers.ui.object.Question;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
@@ -161,15 +161,15 @@ public class MainController {
             // Question stopRecording()
             Platform.runLater(() -> {
                 this.startButton.setDisable(true);
-                Query currentQuery = null;
+                Command currentCommand = null;
                 try {
-                    currentQuery = RecordingUtils.endRecording(MainController.id, new Question());
+                    currentCommand = RecordingUtils.endRecording(MainController.id, new Question());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                System.err.println(currentQuery);
+                System.err.println(currentCommand);
                 try {
-                    this.runCommand(currentQuery);
+                    this.runCommand(currentCommand);
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -185,10 +185,10 @@ public class MainController {
         this.isRecording = !this.isRecording;
     }
 
-    public void runCommand(Query query) throws IOException, InterruptedException {
-        switch (query.getQueryType()) {
+    public void runCommand(Command command) throws IOException, InterruptedException {
+        switch (command.getQueryType()) {
             case QUESTION:
-                newQuestion(query.getQuestion());
+                newQuestion(command);
                 break;
             case DELETE_PROMPT:
                 deleteQuery();
@@ -221,7 +221,10 @@ public class MainController {
      *
      * @param currentQuestion the question to be added to the history list
      */
-    public void newQuestion(Question currentQuestion) {
+    public void newQuestion(Command command) {
+        System.out.println("New Question");
+        // TODO: API call
+            Question currentQuestion = new Question();
         this.pastQueries.remove(this.pastQueries.size() - 1);
         this.pastQueries.add(currentQuestion);
         this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);

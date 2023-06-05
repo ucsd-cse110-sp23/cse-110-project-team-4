@@ -28,7 +28,7 @@ Once you've run this command, a window should appear on your screen. It should l
 ---
 
 # How to use the "SayItAssistant" app
-Generating an AI generated response to a recorded query (question/statement). 
+Generating an AI generated response to a recorded command (question/statement). 
 
 The purpose of the **SayItAssistant** application is to let the user speak out loud their question or statement. Within seconds, a response should be displayed on the screen according to their question or statement. 
 
@@ -36,7 +36,7 @@ On our application, there are several buttons the user should know about:
 1. "New Question"
    * the button initiates a recording for the user 
    * The user should start speaking their question or statement 
-   * Once the user is finished with their query, click "End Recording"
+   * Once the user is finished with their command, click "End Recording"
 2. "Delete Question"
    * The user should click on the question they wish to delete
    * Once the user has selected their question, click on the "Delete Question" button

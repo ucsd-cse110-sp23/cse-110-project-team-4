@@ -39,7 +39,7 @@ Stage stage = (Stage) button.getScene().getWindow();
 ```
 
 ### Why multithreading?
-Multithreading is used to allow the UI to be responsive while the backend is processing the user's query.
+Multithreading is used to allow the UI to be responsive while the backend is processing the user's command.
 Here's an example of the workflow without multithreading, i.e. everything runs on the UI thread:
 ```java
 void buttonPressed(ActionEvent event) {
