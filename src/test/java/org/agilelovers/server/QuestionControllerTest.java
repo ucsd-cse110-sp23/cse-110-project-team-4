@@ -1,17 +1,28 @@
 package org.agilelovers.server;
 
 import org.agilelovers.server.mock.mockOpenAI;
-import org.agilelovers.server.mock.mockRecording;
+import org.agilelovers.server.question.QuestionDocument;
 import org.agilelovers.server.question.QuestionRepository;
+import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
+import org.agilelovers.ui.object.Question;
+import org.agilelovers.server.mock.mockRecording;
 import org.junit.After;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opentest4j.TestAbortedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 
 @RunWith(SpringRunner.class)
@@ -43,7 +54,7 @@ public class QuestionControllerTest {
         questionRepository.deleteAll();
         userRepository.deleteAll();
     }
-/*
+
     @Test
     public void AskingAQuestion() throws Exception {
 
@@ -70,17 +81,16 @@ public class QuestionControllerTest {
 
         mockRecord.startRecording();
         Question mockedQuestionObject = mockRecord.endRecording();
-        String question = mockedQuestionObject.getPrompt();
+        String question = mockedQuestionObject.getResponse();
 
         mvc.perform(post("/api/questions/"+id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.toJson(question))
         );
 
-        Optional<QuestionDocument> foundQuestion = questionRepository.findByUserId(id);
+        Optional<QuestionDocument> foundQuestion = questionRepository.findById(id);
         assertThat(foundQuestion.map(QuestionDocument::getQuestion).toString())
                 .isEqualTo("Optional[\"Question, How tall is Nicholas Lam\"]");
     }
- */
 
 }
