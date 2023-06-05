@@ -1,4 +1,4 @@
-package org.agilelovers.server.user.errors;
+package org.agilelovers.server.common.errors;
 
 public class UserNotFoundError extends RuntimeException{
     public UserNotFoundError(String email) {

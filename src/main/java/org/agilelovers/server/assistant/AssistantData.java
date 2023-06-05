@@ -3,18 +3,17 @@ package org.agilelovers.server.assistant;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.agilelovers.server.command.CommandDocument;
-import org.agilelovers.server.question.QuestionDocument;
 
 @Data
 @Builder
 public class AssistantData {
-    @ApiModelProperty(notes = "If the response is a command or a question.")
-    private boolean isCommand;
 
-    @ApiModelProperty(notes = "Command data if the audio file contains a command, null otherwise")
-    private CommandDocument command;
+    @ApiModelProperty(notes = "The transcribed string returned by whisper", required = true)
+    private String transcribed;
 
-    @ApiModelProperty(notes = "Question data if the audio file contains a question, null otherwise")
-    private QuestionDocument question;
+    @ApiModelProperty(notes = "The command to be run, if any")
+    private String command;
+
+    @ApiModelProperty(notes = "The arguments for the command, if any")
+    private String command_arguments;
 }

@@ -4,8 +4,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.agilelovers.server.user.errors.NotAuthorizedException;
-import org.agilelovers.server.user.errors.UserNotFoundError;
+import org.agilelovers.server.common.errors.NotAuthorizedError;
+import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +50,7 @@ public class UserController {
                     .email(savedUser.getEmail())
                     .id(savedUser.getId())
                     .build();
-        } else throw new NotAuthorizedException();
+        } else throw new NotAuthorizedError();
     }
 
     @ApiOperation(value = "Update email", notes = "Update a user's email")
