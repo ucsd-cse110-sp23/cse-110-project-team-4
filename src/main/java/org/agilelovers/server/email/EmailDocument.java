@@ -25,7 +25,7 @@ public class EmailDocument {
     @CreatedDate
     private Date createdDate;
 
-    @ApiModelProperty(notes = "User ID associated with this question", required = true)
+    @ApiModelProperty(notes = "User ID associated with this email", required = true)
     @NotNull
     @NotBlank
     private String userId;
@@ -39,4 +39,8 @@ public class EmailDocument {
     @NotNull
     @NotBlank
     private String body;
+
+    @ApiModelProperty(notes = "Tells if an email is drafted or sent", required = true)
+    @NotNull
+    private boolean sentEmail;
 }

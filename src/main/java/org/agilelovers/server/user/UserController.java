@@ -59,11 +59,11 @@ public class UserController {
             @ApiResponse(code = 404, message = "User not found"),
     })
     @PutMapping("/api/users/{id}")
-    public ReducedUserDocument updateEmail(@RequestBody @ApiParam(name = "email", value = "New email") String email,
+    public ReducedUserDocument updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") UserEmailDocument emailDoc,
                                            @PathVariable @ApiParam(name = "id", value = "User ID") String id) {
         return users.findById(id)
                 .map(user -> {
-                    user.setEmail(email);
+                    user.setEmail(emailDoc.getEmail());
                     users.save(user);
                     return ReducedUserDocument.builder()
                             .username(user.getUsername())

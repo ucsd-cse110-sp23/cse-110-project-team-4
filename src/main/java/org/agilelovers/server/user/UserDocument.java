@@ -1,5 +1,7 @@
 package org.agilelovers.server.user;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -29,14 +31,19 @@ public class UserDocument {
     @Indexed(name = "username", unique = true)
     private String username;
 
-    @ApiModelProperty(notes = "Email of the user")
-    @Email
-    private String email;
-
     @ApiModelProperty(notes = "Password of the user", required = true)
     @NotNull
     @NotBlank
     private String password;
+
+    @ApiModelProperty(notes = "Email of the user inputted during email setup")
+    @Email
+    private String email;
+
+    @ApiModelProperty(notes = "Document containing email configuration, given during email setup ")
+    private UserEmailDocument emailInformation;
+
+
 }
 
 @Data
