@@ -119,7 +119,7 @@ public class SayItAssistant {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            ques.setPrompt(question);
+            ques.setPromptCommand(question);
 
             String prompt = question;
             String response = null;
@@ -169,6 +169,6 @@ public class SayItAssistant {
      * @throws IOException if the file is not found/cannot be opened
      */
     public void deleteDatabaseQuestion(Question question) throws IOException {
-        queryDatabase.deleteQueryFromFile(question.getPrompt());
+        queryDatabase.deleteQueryFromFile(question.getPromptCommand());
     }
 }

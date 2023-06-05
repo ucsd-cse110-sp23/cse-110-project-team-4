@@ -10,13 +10,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import org.agilelovers.ui.object.Command;
+import org.agilelovers.ui.object.Prompt;
 import org.agilelovers.ui.object.Question;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
 
 import java.io.IOException;
 
-// TODO: redo documentaiton
+// TODO: redo documentation
 /**
  * Controller class for the UI.
  * This class is responsible for handling user input and updating the UI accordingly. It also handles the interaction
@@ -62,7 +63,7 @@ public class MainController {
     /**
      * A list that contains all the question objects.
      */
-    protected ObservableList<Question> pastPrompts = FXCollections.observableArrayList();
+    protected ObservableList<Prompt> pastPrompts = FXCollections.observableArrayList();
 
     public static MainController instance;
 
@@ -70,7 +71,7 @@ public class MainController {
 
     // TODO: chronological ordering
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
         System.out.println("Initializing Controller");
         answerTextArea.setEditable(false);
         Platform.runLater(() -> {
@@ -80,8 +81,8 @@ public class MainController {
                 throw new RuntimeException(e);
             }
         });
-        for (Question question : pastPrompts) {
-            System.out.println(question);
+        for (Prompt prompt : pastPrompts) {
+            System.out.println(prompt);
         }
         initHistoryList();
     }
@@ -105,7 +106,7 @@ public class MainController {
                 return;
             }
             Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.getPrompt());
+            questionLabel.setText(currentQuestion.getPromptCommand());
             answerTextArea.setText(currentQuestion.getResponse());
         });
     }
@@ -122,9 +123,9 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = this.pastPrompts.get(index);
-            questionLabel.setText(currentQuestion.getPrompt());
-            answerTextArea.setText(currentQuestion.getResponse());
+            Prompt currentPrompt = this.pastPrompts.get(index);
+            questionLabel.setText(currentPrompt.getPromptCommand());
+            answerTextArea.setText(currentPrompt.getResponse());
         });
     }
 
@@ -157,7 +158,7 @@ public class MainController {
 
     public void newQuery(ActionEvent event) throws IOException {
         if (this.isRecording) {
-            // wait for chatgpt to response
+            // wait for ChatGPT to respond
             // Question stopRecording()
             Platform.runLater(() -> {
                 this.startButton.setDisable(true);
@@ -216,8 +217,8 @@ public class MainController {
      * The new question is added to the history list and set as the current question.
      * The "new question" button label is changed to "new question".
      * The "delete" and "clear all" buttons are re-enabled.
-     * The question and answer labels are updated to reflect the new question.
-     * The new question is sent to the backend to be processed.
+     * The question and answer labels updated to reflect the new question.
+     * The new question sent to the backend to be processed.
      *
      * @param command the command containing question to be answered and added to prompt history
      */
@@ -261,7 +262,7 @@ public class MainController {
 
     private void setupEmail() {
         System.out.println("Setup Email");
-
+        // TODO: change scene to EmailSetup
     }
 
     private void createEmail() {

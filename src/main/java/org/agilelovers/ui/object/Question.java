@@ -3,25 +3,22 @@ package org.agilelovers.ui.object;
 
 import org.agilelovers.ui.controller.MainController;
 
-public class Question {
+public class Question extends Prompt {
     private String id = "";
     private String userId = "";
-    private String queryType = "";
-    private String prompt = "";
+    private String promptCommand = "";
     private String response = "";
 
     public Question() {
+        super("", "", "", "");
     }
 
-    public Question(String id, String userId, String prompt, String response) {
-        this.id = id;
-        this.userId = userId;
-        this.prompt = prompt;
-        this.response = response;
+    public Question(String id, String userId, String promptCommand, String response) {
+        super(id, userId, promptCommand, response);
     }
 
-    public String getPrompt() {
-        return this.prompt;
+    public String getPromptCommand() {
+        return this.promptCommand;
     }
 
     public String getResponse() {
@@ -36,13 +33,6 @@ public class Question {
         return userId;
     }
 
-    public String getQueryType() {
-        return queryType;
-    }
-
-    public void setQueryType(String queryType) {
-        this.queryType = queryType;
-    }
     public void setId(String id) {
         this.id = id;
     }
@@ -51,9 +41,9 @@ public class Question {
         this.userId = userId;
     }
 
-    public void setPrompt(String newQuestion) {
+    public void setPromptCommand(String newQuestion) {
         if (MainController.instance != null) MainController.instance.refreshLabels();
-        this.prompt = newQuestion;
+        this.promptCommand = newQuestion;
     }
 
     public void setResponse(String newAnswer) {
@@ -63,6 +53,6 @@ public class Question {
 
     @Override
     public String toString() {
-        return this.prompt;
+        return this.promptCommand;
     }
 }

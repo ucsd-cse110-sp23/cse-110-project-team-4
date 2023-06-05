@@ -20,7 +20,7 @@ class QuestionTest {
 
     @Test
     void testQuestion() {
-        Assertions.assertThat(testQuestion.getPrompt()).isEqualTo("question");
+        Assertions.assertThat(testQuestion.getPromptCommand()).isEqualTo("question");
     }
 
     @Test
@@ -41,8 +41,8 @@ class QuestionTest {
 
     @Test
     void setTestQuestion() {
-        testQuestion.setPrompt("newQuestion");
-        Assertions.assertThat(testQuestion.getPrompt()).isEqualTo("newQuestion");
+        testQuestion.setPromptCommand("newQuestion");
+        Assertions.assertThat(testQuestion.getPromptCommand()).isEqualTo("newQuestion");
     }
 
     @Test
@@ -60,7 +60,7 @@ class QuestionTest {
     @Test
     void testEmptyQuestion() {
         Question emptyQuestion = new Question();
-        Assertions.assertThat(emptyQuestion.getPrompt()).isEmpty();
+        Assertions.assertThat(emptyQuestion.getPromptCommand()).isEmpty();
     }
 
     @Test
@@ -83,8 +83,8 @@ class QuestionTest {
 
     @Test
     void testSetNullQuestion() {
-        testQuestion.setPrompt(null);
-        Assertions.assertThat(testQuestion.getPrompt()).isNull();
+        testQuestion.setPromptCommand(null);
+        Assertions.assertThat(testQuestion.getPromptCommand()).isNull();
     }
 
     @Test
