@@ -62,7 +62,7 @@ public class MainController {
     /**
      * A list that contains all the question objects.
      */
-    protected ObservableList<Question> pastQueries = FXCollections.observableArrayList();
+    protected ObservableList<Question> pastPrompts = FXCollections.observableArrayList();
 
     public static MainController instance;
 
@@ -80,7 +80,7 @@ public class MainController {
                 throw new RuntimeException(e);
             }
         });
-        for (Question question : pastQueries) {
+        for (Question question : pastPrompts) {
             System.out.println(question);
         }
         initHistoryList();
@@ -97,7 +97,7 @@ public class MainController {
      * If not, the question and answer labels will be empty.
      */
     public void initHistoryList() {
-        this.historyList.setItems(this.pastQueries);
+        this.historyList.setItems(this.pastPrompts);
         this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 questionLabel.setText("");
@@ -122,7 +122,7 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = this.pastQueries.get(index);
+            Question currentQuestion = this.pastPrompts.get(index);
             questionLabel.setText(currentQuestion.getPrompt());
             answerTextArea.setText(currentQuestion.getResponse());
         });
@@ -177,7 +177,7 @@ public class MainController {
             });
             this.startButton.setText("Start");
         } else {
-            this.pastQueries.add(new Question("", "", "RECORDING", ""));
+            this.pastPrompts.add(new Question("", "", "RECORDING", ""));
             // call a method that starts recording
             RecordingUtils.startRecording();
             this.startButton.setText("Stop Recording");
@@ -219,15 +219,16 @@ public class MainController {
      * The question and answer labels are updated to reflect the new question.
      * The new question is sent to the backend to be processed.
      *
-     * @param currentQuestion the question to be added to the history list
+     * @param command the command containing question to be answered and added to prompt history
      */
-    public void newQuestion(Command command) {
+    public void newQuestion(Command command) throws IOException, InterruptedException {
         System.out.println("New Question");
-        // TODO: API call
-            Question currentQuestion = new Question();
-        this.pastQueries.remove(this.pastQueries.size() - 1);
-        this.pastQueries.add(currentQuestion);
-        this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
+        Question currentQuestion = null;
+
+        currentQuestion = FrontEndAPIUtils.newQuestion(command.getCommandPrompt(), MainController.id);
+        this.pastPrompts.remove(this.pastPrompts.size() - 1);
+        this.pastPrompts.add(currentQuestion);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 
     /**
@@ -238,9 +239,9 @@ public class MainController {
      */
     public void deleteQuery() throws IOException, InterruptedException {
         System.out.println("Delete Question");
-        if (!this.pastQueries.isEmpty()) {
-            FrontEndAPIUtils.deleteQuestion(this.pastQueries.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
-            this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
+        if (!this.pastPrompts.isEmpty()) {
+            FrontEndAPIUtils.deleteQuestion(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
+            this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
             this.historyList.getSelectionModel().select(null);
             System.out.println("Successfully deleted question");
         }
@@ -254,7 +255,7 @@ public class MainController {
     public void clearAll() throws IOException, InterruptedException {
         System.out.println("Clear All");
         FrontEndAPIUtils.clearAll(MainController.id);
-        this.pastQueries.clear();
+        this.pastPrompts.clear();
         this.historyList.getSelectionModel().select(null);
     }
 

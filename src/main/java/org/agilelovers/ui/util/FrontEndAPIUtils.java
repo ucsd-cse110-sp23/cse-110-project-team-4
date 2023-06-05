@@ -135,8 +135,8 @@ public class FrontEndAPIUtils {
         return new Gson().fromJson(response.body(), listType);
     }
 
-    // TODO: implement this method
-    public static Question newQuestion(String id) throws IOException, InterruptedException {
+    // TODO: implement this method (i think need to add a parameter for the question? probably string)
+    public static Question newQuestion(String question, String id) throws IOException, InterruptedException {
         return new Question();
     }
 
