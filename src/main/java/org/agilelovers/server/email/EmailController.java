@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.common.errors.NoEmailConfigured;
 import org.agilelovers.server.common.errors.UserNotFoundError;
+import org.agilelovers.server.email.errors.NoEmailFound;
 import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserEmailDocument;
 import org.agilelovers.server.user.UserEmailRepository;
@@ -52,7 +53,6 @@ public class EmailController {
                 .prompt(prompt)
                 .body(body)
                 .userId(uid)
-                .sentEmail(false)
                 .build()
         );
     }
@@ -75,13 +75,10 @@ public class EmailController {
     }
 
     @ApiOperation(value = "Send email", notes = "Sends email towards a specified user")
-    @PostMapping("/api/emails")
-    public void sendEmail(@RequestBody UserDocument user,
-                          @RequestBody UserEmailDocument emailConfig,
-                          String toEmail){
+    @PostMapping("/api/emails/{uid}")
+    public ReducedEmailDocument sendEmail(@PathVariable String uid,
+                                          String toEmail) {
 
-        if(user.getEmail() == null)
-            throw new NoEmailConfigured();
 
 
 //        Properties props = new Properties();

@@ -64,6 +64,7 @@ public class UserController {
         return users.findById(id)
                 .map(user -> {
                     user.setEmail(emailDoc.getEmail());
+                    user.setEmailInformation(emailDoc);
                     users.save(user);
                     return ReducedUserDocument.builder()
                             .username(user.getUsername())

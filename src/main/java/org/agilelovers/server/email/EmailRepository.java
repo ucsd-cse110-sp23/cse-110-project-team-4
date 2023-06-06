@@ -9,4 +9,6 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface EmailRepository extends MongoRepository<EmailDocument, String> {
     Optional<List<EmailDocument>> findAllByUserId(String userId);
+
+    Optional<EmailDocument> findEmailByID(String emailID);
 }

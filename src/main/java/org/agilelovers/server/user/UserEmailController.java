@@ -7,10 +7,6 @@ import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserEmailController {
 
     private final UserRepository users;
-    private final UserEmailRepository emails;
+    private final UserEmailRepository emailConfigurations;
 
-    public UserEmailController(UserRepository users, UserEmailRepository emails){
+    public UserEmailController(UserRepository users, UserEmailRepository emailConfigurations){
         this.users = users;
-        this.emails = emails;
+        this.emailConfigurations = emailConfigurations;
     }
 
     @ApiOperation(value = "Get email configuration", notes = "Get email configuration linked to user")
@@ -32,7 +28,7 @@ public class UserEmailController {
     })
     @GetMapping("/api/emailconfig/{uid}")
     public UserEmailDocument getEmailConfig(@PathVariable @ApiParam(name = "id", value = "User ID") String uid){
-        return emails.findEmailConfig(uid)
+        return emailConfigurations.findEmailConfig(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
     }
 
@@ -50,7 +46,7 @@ public class UserEmailController {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        return emails.save(UserEmailDocument.builder()
+        return emailConfigurations.save(UserEmailDocument.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
