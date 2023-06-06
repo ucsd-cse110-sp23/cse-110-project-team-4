@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.Command;
-import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.object.Prompt;
 import org.agilelovers.ui.object.UserCredential;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -113,7 +113,7 @@ public class FrontEndAPIUtils {
      * @throws IOException          the io exception
      * @throws InterruptedException the interrupted exception
      */
-    public static List<Question> fetchHistory(String id) throws IOException, InterruptedException {
+    public static List<Prompt> fetchHistory(String id) throws IOException, InterruptedException {
         HttpRequest getRequest = HttpRequest.newBuilder()
                 .uri(URI.create(Constants.SERVER_URL + Constants.QUESTION_ENDPOINT + id))
                 .header("Content-Type", "application/json")
@@ -130,14 +130,14 @@ public class FrontEndAPIUtils {
             throw new RuntimeException("Fetch history failed.");
         }
 
-        Type listType = new TypeToken<List<Question>>() {
+        Type listType = new TypeToken<List<Prompt>>() {
         }.getType();
         return new Gson().fromJson(response.body(), listType);
     }
 
     // TODO: implement this method (i think need to add a parameter for the question? probably string)
-    public static Question newQuestion(Command command, String uid) throws IOException, InterruptedException {
-        return new Question();
+    public static Prompt newQuestion(Command command, String uid) throws IOException, InterruptedException {
+        return new Prompt();
     }
 
     public static void deleteQuestion(String id) throws IOException, InterruptedException {
@@ -164,12 +164,12 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) throw new RuntimeException("Question deletion failed.");
     }
 
-    public static Question createEmail(Command command, String uid) {
-        return new Question();
+    public static Prompt createEmail(Command command, String uid) {
+        return new Prompt();
     }
 
-    public static Question sendEmail(Command command, String uid) {
-        return new Question();
+    public static Prompt sendEmail(Command command, String uid) {
+        return new Prompt();
     }
 
     /**

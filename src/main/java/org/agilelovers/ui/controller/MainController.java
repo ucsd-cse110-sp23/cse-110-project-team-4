@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import org.agilelovers.ui.object.Command;
-import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.object.Prompt;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
 
@@ -50,19 +50,10 @@ public class MainController {
 
     private static String uid;
 
-    public static String getUid() {
-        return uid;
-    }
-
-    public static void setUid(String uid) {
-        MainController.uid = uid;
-    }
-
-    // TODO: deal with email draft type
     /**
-     * A list that contains all the question objects.
+     * A list that contains all the prompt objects.
      */
-    protected ObservableList<Question> pastPrompts = FXCollections.observableArrayList();
+    protected ObservableList<Prompt> pastPrompts = FXCollections.observableArrayList();
 
     public static MainController instance;
 
@@ -80,8 +71,8 @@ public class MainController {
                 throw new RuntimeException(e);
             }
         });
-        for (Question question : pastPrompts) {
-            System.out.println(question);
+        for (Prompt prompt : pastPrompts) {
+            System.out.println(prompt);
         }
         initHistoryList();
     }
@@ -104,9 +95,9 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.getTitle());
-            answerTextArea.setText(currentQuestion.getBody());
+            Prompt currentPrompt = (Prompt) newValue;
+            questionLabel.setText(currentPrompt.getTitle());
+            answerTextArea.setText(currentPrompt.getBody());
         });
     }
 
@@ -122,9 +113,9 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = this.pastPrompts.get(index);
-            questionLabel.setText(currentQuestion.getTitle());
-            answerTextArea.setText(currentQuestion.getBody());
+            Prompt currentPrompt = this.pastPrompts.get(index);
+            questionLabel.setText(currentPrompt.getTitle());
+            answerTextArea.setText(currentPrompt.getBody());
         });
     }
 
@@ -155,6 +146,14 @@ public class MainController {
         return this.answerTextArea;
     }
 
+    public static String getUid() {
+        return uid;
+    }
+
+    public static void setUid(String uid) {
+        MainController.uid = uid;
+    }
+
     public void newQuery(ActionEvent event) throws IOException {
         if (this.isRecording) {
             // wait for ChatGPT to respond
@@ -163,7 +162,7 @@ public class MainController {
                 this.startButton.setDisable(true);
                 Command currentCommand = null;
                 try {
-                    currentCommand = RecordingUtils.endRecording(MainController.uid, new Question());
+                    currentCommand = RecordingUtils.endRecording(MainController.uid, new Prompt());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -177,7 +176,7 @@ public class MainController {
             });
             this.startButton.setText("Start");
         } else {
-            this.pastPrompts.add(new Question());
+            this.pastPrompts.add(new Prompt());
             // call a method that starts recording
             RecordingUtils.startRecording();
             this.startButton.setText("Stop Recording");
@@ -187,26 +186,13 @@ public class MainController {
 
     public void runCommand(Command command) throws IOException, InterruptedException {
         switch (command.getQueryType()) {
-            case QUESTION:
-                newQuestion(command);
-                break;
-            case DELETE_PROMPT:
-                deletePrompt();
-                break;
-            case CLEAR_ALL:
-                clearAll();
-                break;
-            case SETUP_EMAIL:
-                setupEmail();
-                break;
-            case CREATE_EMAIL:
-                createEmail();
-                break;
-            case SEND_EMAIL:
-                sendEmail();
-                break;
-            default:
-                throw new IllegalStateException("Please give a valid command");
+            case QUESTION -> newQuestion(command);
+            case DELETE_PROMPT -> deletePrompt();
+            case CLEAR_ALL -> clearAll();
+            case SETUP_EMAIL -> setupEmail();
+            case CREATE_EMAIL -> createEmail();
+            case SEND_EMAIL -> sendEmail();
+            default -> throw new IllegalStateException("Please give a valid command");
         }
     }
 
@@ -223,11 +209,11 @@ public class MainController {
      */
     public void newQuestion(Command command) throws IOException, InterruptedException {
         System.out.println("New Question");
-        Question currentQuestion = null;
+        Prompt currentPrompt = null;
 
-        currentQuestion = FrontEndAPIUtils.newQuestion(command, MainController.uid);
+        currentPrompt = FrontEndAPIUtils.newQuestion(command, MainController.uid);
         this.pastPrompts.remove(this.pastPrompts.size() - 1);
-        this.pastPrompts.add(currentQuestion);
+        this.pastPrompts.add(currentPrompt);
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 

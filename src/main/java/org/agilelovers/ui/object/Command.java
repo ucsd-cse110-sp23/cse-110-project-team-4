@@ -6,12 +6,12 @@ import org.agilelovers.ui.enums.CommandType;
 public class Command {
     private String transcribed;
     private String command;
-    private String commandPrompt;
+    private String commandArgument;
 
-    public Command(String transcribed, String command, String commandPrompt) {
+    public Command(String transcribed, String command, String commandArgument) {
         this.transcribed = transcribed;
         this.command = command;
-        this.commandPrompt = commandPrompt;
+        this.commandArgument = commandArgument;
     }
 
     public String getTranscribed() {
@@ -22,8 +22,8 @@ public class Command {
         return command;
     }
 
-    public String getCommandPrompt() {
-        return commandPrompt;
+    public String getCommandArgument() {
+        return commandArgument;
     }
 
     public CommandType getQueryType() {
