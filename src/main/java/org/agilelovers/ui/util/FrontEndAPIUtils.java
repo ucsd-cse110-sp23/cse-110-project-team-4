@@ -136,7 +136,7 @@ public class FrontEndAPIUtils {
     }
 
     // TODO: implement this method (i think need to add a parameter for the question? probably string)
-    public static Question newQuestion(String question, String id) throws IOException, InterruptedException {
+    public static Question newQuestion(Command command, String uid) throws IOException, InterruptedException {
         return new Question();
     }
 
@@ -162,6 +162,14 @@ public class FrontEndAPIUtils {
 
         HttpResponse<String> response = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) throw new RuntimeException("Question deletion failed.");
+    }
+
+    public static Question createEmail(Command command, String uid) {
+        return new Question();
+    }
+
+    public static Question sendEmail(Command command, String uid) {
+        return new Question();
     }
 
     /**

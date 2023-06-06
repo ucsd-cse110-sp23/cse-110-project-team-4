@@ -10,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import org.agilelovers.ui.object.Command;
-import org.agilelovers.ui.object.Prompt;
 import org.agilelovers.ui.object.Question;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
@@ -49,21 +48,21 @@ public class MainController {
     @FXML
     protected Button startButton;
 
-    public static String getId() {
-        return id;
+    private static String uid;
+
+    public static String getUid() {
+        return uid;
     }
 
-    public static void setId(String id) {
-        MainController.id = id;
+    public static void setUid(String uid) {
+        MainController.uid = uid;
     }
-
-    private static String id;
 
     // TODO: deal with email draft type
     /**
      * A list that contains all the question objects.
      */
-    protected ObservableList<Prompt> pastPrompts = FXCollections.observableArrayList();
+    protected ObservableList<Question> pastPrompts = FXCollections.observableArrayList();
 
     public static MainController instance;
 
@@ -76,13 +75,13 @@ public class MainController {
         answerTextArea.setEditable(false);
         Platform.runLater(() -> {
             try {
-                FrontEndAPIUtils.fetchHistory(MainController.id);
+                FrontEndAPIUtils.fetchHistory(MainController.uid);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
-        for (Prompt prompt : pastPrompts) {
-            System.out.println(prompt);
+        for (Question question : pastPrompts) {
+            System.out.println(question);
         }
         initHistoryList();
     }
@@ -106,8 +105,8 @@ public class MainController {
                 return;
             }
             Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.getPromptCommand());
-            answerTextArea.setText(currentQuestion.getResponse());
+            questionLabel.setText(currentQuestion.getTitle());
+            answerTextArea.setText(currentQuestion.getBody());
         });
     }
 
@@ -123,9 +122,9 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Prompt currentPrompt = this.pastPrompts.get(index);
-            questionLabel.setText(currentPrompt.getPromptCommand());
-            answerTextArea.setText(currentPrompt.getResponse());
+            Question currentQuestion = this.pastPrompts.get(index);
+            questionLabel.setText(currentQuestion.getTitle());
+            answerTextArea.setText(currentQuestion.getBody());
         });
     }
 
@@ -164,7 +163,7 @@ public class MainController {
                 this.startButton.setDisable(true);
                 Command currentCommand = null;
                 try {
-                    currentCommand = RecordingUtils.endRecording(MainController.id, new Question());
+                    currentCommand = RecordingUtils.endRecording(MainController.uid, new Question());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -178,7 +177,7 @@ public class MainController {
             });
             this.startButton.setText("Start");
         } else {
-            this.pastPrompts.add(new Question("", "", "RECORDING", ""));
+            this.pastPrompts.add(new Question());
             // call a method that starts recording
             RecordingUtils.startRecording();
             this.startButton.setText("Stop Recording");
@@ -192,7 +191,7 @@ public class MainController {
                 newQuestion(command);
                 break;
             case DELETE_PROMPT:
-                deleteQuery();
+                deletePrompt();
                 break;
             case CLEAR_ALL:
                 clearAll();
@@ -226,7 +225,7 @@ public class MainController {
         System.out.println("New Question");
         Question currentQuestion = null;
 
-        currentQuestion = FrontEndAPIUtils.newQuestion(command.getCommandPrompt(), MainController.id);
+        currentQuestion = FrontEndAPIUtils.newQuestion(command, MainController.uid);
         this.pastPrompts.remove(this.pastPrompts.size() - 1);
         this.pastPrompts.add(currentQuestion);
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
@@ -238,8 +237,8 @@ public class MainController {
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
      */
-    public void deleteQuery() throws IOException, InterruptedException {
-        System.out.println("Delete Question");
+    public void deletePrompt() throws IOException, InterruptedException {
+        System.out.println("Delete Prompt");
         if (!this.pastPrompts.isEmpty()) {
             FrontEndAPIUtils.deleteQuestion(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
             this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
@@ -255,7 +254,7 @@ public class MainController {
      */
     public void clearAll() throws IOException, InterruptedException {
         System.out.println("Clear All");
-        FrontEndAPIUtils.clearAll(MainController.id);
+        FrontEndAPIUtils.clearAll(MainController.uid);
         this.pastPrompts.clear();
         this.historyList.getSelectionModel().select(null);
     }

@@ -3,56 +3,62 @@ package org.agilelovers.ui.object;
 
 import org.agilelovers.ui.controller.MainController;
 
-public class Question extends Prompt {
+public class Question {
+    private Command command = null;
     private String id = "";
-    private String userId = "";
-    private String promptCommand = "";
-    private String response = "";
+    private String title = "RECORDING";
+    private String body = "";
 
     public Question() {
-        super("", "", "", "");
     }
 
-    public Question(String id, String userId, String promptCommand, String response) {
-        super(id, userId, promptCommand, response);
+    public Question(Command command) {
+        this.command = command;
     }
 
-    public String getPromptCommand() {
-        return this.promptCommand;
+    public Question(Command command, String id, String title, String body) {
+        this.command = command;
+        this.id = id;
+        this.title = title;
+        this.body = body;
     }
 
-    public String getResponse() {
-        return this.response;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getUserId() {
-        return userId;
+    public void setCommand(Command command) {
+        this.command = command;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setPromptCommand(String newQuestion) {
+    public void setTitle(String newTitle) {
         if (MainController.instance != null) MainController.instance.refreshLabels();
-        this.promptCommand = newQuestion;
+        this.title = newTitle;
     }
 
-    public void setResponse(String newAnswer) {
+    public void setBody(String newAnswer) {
         if (MainController.instance != null) { MainController.instance.refreshLabels(); }
-        this.response = newAnswer;
+        this.body = newAnswer;
+    }
+    public String getTitle() {
+        return this.title;
+    }
+
+    public Command getCommand() {
+        return command;
+    }
+
+    public String getBody() {
+        return this.body;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override
     public String toString() {
-        return this.promptCommand;
+        return this.command.getCommandPrompt();
     }
+
 }

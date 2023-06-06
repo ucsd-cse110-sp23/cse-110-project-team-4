@@ -60,7 +60,7 @@ public class LoginController {
         // check if autologin is enabled
         File f = new File(Constants.USER_TOKEN_PATH);
         if (f.exists() && !f.isDirectory()) {
-            MainController.setId(new BufferedReader(new FileReader(Constants.USER_TOKEN_PATH)).readLine());
+            MainController.setUid(new BufferedReader(new FileReader(Constants.USER_TOKEN_PATH)).readLine());
             switchToMainUI();
         }
     }
@@ -121,7 +121,7 @@ public class LoginController {
             writer.close();
         }
 
-        MainController.setId(uid);
+        MainController.setUid(uid);
 
         switchToMainUI();
     }
@@ -141,7 +141,7 @@ public class LoginController {
         this.disableButtons();
         Platform.runLater(() -> {
             try {
-                UserCredential credential = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText(), MainController.getId());
+                UserCredential credential = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText(), MainController.getUid());
                 this.promptAutoLogin(credential.getId());
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
