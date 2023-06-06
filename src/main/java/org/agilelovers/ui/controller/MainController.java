@@ -190,8 +190,8 @@ public class MainController {
             case DELETE_PROMPT -> deletePrompt();
             case CLEAR_ALL -> clearAll();
             case SETUP_EMAIL -> setupEmail();
-            case CREATE_EMAIL -> createEmail();
-            case SEND_EMAIL -> sendEmail();
+            case CREATE_EMAIL -> createEmail(command);
+            case SEND_EMAIL -> sendEmail(command);
             default -> throw new IllegalStateException("Please give a valid command");
         }
     }
@@ -250,12 +250,24 @@ public class MainController {
         // TODO: change scene to EmailSetup
     }
 
-    private void createEmail() {
+    private void createEmail(Command command) {
         System.out.println("Create Email");
+        Prompt currentPrompt = null;
+
+        currentPrompt = FrontEndAPIUtils.createEmail(command, MainController.uid);
+        this.pastPrompts.remove(this.pastPrompts.size() - 1);
+        this.pastPrompts.add(currentPrompt);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 
-    private void sendEmail() {
+    private void sendEmail(Command command) {
         System.out.println("Send Email");
+        Prompt currentPrompt = null;
+
+        currentPrompt = FrontEndAPIUtils.sendEmail(command, this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(), MainController.uid);
+        this.pastPrompts.remove(this.pastPrompts.size() - 1);
+        this.pastPrompts.add(currentPrompt);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 }
 

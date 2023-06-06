@@ -168,7 +168,7 @@ public class FrontEndAPIUtils {
         return new Prompt();
     }
 
-    public static Prompt sendEmail(Command command, String uid) {
+    public static Prompt sendEmail(Command command, String id, String uid) {
         return new Prompt();
     }
 

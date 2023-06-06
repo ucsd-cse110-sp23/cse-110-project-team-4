@@ -58,7 +58,7 @@ public class Prompt {
 
     @Override
     public String toString() {
-        return this.command.getCommandArgument();
+        return this.command.getCommand_arguments();
     }
 
 }
