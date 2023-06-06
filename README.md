@@ -28,20 +28,20 @@ Once you've run this command, a window should appear on your screen. It should l
 ---
 
 # How to use the "SayItAssistant" app
-Generating an AI generated response to a recorded command (question/statement). 
+Generating an AI generated response to a recorded command (prompt/statement). 
 
-The purpose of the **SayItAssistant** application is to let the user speak out loud their question or statement. Within seconds, a response should be displayed on the screen according to their question or statement. 
+The purpose of the **SayItAssistant** application is to let the user speak out loud their prompt or statement. Within seconds, a response should be displayed on the screen according to their prompt or statement. 
 
 On our application, there are several buttons the user should know about:
 1. "New Question"
    * the button initiates a recording for the user 
-   * The user should start speaking their question or statement 
+   * The user should start speaking their prompt or statement 
    * Once the user is finished with their command, click "End Recording"
 2. "Delete Question"
-   * The user should click on the question they wish to delete
-   * Once the user has selected their question, click on the "Delete Question" button
+   * The user should click on the prompt they wish to delete
+   * Once the user has selected their prompt, click on the "Delete Question" button
 3. "Clear All"
-   * Clears all questions from the question list and no questions should be displayed
+   * Clears all prompts from the prompt list and no prompts should be displayed
 
 ---
 
@@ -55,26 +55,26 @@ On our application, there are several buttons the user should know about:
 
 #### Demo: satisfaction of all milestone requirements – 35 points [priority] - points:
 
-- [x] Story 1: **Ask a question** [H] - 12 pts 
-  - As a user I want the app to display an answer when I ask a question verbally so that I don’t have to type in my questions
+- [x] Story 1: **Ask a prompt** [H] - 12 pts 
+  - As a user I want the app to display an answer when I ask a prompt verbally so that I don’t have to type in my prompts
 
 - [x] Story 2: **Copy and paste answers** [M] - 2 pts 
   - As a user I want copy parts of an answer so that I can paste them into another program like Google Documents so that I can add part of the answer to my research paper
 
-- [x] Story 3: **Browse question prompt history** [H] - 5 pts 
-  - As a user I want to be able to view a list of past questions so that I can see what questions I already asked
+- [x] Story 3: **Browse prompt prompt history** [H] - 5 pts 
+  - As a user I want to be able to view a list of past prompts so that I can see what prompts I already asked
 
 - [x] Story 4: **Persistence of old prompts and answers** [M] - 2 pts 
-  - As a user I want older questions and answers to still be available after the program is killed and restarted so that I can find the information and topics again
+  - As a user I want older prompts and answers to still be available after the program is killed and restarted so that I can find the information and topics again
 
-- [x] Story 5: **Read old question prompt and answer** [H] - 5 pts 
-  - As a user I want to be able to view the answer to a past question when I click on it the question history so that I can review a previous answer
+- [x] Story 5: **Read old prompt prompt and answer** [H] - 5 pts 
+  - As a user I want to be able to view the answer to a past prompt when I click on it the prompt history so that I can review a previous answer
 
-- [x] Story 6: **Delete old question prompt and answer** [M] - 3 pts 
-  - As a user I want to be able to select a past question and then delete it so that I can remove unneeded questions so I can more easily find important information
+- [x] Story 6: **Delete old prompt prompt and answer** [M] - 3 pts 
+  - As a user I want to be able to select a past prompt and then delete it so that I can remove unneeded prompts so I can more easily find important information
 
-- [x] Story 7: **Clear all older question prompts and answers** [M] - 3 pts 
-  - As a user I want to be able to clear all past questions when I no longer need them so that I can prevent my screen from being cluttered when researching new topics
+- [x] Story 7: **Clear all older prompt prompts and answers** [M] - 3 pts 
+  - As a user I want to be able to clear all past prompts when I no longer need them so that I can prevent my screen from being cluttered when researching new topics
 
 - [x] Story 8: **Scalable to work on multiple platforms** [M] - 3 pts
 *Details for Story 8:*
