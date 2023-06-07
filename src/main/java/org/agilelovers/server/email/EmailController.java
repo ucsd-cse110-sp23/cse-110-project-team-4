@@ -32,7 +32,7 @@ public class EmailController {
         this.client = new OpenAIClient();
     }
 
-    @GetMapping("/api/emails/{uid}")
+    @GetMapping("/api/emails/all/{uid}")
     public List<EmailDocument> getAllEmailsFromUserId(@PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         return emails.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
@@ -86,7 +86,7 @@ public class EmailController {
     }
 
     @ApiOperation(value = "Send email", notes = "Sends email towards a specified user")
-    @PostMapping("/api/emails/{uid}")
+    @PostMapping("/api/emails/send/{uid}")
     public ReducedEmailDocument sendEmail(@PathVariable String uid,
                                           @RequestBody @ApiParam(name = "email information",
                                                value = "information required to send an email") EmailInformationDocument emailInfo) {

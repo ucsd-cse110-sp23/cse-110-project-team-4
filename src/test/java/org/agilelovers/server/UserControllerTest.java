@@ -1,6 +1,9 @@
 package org.agilelovers.server;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import org.agilelovers.server.user.ReducedUserDocument;
 import org.agilelovers.server.user.UserDocument;
+import org.agilelovers.server.user.UserDocumentSecured;
 import org.agilelovers.server.user.UserRepository;
 import org.junit.After;
 import org.junit.Test;
@@ -21,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.MOCK,
@@ -32,11 +36,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 public class UserControllerTest {
 
+    private final String API_KEY;
+
     @Autowired
     private MockMvc mvc;
 
     @Autowired
     private UserRepository userRepository;
+
+    public UserControllerTest() {
+        this.API_KEY = Dotenv.load().get("API_SECRET");
+    }
 
     @After
     public void resetDb() {
@@ -49,9 +59,10 @@ public class UserControllerTest {
         String username = "testing@get.com";
         String password = "getplaintext";
 
-        UserDocument user = UserDocument.builder()
+        UserDocumentSecured user = UserDocumentSecured.builder()
                 .username(username)
                 .password(password)
+                .apiPassword(API_KEY)
                 .build();
 
         mvc.perform(post("/api/users")
@@ -69,19 +80,21 @@ public class UserControllerTest {
         //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
         String str = httpResponse.getContentAsString();
 
-        UserDocument result = JsonUtil.fromJson(str, UserDocument.class);
+        ReducedUserDocument result = JsonUtil.fromJson(str, ReducedUserDocument.class);
 
         //Perform assertions to verify the retrieved user
-        assertThat(result).extracting(UserDocument::getUsername).isEqualTo(username);
-        assertThat(result).extracting(UserDocument::getPassword).isEqualTo(password);
+        assertThat(result).extracting(ReducedUserDocument::getUsername).isEqualTo(username);
     }
 
 
     @Test
     public void createUserWithValidInputs() throws Exception {
-        UserDocument user = UserDocument.builder()
-                .username("testing@test.com")
-                .password("plaintext")
+        String username = "testing@test.com";
+        String password = "getplaintext";
+        UserDocumentSecured user = UserDocumentSecured.builder()
+                .username(username)
+                .password(password)
+                .apiPassword(API_KEY)
                 .build();
 
         mvc.perform(post("/api/users")
@@ -108,7 +121,6 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.toJson(user)))
                 .andExpect(status().isNotFound()); // Expecting a 404 error
-
     }
 
     @Test
