@@ -1,4 +1,4 @@
-package org.agilelovers.server.user;
+package org.agilelovers.server.user.models;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDocumentSecured extends UserDocument {
+public class SecureUser extends UserDocument {
     @ApiModelProperty(notes = "The secret required to use this API", required = true)
     private String apiPassword;
 }

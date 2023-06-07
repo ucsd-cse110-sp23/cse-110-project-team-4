@@ -1,9 +1,9 @@
 package org.agilelovers.server;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.agilelovers.server.user.ReducedUserDocument;
-import org.agilelovers.server.user.UserDocument;
-import org.agilelovers.server.user.UserDocumentSecured;
+import org.agilelovers.server.user.models.ReducedUser;
+import org.agilelovers.server.user.models.UserDocument;
+import org.agilelovers.server.user.models.SecureUser;
 import org.agilelovers.server.user.UserRepository;
 import org.junit.After;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class UserControllerTest {
         String username = "testing@get.com";
         String password = "getplaintext";
 
-        UserDocumentSecured user = UserDocumentSecured.builder()
+        SecureUser user = SecureUser.builder()
                 .username(username)
                 .password(password)
                 .apiPassword(API_KEY)
@@ -80,10 +80,10 @@ public class UserControllerTest {
         //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
         String str = httpResponse.getContentAsString();
 
-        ReducedUserDocument result = JsonUtil.fromJson(str, ReducedUserDocument.class);
+        ReducedUser result = JsonUtil.fromJson(str, ReducedUser.class);
 
         //Perform assertions to verify the retrieved user
-        assertThat(result).extracting(ReducedUserDocument::getUsername).isEqualTo(username);
+        assertThat(result).extracting(ReducedUser::getUsername).isEqualTo(username);
     }
 
 
@@ -91,7 +91,7 @@ public class UserControllerTest {
     public void createUserWithValidInputs() throws Exception {
         String username = "testing@test.com";
         String password = "getplaintext";
-        UserDocumentSecured user = UserDocumentSecured.builder()
+        SecureUser user = SecureUser.builder()
                 .username(username)
                 .password(password)
                 .apiPassword(API_KEY)

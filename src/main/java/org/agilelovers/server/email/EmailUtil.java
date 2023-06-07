@@ -1,13 +1,12 @@
 package org.agilelovers.server.email;
 
-import org.agilelovers.server.user.UserEmailDocument;
+import org.agilelovers.server.user.models.UserEmailDocument;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
 
 public class EmailUtil {
 

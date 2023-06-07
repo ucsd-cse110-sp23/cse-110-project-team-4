@@ -1,4 +1,4 @@
-package org.agilelovers.server.user;
+package org.agilelovers.server.user.models;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

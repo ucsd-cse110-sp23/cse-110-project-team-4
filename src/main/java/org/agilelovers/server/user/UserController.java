@@ -6,6 +6,10 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.errors.NotAuthorizedError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
+import org.agilelovers.server.user.models.ReducedUser;
+import org.agilelovers.server.user.models.UserDocument;
+import org.agilelovers.server.user.models.SecureUser;
+import org.agilelovers.server.user.models.UserEmailDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +32,11 @@ public class UserController {
             @ApiResponse(code = 404, message = "User not found"),
     })
     @GetMapping("/api/users")
-    public ReducedUserDocument getUser(@RequestBody UserDocument user) {
+    public ReducedUser getUser(@RequestBody UserDocument user) {
         UserDocument foundUser = users.findByUsernameAndPassword(user.getUsername(), user.getPassword())
                 .orElseThrow(() -> new UserNotFoundError(user.getUsername()));
 
-        return ReducedUserDocument.builder()
+        return ReducedUser.builder()
                 .username(foundUser.getUsername())
                 .email(foundUser.getEmail())
                 .id(foundUser.getId())
@@ -42,10 +46,10 @@ public class UserController {
 
     @ApiOperation(value = "Sign up", notes = "Sign up with a username and password")
     @PostMapping("/api/users")
-    public ReducedUserDocument createUser(@RequestBody UserDocumentSecured user) {
+    public ReducedUser createUser(@RequestBody SecureUser user) {
         if (user.getApiPassword() != null && user.getApiPassword().equals(this.apiPassword)) {
             UserDocument savedUser = users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
-            return ReducedUserDocument.builder()
+            return ReducedUser.builder()
                     .username(savedUser.getUsername())
                     .email(savedUser.getEmail())
                     .id(savedUser.getId())
@@ -59,14 +63,14 @@ public class UserController {
             @ApiResponse(code = 404, message = "User not found"),
     })
     @PutMapping("/api/users/{id}")
-    public ReducedUserDocument updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") UserEmailDocument emailDoc,
-                                           @PathVariable @ApiParam(name = "id", value = "User ID") String id) {
+    public ReducedUser updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") UserEmailDocument emailDoc,
+                                   @PathVariable @ApiParam(name = "id", value = "User ID") String id) {
         return users.findById(id)
                 .map(user -> {
                     user.setEmail(emailDoc.getEmail());
                     user.setEmailInformation(emailDoc);
                     users.save(user);
-                    return ReducedUserDocument.builder()
+                    return ReducedUser.builder()
                             .username(user.getUsername())
                             .email(user.getEmail())
                             .id(user.getId())
