@@ -71,14 +71,20 @@ public class MainController {
         answerTextArea.setEditable(false);
         Platform.runLater(() -> {
             try {
-                FrontEndAPIUtils.fetchHistory(MainController.uid);
+                pastPrompts.addAll(FrontEndAPIUtils.fetchQuestionHistory(MainController.uid));
+                pastPrompts.sort(null);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
-        for (Prompt prompt : pastPrompts) {
-            System.out.println(prompt);
-        }
+        Platform.runLater(() -> {
+            try {
+                pastPrompts.addAll(FrontEndAPIUtils.fetchEmailHistory(MainController.uid));
+                pastPrompts.sort(null);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         initHistoryList();
     }
 
@@ -159,7 +165,7 @@ public class MainController {
         MainController.uid = uid;
     }
 
-    public void newQuery(ActionEvent event) throws IOException {
+    private void newQuery(ActionEvent event) throws IOException {
         if (this.isRecording) {
             // wait for ChatGPT to respond
             // Question stopRecording()
@@ -189,14 +195,13 @@ public class MainController {
         this.isRecording = !this.isRecording;
     }
 
-    public void runCommand(Command command) throws IOException, InterruptedException {
+    private void runCommand(Command command) throws IOException, InterruptedException {
         switch (command.getQueryType()) {
-            case QUESTION -> newQuestion(command);
+            case QUESTION, CREATE_EMAIL -> newPrompt(command);
             case DELETE_PROMPT -> deletePrompt();
             case CLEAR_ALL -> clearAll();
             case SETUP_EMAIL -> setupEmail();
-            case CREATE_EMAIL -> createEmail(command);
-            case SEND_EMAIL -> sendEmail(command);
+            case SEND_EMAIL -> sendEmail();
             default -> throw new IllegalStateException("Please give a valid command");
         }
     }
@@ -212,11 +217,18 @@ public class MainController {
      *
      * @param command the command containing question to be answered and added to prompt history
      */
-    public void newQuestion(Command command) throws IOException, InterruptedException {
+    private void newPrompt(Command command) throws IOException, InterruptedException {
         System.out.println("New Question");
-        Prompt currentPrompt = null;
+        Prompt currentPrompt = new Prompt(command);
 
-        currentPrompt = FrontEndAPIUtils.newQuestion(command, MainController.uid);
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.newPrompt(command, currentPrompt, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         this.pastPrompts.remove(this.pastPrompts.size() - 1);
         this.pastPrompts.add(currentPrompt);
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
@@ -228,14 +240,21 @@ public class MainController {
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
      */
-    public void deletePrompt() throws IOException, InterruptedException {
+    private void deletePrompt() throws IOException, InterruptedException {
         System.out.println("Delete Prompt");
-        if (!this.pastPrompts.isEmpty()) {
-            FrontEndAPIUtils.deleteQuestion(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
-            this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
-            this.historyList.getSelectionModel().select(null);
-            System.out.println("Successfully deleted question");
-        }
+        if (this.pastPrompts.isEmpty()) return;
+
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.deletePrompt(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
+        this.historyList.getSelectionModel().select(null);
+        System.out.println("Successfully deleted question");
     }
 
     /**
@@ -243,9 +262,24 @@ public class MainController {
      * <p>
      * If no questions are in the list, nothing will happen.
      */
-    public void clearAll() throws IOException, InterruptedException {
+    private void clearAll() throws IOException, InterruptedException {
         System.out.println("Clear All");
-        FrontEndAPIUtils.clearAll(MainController.uid);
+
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.clearAll(MainController.uid, true);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.clearAll(MainController.uid, false);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         this.pastPrompts.clear();
         this.historyList.getSelectionModel().select(null);
     }
@@ -255,29 +289,16 @@ public class MainController {
         SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.EMAIL_SETUP_UI);
     }
 
-    private void createEmail(Command command) {
-        System.out.println("Create Email");
-        Prompt currentPrompt = null;
-
-        currentPrompt = FrontEndAPIUtils.createEmail(command, MainController.uid);
-        this.pastPrompts.remove(this.pastPrompts.size() - 1);
-        this.pastPrompts.add(currentPrompt);
-        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
-    }
-
-    private void sendEmail(Command command) {
+    private void sendEmail() throws IOException, InterruptedException {
         System.out.println("Send Email");
-        Prompt currentPrompt = null;
-
-        currentPrompt = FrontEndAPIUtils.sendEmail(command, this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(), MainController.uid);
-        this.pastPrompts.remove(this.pastPrompts.size() - 1);
-        this.pastPrompts.add(currentPrompt);
-        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
+//        Platform.runLater(() -> {
+//            try {
+//                FrontEndAPIUtils.sendEmail(MainController.uid);
+//            } catch (IOException | InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
     }
 
-    public void openEmailSetup() throws IOException {
-        SceneChanger sceneChanger = SceneChanger.getInstance();
-
-    }
 }
 

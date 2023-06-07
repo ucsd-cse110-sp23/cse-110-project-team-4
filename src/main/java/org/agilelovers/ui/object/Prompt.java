@@ -5,7 +5,7 @@ import org.agilelovers.ui.controller.MainController;
 
 import java.util.Date;
 
-public class Prompt {
+public class Prompt implements Comparable<Prompt> {
     private Command command = null;
     private String id = "";
     private String title = "RECORDING";
@@ -17,6 +17,7 @@ public class Prompt {
 
     public Prompt(Command command) {
         this.command = command;
+        this.title = command.getTranscribed();
     }
 
     public Prompt(Command command, String id, String title, String body) {
@@ -64,4 +65,16 @@ public class Prompt {
         return this.command.getCommand_arguments();
     }
 
+    @Override
+    public int compareTo(Prompt o) {
+        return this.createdDate.compareTo(o.createdDate);
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 }

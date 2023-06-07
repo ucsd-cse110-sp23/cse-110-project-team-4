@@ -70,7 +70,7 @@ public class FrontEndAPIUtils {
 
     /**
      * Login user credential and return the user credential.
-     * Send a GET request to the backend API to login to an existing account.
+     * Send a GET request to the backend API to log in to an existing account.
      * If the user credentials are invalid, an exception is thrown.
      * If the user credentials are valid, the user credential is returned.
      *
@@ -107,14 +107,14 @@ public class FrontEndAPIUtils {
     }
 
     /**
-     * Fetch history list.
+     * Fetch question history list.
      *
      * @param id the id
      * @return the list
      * @throws IOException          the io exception
      * @throws InterruptedException the interrupted exception
      */
-    public static List<Prompt> fetchHistory(String id) throws IOException, InterruptedException {
+    public static List<Prompt> fetchQuestionHistory(String id) throws IOException, InterruptedException {
         HttpRequest getRequest = HttpRequest.newBuilder()
                 .uri(URI.create(Constants.SERVER_URL + Constants.QUESTION_ENDPOINT + id))
                 .header("Content-Type", "application/json")
@@ -136,14 +136,62 @@ public class FrontEndAPIUtils {
         return new Gson().fromJson(response.body(), listType);
     }
 
-    // TODO: implement this method (i think need to add a parameter for the question? probably string)
-    public static Prompt newQuestion(Command command, String uid) throws IOException, InterruptedException {
-        return new Prompt();
+    /**
+     * Fetch email history list.
+     *
+     * @param id the id
+     * @return the list
+     * @throws IOException          the io exception
+     * @throws InterruptedException the interrupted exception
+     */
+    public static List<Prompt> fetchEmailHistory(String id) throws IOException, InterruptedException {
+        HttpRequest getRequest = HttpRequest.newBuilder()
+                .uri(URI.create(Constants.SERVER_URL + Constants.EMAIL_ENDPOINT + id))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            System.err.println("Response code: " + response.statusCode());
+            System.err.println("Response body: " + response.body());
+            System.err.println(id);
+            throw new RuntimeException("Fetch history failed.");
+        }
+
+        Type listType = new TypeToken<List<Prompt>>() {
+        }.getType();
+        return new Gson().fromJson(response.body(), listType);
     }
 
-    public static void deleteQuestion(String id) throws IOException, InterruptedException {
+    public static Prompt newPrompt(Command command, Prompt prompt, String uid) throws IOException, InterruptedException {
+        HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (command.getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_ENDPOINT : Constants.EMAIL_ENDPOINT) + uid))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(command.getCommand_arguments()))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            System.err.println("Response code: " + response.statusCode());
+            System.err.println("Response body: " + response.body());
+            throw new IllegalArgumentException(response.body());
+        }
+
+        Prompt prompt1 = new Gson().fromJson(response.body(), Prompt.class);
+        prompt.setBody(prompt1.getBody());
+        prompt.setId(prompt1.getId());
+        prompt.setCreatedDate(prompt1.getCreatedDate());
+
+        return prompt;
+    }
+
+    public static void deletePrompt(Prompt prompt) throws IOException, InterruptedException {
         HttpRequest deleteRequest =
-                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.DELETION_ENDPOINT + id))
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (prompt.getCommand().getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_DELETION_ENDPOINT : Constants.EMAIL_DELETION_ENDPOINT) + prompt.getId()))
                         .DELETE()
                         .build();
 
@@ -153,9 +201,9 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) throw new RuntimeException("Question deletion failed.");
     }
 
-    public static void clearAll(String uid) throws IOException, InterruptedException {
+    public static void clearAll(String uid, boolean isQuestion) throws IOException, InterruptedException {
         HttpRequest deleteRequest =
-                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.DELETE_ALL_ENDPOINT + uid))
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (isQuestion ? Constants.DELETE_ALL_QUESTIONS_ENDPOINT : Constants.DELETE_ALL_EMAILS_ENDPOINT) + uid))
                         .DELETE()
                         .build();
 
@@ -165,11 +213,10 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) throw new RuntimeException("Question deletion failed.");
     }
 
-    public static Prompt createEmail(Command command, String uid) {
-        return new Prompt();
-    }
-
-    public static Prompt sendEmail(Command command, String id, String uid) {
+    // TODO
+    public static Prompt sendEmail(Command command, Prompt prompt, String id, String uid) {
+        // command is for email address
+        // prompt is for checking valid email draft
         return new Prompt();
     }
 
