@@ -7,9 +7,9 @@ import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.EmailUtil;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.common.errors.UserNotFoundError;
-import org.agilelovers.server.email.errors.NoEmailFound;
+import org.agilelovers.server.common.errors.NoEmailFound;
 import org.agilelovers.server.user.models.UserDocument;
-import org.agilelovers.server.user.models.UserEmailDocument;
+import org.agilelovers.server.user.models.UserEmailConfigDocument;
 import org.agilelovers.server.user.UserEmailRepository;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
@@ -23,15 +23,18 @@ import static org.agilelovers.common.CommandType.CREATE_EMAIL;
 
 @RestController
 public class EmailController {
-    private final EmailRepository emails;
+
     private final UserRepository users;
+    private final EmailRepository emails;
     private final UserEmailRepository emailConfigurations;
+    private final ReturnedEmailRepository emailsSent;
     private final OpenAIClient client;
 
-    public EmailController(EmailRepository emails, UserRepository users, UserEmailRepository emailConfigurations) {
+    public EmailController(EmailRepository emails, UserRepository users, UserEmailRepository emailConfigurations, ReturnedEmailRepository emailsSent) {
         this.emails = emails;
         this.users = users;
         this.emailConfigurations = emailConfigurations;
+        this.emailsSent = emailsSent;
         this.client = new OpenAIClient();
     }
 
@@ -48,7 +51,7 @@ public class EmailController {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        return emails.findByid(emailID)
+        return emails.findById(emailID)
                 .orElseThrow(() -> new NoEmailFound(emailID));
 
     }
@@ -61,11 +64,12 @@ public class EmailController {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
+        Optional<UserDocument> user = users.findById(uid);
         String body = this.client.getAnswer(prompt);
 
         return emails.save(EmailDocument.builder()
-                .prompt(prompt)
-                .body(body)
+                .entirePrompt(prompt)
+                .body(body + "\n " + user.get().getEmailInformation().getDisplayName())
                 .userId(uid)
                 .build()
         );
@@ -90,24 +94,26 @@ public class EmailController {
 
     @ApiOperation(value = "Send email", notes = "Sends email towards a specified user")
     @PostMapping("/api/emails/send/{uid}")
-    public ReducedEmailDocument sendEmail(@PathVariable String uid,
-                                          @RequestBody @ApiParam(name = "email information",
-                                               value = "information required to send an email") EmailInformationDocument emailInfo) {
+    public ReturnedEmailDocument sendEmail(@PathVariable String uid,
+                                           @RequestBody @ApiParam(name = "email information",
+                                               value = "information required to send an email")
+                                               PassedEmailDocument emailInfo) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-//        if (!emailInfo.getCommand().equals(CREATE_EMAIL)){
-//            return emails.save(ReducedEmailDocument.builder()
-//                    .originalId(emailInfo.getId())
-//                    .confirmationOfEmailSent("Please select an email draft to send")
-//                    .build()
-//            );
-//        }
+        if (!emailInfo.getCommand().equals(CREATE_EMAIL)){
+            return emailsSent.save(ReturnedEmailDocument.builder()
+                    .userId(emailInfo.getUserId())
+                    .entirePrompt(emailInfo.getEntirePrompt())
+                    .confirmationOfEmailSent("Please select an email draft to send")
+                    .build()
+            );
+        }
 
-        Optional<EmailDocument> email = emails.findByid(emailInfo.getId());
+        Optional<EmailDocument> email = emails.findById(emailInfo.getSentId());
         Optional<UserDocument> currentUser = this.users.findById(uid);
-        UserEmailDocument emailConfig = currentUser.get().getEmailInformation();
+        UserEmailConfigDocument emailConfig = currentUser.get().getEmailInformation();
 
         Properties props = new Properties();
         props.put("mail.smtp.host", emailConfig.getSmtpHost());
@@ -123,9 +129,8 @@ public class EmailController {
 
         Session session = Session.getInstance(props, auth);
 
-        EmailUtil.sendEmail(session, emailInfo.getEmailOfUserSentTowards(), email.get().getBody(), emailConfig);
-
-        return ReducedEmailDocument.builder().build();
+        return  emailsSent.save(EmailUtil.sendEmail(session, emailInfo.getRecipient(),  email.get().getBody(),
+                                emailConfig, emailInfo.getEntirePrompt()));
 
     }
 }

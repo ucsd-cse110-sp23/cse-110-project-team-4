@@ -1,12 +1,14 @@
 package org.agilelovers.server.common;
 
-import org.agilelovers.server.user.models.UserEmailDocument;
+import org.agilelovers.server.email.ReturnedEmailDocument;
+import org.agilelovers.server.user.models.UserEmailConfigDocument;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Optional;
 
 public class EmailUtil {
 
@@ -17,7 +19,7 @@ public class EmailUtil {
      * @param toEmail
      * @param body
      */
-    public static void sendEmail(Session session, String toEmail, String body, UserEmailDocument emailConfig) {
+    public static ReturnedEmailDocument sendEmail(Session session, String toEmail, String body, UserEmailConfigDocument emailConfig, String entirePrompt) {
         try {
             MimeMessage msg = new MimeMessage(session);
 
@@ -30,8 +32,21 @@ public class EmailUtil {
             msg.setText(body, "UTF-8");
 
             Transport.send(msg);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            String errorMessage = "Failed to send email. Email configuration error: " + e.getMessage();
+            return ReturnedEmailDocument.builder()
+                    .userId(emailConfig.getUserID())
+                    .entirePrompt(entirePrompt)
+                    .confirmationOfEmailSent(errorMessage)
+                    .build();
         }
+
+        return ReturnedEmailDocument.builder()
+                .userId(emailConfig.getUserID())
+                .entirePrompt(entirePrompt)
+                .confirmationOfEmailSent("Email was successfully sent")
+                .build();
+
     }
 }

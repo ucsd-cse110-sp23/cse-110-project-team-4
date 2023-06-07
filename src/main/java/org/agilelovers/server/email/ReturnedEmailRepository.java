@@ -3,14 +3,14 @@ package org.agilelovers.server.email;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+
 import java.util.List;
 import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
-public interface EmailRepository extends MongoRepository<EmailDocument, String> {
-    Optional<List<EmailDocument>> findAllByUserId(String userID);
+public interface ReturnedEmailRepository  extends MongoRepository<ReturnedEmailDocument, String> {
 
-    Optional<EmailDocument> findById(String id);
+    Optional<List<ReturnedEmailDocument>> findAllByUserId(String userID);
 
-
+    Optional<ReturnedEmailDocument> findById(String Id);
 }

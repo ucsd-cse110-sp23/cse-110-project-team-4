@@ -38,15 +38,15 @@ public class QuestionController {
     @PostMapping("/api/questions/{uid}")
     public QuestionDocument createQuestion(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
                                            @RequestBody @ApiParam(name = "question",
-                                                   value = "Question to get the answer of") String question) {
+                                                   value = "Question to get the answer of") String entirePrompt) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        String answer = this.client.getAnswer(question);
+        String answer = this.client.getAnswer(entirePrompt);
 
         return questions.save(QuestionDocument.builder()
-                .question(question)
+                .entirePrompt(entirePrompt)
                 .answer(answer)
                 .userId(uid)
                 .build()

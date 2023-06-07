@@ -9,7 +9,7 @@ import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.models.ReducedUser;
 import org.agilelovers.server.user.models.UserDocument;
 import org.agilelovers.server.user.models.SecureUser;
-import org.agilelovers.server.user.models.UserEmailDocument;
+import org.agilelovers.server.user.models.UserEmailConfigDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +63,7 @@ public class UserController {
             @ApiResponse(code = 404, message = "User not found"),
     })
     @PutMapping("/api/users/{id}")
-    public ReducedUser updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") UserEmailDocument emailDoc,
+    public ReducedUser updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") UserEmailConfigDocument emailDoc,
                                    @PathVariable @ApiParam(name = "id", value = "User ID") String id) {
         return users.findById(id)
                 .map(user -> {

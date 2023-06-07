@@ -1,4 +1,4 @@
-package org.agilelovers.server.email.errors;
+package org.agilelovers.server.common.errors;
 
 public class NoEmailFound extends RuntimeException{
 

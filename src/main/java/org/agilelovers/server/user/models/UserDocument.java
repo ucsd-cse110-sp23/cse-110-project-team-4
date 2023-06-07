@@ -41,7 +41,7 @@ public class UserDocument {
     private String email;
 
     @ApiModelProperty(notes = "Document containing email configuration, given during email setup ")
-    private UserEmailDocument emailInformation;
+    private UserEmailConfigDocument emailInformation;
 
 
 }
