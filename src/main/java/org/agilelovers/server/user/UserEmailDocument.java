@@ -26,6 +26,9 @@ public class UserEmailDocument {
     @Id
     private String id;
 
+    @ApiModelProperty(notes = "ID Of User this email information relate to")
+    private String userID;
+
     @ApiModelProperty(notes = "first name of user during email setup")
     @NotEmpty
     private String firstName;

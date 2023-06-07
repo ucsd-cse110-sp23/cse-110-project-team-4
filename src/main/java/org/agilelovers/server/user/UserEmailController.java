@@ -35,25 +35,21 @@ public class UserEmailController {
 
     @ApiOperation(value = "Email configuration", notes = "Set up email configurations to be able to send emails")
     @PostMapping("/api/emailconfig/{uid}")
-    public UserEmailDocument saveEmailConfig(@RequestBody @ApiParam(name = "firstName", value = "New first Name") String firstName,
-                                           @RequestBody @ApiParam(name = "lastName", value = "New last Name") String lastName,
-                                           @RequestBody @ApiParam(name = "email", value = "New email") String email,
-                                           @RequestBody @ApiParam(name = "emailPassword", value = "New email password") String emailPassword,
-                                           @RequestBody @ApiParam(name = "displayName", value = "New display name") String displayName,
-                                           @RequestBody @ApiParam(name = "smtpHost", value = "New smtp host") String smtpHost,
-                                           @RequestBody @ApiParam(name = "tlsPort", value = "New tls port") String tlsPort,
+    public UserEmailDocument saveEmailConfig(@RequestBody @ApiParam(name = "User Email Configuration",
+                                                value = "information relating to user email config") UserEmailDocument emailConfig,
                                            @PathVariable @ApiParam(name = "id", value = "User ID") String uid){
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
         return emailConfigurations.save(UserEmailDocument.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .emailPassword(emailPassword)
-                .displayName(displayName)
-                .smtpHost(smtpHost)
-                .tlsPort(tlsPort)
+                .userID(emailConfig.getUserID())
+                .firstName(emailConfig.getFirstName())
+                .lastName(emailConfig.getLastName())
+                .email(emailConfig.getEmail())
+                .emailPassword(emailConfig.getEmailPassword())
+                .displayName(emailConfig.getDisplayName())
+                .smtpHost(emailConfig.getSmtpHost())
+                .tlsPort(emailConfig.getTlsPort())
                 .build()
         );
 
