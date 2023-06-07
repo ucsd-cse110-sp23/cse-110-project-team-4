@@ -3,10 +3,7 @@ package org.agilelovers.ui.util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.ui.Constants;
-import org.agilelovers.ui.object.Command;
-import org.agilelovers.ui.object.Prompt;
-import org.agilelovers.ui.object.UserCredential;
-import org.agilelovers.ui.object.UserCredentialWithKey;
+import org.agilelovers.ui.object.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -218,6 +215,17 @@ public class FrontEndAPIUtils {
         // command is for email address
         // prompt is for checking valid email draft
         return new Prompt();
+    }
+
+    // TODO
+    public static EmailConfig getEmailConfig(String uid) {
+        String temp = "";
+        return new Gson().fromJson(temp, EmailConfig.class);
+    }
+
+    // TODO
+    public static void setEmailConfig(EmailConfig config, String uid) {
+
     }
 
     /**

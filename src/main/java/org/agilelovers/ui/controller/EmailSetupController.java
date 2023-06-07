@@ -7,6 +7,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.agilelovers.ui.MainApplication;
 import org.agilelovers.ui.enums.SceneType;
+import org.agilelovers.ui.object.EmailConfig;
+import org.agilelovers.ui.util.FrontEndAPIUtils;
 
 import java.io.IOException;
 
@@ -63,12 +65,14 @@ public class EmailSetupController {
      */
     @FXML
     private void initialize() {
-        firstNameField.setText("");
-        lastNameField.setText("");
-        displayNameField.setText("");
-        emailField.setText("");
-        passwordField.setText("");
-        smtpHostField.setText("");
+        EmailConfig config = FrontEndAPIUtils.getEmailConfig(MainController.getUid());
+        firstNameField.setText(config.getFirstName());
+        lastNameField.setText(config.getLastName());
+        displayNameField.setText(config.getDisplayName());
+        emailField.setText(config.getEmail());
+        passwordField.setText(config.getPassword());
+        smtpHostField.setText(config.getSmtpHost());
+        tlsPortField.setText(config.getTlsPort());
     }
 
     /**
@@ -78,7 +82,8 @@ public class EmailSetupController {
      * @throws IOException
      */
     public void saveInfo(ActionEvent event) throws IOException {
-
+        EmailConfig config = new EmailConfig(firstNameField.getText(), lastNameField.getText(), displayNameField.getText(), emailField.getText(), passwordField.getText(), smtpHostField.getText(), tlsPortField.getText());
+        FrontEndAPIUtils.setEmailConfig(config, MainController.getUid());
         SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
     }
 
@@ -87,7 +92,7 @@ public class EmailSetupController {
      * @param event event triggered by "Cancel" button click
      * @throws IOException
      */
-    public void cancelSetup(ActionEvent event) throws IOException {
+    public void cancel(ActionEvent event) throws IOException {
         SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
     }
 
