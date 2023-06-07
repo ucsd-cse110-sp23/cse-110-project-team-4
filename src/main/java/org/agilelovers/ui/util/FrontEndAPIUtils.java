@@ -6,6 +6,7 @@ import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.Command;
 import org.agilelovers.ui.object.Prompt;
 import org.agilelovers.ui.object.UserCredential;
+import org.agilelovers.ui.object.UserCredentialWithKey;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -48,11 +49,11 @@ public class FrontEndAPIUtils {
      * @throws InterruptedException     thrown if the request is interrupted
      * @throws IllegalArgumentException thrown if the username already exists
      */
-    public static UserCredential createAccount(String username, String password)
+    public static UserCredential createAccount(String username, String password, String apiPassword)
             throws URISyntaxException, IOException, InterruptedException, IllegalArgumentException {
         HttpRequest postRequest = HttpRequest.newBuilder().uri(new URI(Constants.SERVER_URL + Constants.USER_ENDPOINT))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(new UserCredential(username, password, null).toString()))
+                .POST(HttpRequest.BodyPublishers.ofString(new UserCredentialWithKey(username, password, null, null, apiPassword).toString()))
                 .build();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -61,7 +62,7 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) {
             System.err.println("Response code: " + response.statusCode());
             System.err.println("Response body: " + response.body());
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException(response.body());
         }
 
         return new Gson().fromJson(response.body(), UserCredential.class);
@@ -90,7 +91,7 @@ public class FrontEndAPIUtils {
                         .header("Content-Type", "application/json")
                         .method("GET",
                                 HttpRequest.BodyPublishers.ofString(
-                                        new UserCredential(username, password, id).toString()))
+                                        new UserCredential(username, password, null, id).toString()))
                         .build();
 
         HttpClient client = HttpClient.newHttpClient();

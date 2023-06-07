@@ -9,6 +9,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import org.agilelovers.ui.MainApplication;
+import org.agilelovers.ui.enums.SceneType;
 import org.agilelovers.ui.object.Command;
 import org.agilelovers.ui.object.Prompt;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
@@ -62,7 +64,10 @@ public class MainController {
     // TODO: chronological ordering
     @FXML
     private void initialize() {
-        System.out.println("Initializing Controller");
+        System.out.println("Initializing Main Controller");
+        if (MainController.uid == null) {
+            throw new NullPointerException("MainController.uid is null");
+        }
         answerTextArea.setEditable(false);
         Platform.runLater(() -> {
             try {
@@ -245,9 +250,9 @@ public class MainController {
         this.historyList.getSelectionModel().select(null);
     }
 
-    private void setupEmail() {
+    private void setupEmail() throws IOException {
         System.out.println("Setup Email");
-        // TODO: change scene to EmailSetup
+        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.EMAIL_SETUP_UI);
     }
 
     private void createEmail(Command command) {
@@ -268,6 +273,11 @@ public class MainController {
         this.pastPrompts.remove(this.pastPrompts.size() - 1);
         this.pastPrompts.add(currentPrompt);
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
+    }
+
+    public void openEmailSetup() throws IOException {
+        SceneChanger sceneChanger = SceneChanger.getInstance();
+
     }
 }
 

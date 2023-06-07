@@ -1,14 +1,13 @@
 package org.agilelovers.ui.controller;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import org.agilelovers.ui.Constants;
+import org.agilelovers.ui.MainApplication;
+import org.agilelovers.ui.enums.SceneType;
 import org.agilelovers.ui.object.UserCredential;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 
@@ -57,12 +56,7 @@ public class LoginController {
      */
     @FXML
     private void initialize() throws IOException {
-        // check if autologin is enabled
-        File f = new File(Constants.USER_TOKEN_PATH);
-        if (f.exists() && !f.isDirectory()) {
-            MainController.setUid(new BufferedReader(new FileReader(Constants.USER_TOKEN_PATH)).readLine());
-            switchToMainUI();
-        }
+
     }
 
     /**
@@ -116,14 +110,14 @@ public class LoginController {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == buttonTypeOne) {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(Constants.USER_TOKEN_PATH));
-            writer.write(uid);
-            writer.close();
+            System.out.println("writing files");
+            File userToken = new File(Constants.USER_TOKEN_PATH);
+            FileWriter fw = new FileWriter(Constants.USER_TOKEN_PATH);
+            fw.write(uid);
+            fw.close();
         }
 
         MainController.setUid(uid);
-
-        switchToMainUI();
     }
 
     /**
@@ -143,6 +137,7 @@ public class LoginController {
             try {
                 UserCredential credential = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText(), MainController.getUid());
                 this.promptAutoLogin(credential.getId());
+                SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             } catch (IllegalArgumentException e) {
@@ -164,8 +159,8 @@ public class LoginController {
      * Helper method that handles create account failure.
      * Displays an error message and re-enables the login and create account buttons.
      */
-    private void createAccountFailed() {
-        this.warningLabel.setText("Username already exists. Try again.");
+    private void createAccountFailed(String errorMessage) {
+        this.warningLabel.setText(errorMessage);
         this.enableButtons();
     }
 
@@ -177,6 +172,8 @@ public class LoginController {
      * @param event event triggered by the "Create Account" button click
      */
     public void createAccount(ActionEvent event) {
+        Dotenv dotenv = Dotenv.load();
+        String apiPassword = dotenv.get("API_SECRET");
         if (verifyEmptyFields()) {
             return;
         }
@@ -184,36 +181,21 @@ public class LoginController {
         // add username and password to database
         Platform.runLater(() -> {
             try {
-                UserCredential credential = FrontEndAPIUtils.createAccount(this.usernameField.getText(), this.passwordField.getText());
+                UserCredential credential = FrontEndAPIUtils.createAccount(this.usernameField.getText(), this.passwordField.getText(), apiPassword);
                 this.promptAutoLogin(credential.getId());
+                SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
+
             } catch (IOException | InterruptedException | URISyntaxException e) {
                 throw new RuntimeException(e);
             } catch (IllegalArgumentException e) {
-                this.createAccountFailed();
+                if (e.getMessage().contains("duplicate")) {
+                    this.createAccountFailed("Email already registered.");
+                } else {
+                    this.createAccountFailed("Invalid email address.");
+                }
             }
         });
+
     }
-
-    /**
-     * Switches to the main UI. This method is called when the user is successfully logged in.
-     * Removes the current login UI and loads the main UI.
-     * TODO: switching to main UI should be done in a separate method, by a different class (Not SRP rn)
-     *
-     * @throws IOException if the main UI cannot be loaded
-     */
-    public void switchToMainUI() throws IOException {
-        Stage stage = (Stage) this.loginButton.getScene().getWindow();
-        stage.close();
-
-        var fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("/MainExperimental.fxml"));
-        Parent root = fxmlLoader.load();
-        MainController.instance = fxmlLoader.getController();
-        stage = new Stage();
-        stage.setTitle("SayItAssistant");
-        stage.setScene(new Scene(root, 600, 400));
-        stage.show();
-    }
-
 
 }

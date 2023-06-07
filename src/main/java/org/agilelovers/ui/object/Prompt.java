@@ -3,11 +3,14 @@ package org.agilelovers.ui.object;
 
 import org.agilelovers.ui.controller.MainController;
 
+import java.util.Date;
+
 public class Prompt {
     private Command command = null;
     private String id = "";
     private String title = "RECORDING";
     private String body = "";
+    private Date createdDate = null;
 
     public Prompt() {
     }

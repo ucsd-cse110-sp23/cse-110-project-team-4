@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.agilelovers.ui.MainApplication;
+import org.agilelovers.ui.enums.SceneType;
 
 import java.io.IOException;
 
@@ -77,7 +79,7 @@ public class EmailSetupController {
      */
     public void saveInfo(ActionEvent event) throws IOException {
 
-        // TODO: switch to main UI
+        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
     }
 
     /**
@@ -86,7 +88,7 @@ public class EmailSetupController {
      * @throws IOException
      */
     public void cancelSetup(ActionEvent event) throws IOException {
-        // TODO: switch to main UI
+        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
     }
 
 }
