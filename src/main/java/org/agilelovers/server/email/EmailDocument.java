@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+
 
 @Document("sayit-emails")
 @Data
@@ -58,3 +59,4 @@ class ReducedEmailDocument {
     @ApiModelProperty(notes = "Email of the user draft was sent to")
     private String emailOfUserSentTowards;
 }
+

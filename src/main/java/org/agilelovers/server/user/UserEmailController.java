@@ -28,7 +28,7 @@ public class UserEmailController {
     })
     @GetMapping("/api/emailconfig/{uid}")
     public UserEmailDocument getEmailConfig(@PathVariable @ApiParam(name = "id", value = "User ID") String uid){
-        return emailConfigurations.findEmailConfig(uid)
+        return emailConfigurations.findByUserID(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
     }
 

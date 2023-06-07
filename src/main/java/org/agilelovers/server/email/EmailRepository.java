@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface EmailRepository extends MongoRepository<EmailDocument, String> {
     Optional<List<EmailDocument>> findAllByUserId(String userID);
 
-    Optional<EmailDocument> findEmailByID(String userID);
+    Optional<EmailDocument> findByid(String id);
+
 }
