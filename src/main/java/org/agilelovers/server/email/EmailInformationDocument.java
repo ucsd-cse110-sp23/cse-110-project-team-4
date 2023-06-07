@@ -24,6 +24,11 @@ public class EmailInformationDocument {
     @NotBlank
     private String userId;
 
+    @ApiModelProperty(notes = "Checking for 'Create Email' command")
+    @NotNull
+    @NotBlank
+    private String command;
+
     @ApiModelProperty(notes = "The email prompt used to generate the body", required = true)
     @NotNull
     @NotBlank

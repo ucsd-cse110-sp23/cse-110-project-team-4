@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import static org.agilelovers.common.CommandType.CREATE_EMAIL;
+
 @RestController
 public class EmailController {
     private final EmailRepository emails;
@@ -94,6 +96,14 @@ public class EmailController {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
+
+//        if (!emailInfo.getCommand().equals(CREATE_EMAIL)){
+//            return emails.save(ReducedEmailDocument.builder()
+//                    .originalId(emailInfo.getId())
+//                    .confirmationOfEmailSent("Please select an email draft to send")
+//                    .build()
+//            );
+//        }
 
         Optional<EmailDocument> email = emails.findByid(emailInfo.getId());
         Optional<UserDocument> currentUser = this.users.findById(uid);
