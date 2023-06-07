@@ -344,7 +344,6 @@ public class UserControllerTest {
      */
     @Test
     public void updateEmailTest() throws Exception {
-
         String username = "unsure_testing@test.com";
         String email = "now_sure_testing@test.com";
         String password = "plaintext";
@@ -380,5 +379,42 @@ public class UserControllerTest {
         assertThat(found).extracting(UserDocument::getEmail).isEqualTo(email);
     }
 
+    /**
+     * 1. Creating a VALID user with VALID email
+     * 2. POST the user to DB
+     * 3. find the user in DB
+     * 4. PUT (update) the user's email with an INVALID email
+     * Asserts: Expects an invalid email error
+     * @throws Exception
+     */
+    @Test
+    public void updateEmailInvalidEmailTest() throws Exception {
+        String username = "testing@user.com";
+        String email = "testing@email.com";
+        String invalidEmail = "invalidemail";
+        String password = "plaintext";
 
+        SecureUser user = SecureUser.builder()
+                .username(username)
+                .password(password)
+                .email(email)
+                .apiPassword(API_KEY)
+                .build();
+
+        mvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.toJson(user))
+        );
+
+        UserDocument found = userRepository.findByUsernameAndPassword(username, password)
+                .orElseThrow(TestAbortedException::new);
+
+        assertThat(found).extracting(UserDocument::getUsername).isEqualTo(username);
+
+        String id = found.getId();
+
+        mvc.perform(put("/api/users/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidEmail)).andExpect(status().isBadRequest());
+    }
 }
