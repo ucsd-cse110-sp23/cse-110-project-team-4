@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.server.common.EmailUtil;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.email.errors.NoEmailFound;

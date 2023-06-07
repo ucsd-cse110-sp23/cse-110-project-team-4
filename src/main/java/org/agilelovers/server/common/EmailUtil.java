@@ -1,4 +1,4 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.common;
 
 import org.agilelovers.server.user.models.UserEmailDocument;
 
