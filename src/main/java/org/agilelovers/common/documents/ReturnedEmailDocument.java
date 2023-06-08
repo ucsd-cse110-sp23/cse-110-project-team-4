@@ -1,4 +1,4 @@
-package org.agilelovers.server.email.returned;
+package org.agilelovers.common.documents;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class ReturnedEmailDocument {
     @Id
     private String id;
 
-    @ApiModelProperty(notes = "User ID this Email is related to")
+    @ApiModelProperty(notes = "User ID this Email is related to", required = true)
     @NotNull
     @NotBlank
     private String userId;
@@ -32,9 +32,9 @@ public class ReturnedEmailDocument {
     @CreatedDate
     private Date createdDate;
 
-    @ApiModelProperty(notes = "COMMAND: prompt")
+    @ApiModelProperty(notes = "COMMAND: prompt", required = true)
     private String entirePrompt;
 
-    @ApiModelProperty(notes = "confirmation of whether or not email was successfully sent")
+    @ApiModelProperty(notes = "confirmation of whether or not email was successfully sent", required = true)
     private String confirmationOfEmailSent;
 }

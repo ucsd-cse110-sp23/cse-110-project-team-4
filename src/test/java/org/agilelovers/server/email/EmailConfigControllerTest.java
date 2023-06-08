@@ -6,7 +6,7 @@ import org.agilelovers.common.models.EmailConfigModel;
 import org.agilelovers.server.Server;
 import org.agilelovers.server.email.config.EmailConfigRepository;
 import org.agilelovers.common.models.SecureUserModel;
-import org.agilelovers.server.email.config.EmailConfigDocument;
+import org.agilelovers.common.documents.EmailConfigDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -198,4 +198,45 @@ public class EmailConfigControllerTest {
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));
     }
+
+    @Test
+    public void saveBadEmailPasswordTest() throws Exception {
+        configDocument.setEmailPassword("badPassword");
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
+    @Test
+    public void saveNullDisplayNameTest() throws Exception {
+        configDocument.setDisplayName(null);
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
+    @Test
+    public void saveNullLastNameTest() throws Exception {
+        configDocument.setLastName(null);
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
+    @Test
+    public void saveNullFirstNameTest() throws Exception {
+        configDocument.setFirstName(null);
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
 }

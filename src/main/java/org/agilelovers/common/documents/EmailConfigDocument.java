@@ -1,4 +1,4 @@
-package org.agilelovers.server.email.config;
+package org.agilelovers.common.documents;
 
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -30,40 +30,38 @@ public class EmailConfigDocument {
     @Id
     private String id;
 
-    @ApiModelProperty(notes = "ID Of User this email information relate to")
-    @NotBlank
-    @NotEmpty
+    @ApiModelProperty(notes = "ID Of User this email information relate to", required = true)
     @NotNull
     private String userID;
 
     @ApiModelProperty(notes = "first name of user during email setup")
-    @NotEmpty
+    @NotNull
     private String firstName;
 
     @ApiModelProperty(notes = "last name of user during email setup")
-    @NotEmpty
+    @NotNull
     private String lastName;
 
     @ApiModelProperty(notes = "Email of the user inputted during email setup")
-    @NotEmpty
+    @NotNull
     @Email
     private String email;
 
     @ApiModelProperty(notes = "Email password of the email given by user in email setup")
-    @NotEmpty
+    @NotNull
     private String emailPassword;
 
     @ApiModelProperty(notes = "Display name to be shown on email sent, given in email setup")
-    @Indexed(name = "display name")
     @NotNull
+    @Indexed(name = "display name")
     private String displayName;
 
     @ApiModelProperty(notes = "SmtpHost of email given during email setup")
-    @NotEmpty
     @URLConstraint
+    @NotNull
     private String smtpHost;
 
     @ApiModelProperty(notes = "tlsPort of email given during email setup")
-    @NotEmpty
+    @NotNull
     private String tlsPort;
 }

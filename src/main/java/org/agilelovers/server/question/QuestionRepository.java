@@ -1,5 +1,6 @@
 package org.agilelovers.server.question;
 
+import org.agilelovers.common.documents.QuestionDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

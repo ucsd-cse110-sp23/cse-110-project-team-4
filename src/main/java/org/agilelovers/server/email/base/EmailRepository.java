@@ -1,5 +1,6 @@
 package org.agilelovers.server.email.base;
 
+import org.agilelovers.common.documents.EmailDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

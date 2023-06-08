@@ -1,4 +1,4 @@
-package org.agilelovers.server.email.base;
+package org.agilelovers.common.documents;
 
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -14,6 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 
@@ -27,13 +28,12 @@ public class EmailDocument {
     @Id
     private String id;
 
-    @ApiModelProperty(notes = "Timestamp this question was created at", required = true)
+    @ApiModelProperty(notes = "Timestamp this question was created at")
     @CreatedDate
     private Date createdDate;
 
     @ApiModelProperty(notes = "User ID associated with this email", required = true)
-    @NotNull
-    @NotBlank
+    @NotEmpty
     private String userId;
 
     @ApiModelProperty(notes = "The email prompt used to generate the body", required = true)
