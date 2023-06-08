@@ -166,7 +166,7 @@ public class FrontEndAPIUtils {
     public static Prompt newPrompt(Command command, Prompt prompt, String uid) throws IOException, InterruptedException {
         HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (command.getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_ENDPOINT : Constants.EMAIL_ENDPOINT) + uid))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(command.getCommand_arguments()))
+                .POST(HttpRequest.BodyPublishers.ofString(command.getTranscribed()))
                 .build();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -178,7 +178,7 @@ public class FrontEndAPIUtils {
             throw new IllegalArgumentException(response.body());
         }
 
-        Prompt prompt1 = new Gson().fromJson(response.body(), Prompt.class);
+        Prompt prompt1 = new Gson().fromJson(response.body(), (command.getCommand().equals(Constants.QUESTION_COMMAND) ? Question.class : EmailDraft.class));
         prompt.setBody(prompt1.getBody());
         prompt.setId(prompt1.getId());
         prompt.setCreatedDate(prompt1.getCreatedDate());
@@ -188,7 +188,7 @@ public class FrontEndAPIUtils {
 
     public static void deletePrompt(Prompt prompt) throws IOException, InterruptedException {
         HttpRequest deleteRequest =
-                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (prompt.getCommand().getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_DELETION_ENDPOINT : Constants.EMAIL_DELETION_ENDPOINT) + prompt.getId()))
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (prompt.getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_DELETION_ENDPOINT : Constants.EMAIL_DELETION_ENDPOINT) + prompt.getId()))
                         .DELETE()
                         .build();
 
@@ -214,7 +214,7 @@ public class FrontEndAPIUtils {
     public static Prompt sendEmail(Command command, Prompt prompt, String id, String uid) {
         // command is for email address
         // prompt is for checking valid email draft
-        return new Prompt();
+        return new EmailSent();
     }
 
     // TODO

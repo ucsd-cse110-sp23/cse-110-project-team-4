@@ -3,7 +3,6 @@ package org.agilelovers.ui.util;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.AudioRecorder;
 import org.agilelovers.ui.object.Command;
-import org.agilelovers.ui.object.Prompt;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +12,7 @@ public class RecordingUtils {
     private static AudioRecorder recorder = new AudioRecorder(audioFile);
 
 
-    public static Command endRecording(String id, Prompt ques) throws IOException {
+    public static Command endRecording(String id) throws IOException {
         // new thread for operations
         recorder.stop();
 

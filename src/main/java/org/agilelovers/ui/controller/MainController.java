@@ -12,7 +12,9 @@ import javafx.scene.control.TextArea;
 import org.agilelovers.ui.MainApplication;
 import org.agilelovers.ui.enums.SceneType;
 import org.agilelovers.ui.object.Command;
+import org.agilelovers.ui.object.EmailDraft;
 import org.agilelovers.ui.object.Prompt;
+import org.agilelovers.ui.object.Question;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
 
@@ -174,7 +176,7 @@ public class MainController {
                 this.startButton.setDisable(true);
                 Command currentCommand = null;
                 try {
-                    currentCommand = RecordingUtils.endRecording(MainController.uid, new Prompt());
+                    currentCommand = RecordingUtils.endRecording(MainController.uid);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -188,7 +190,7 @@ public class MainController {
             });
             this.startButton.setText("Start");
         } else {
-            this.pastPrompts.add(new Prompt());
+            this.pastPrompts.add(new Question());
             // call a method that starts recording
             RecordingUtils.startRecording();
             this.startButton.setText("Stop Recording");
@@ -198,10 +200,11 @@ public class MainController {
 
     private void runCommand(Command command) throws IOException, InterruptedException {
         switch (command.getQueryType()) {
-            case QUESTION, CREATE_EMAIL -> newPrompt(command);
+            case QUESTION -> newQuestion(command);
             case DELETE_PROMPT -> deletePrompt();
             case CLEAR_ALL -> clearAll();
             case SETUP_EMAIL -> setupEmail();
+            case CREATE_EMAIL -> createEmail(command);
             case SEND_EMAIL -> sendEmail();
             default -> throw new IllegalStateException("Please give a valid command");
         }
@@ -218,21 +221,11 @@ public class MainController {
      *
      * @param command the command containing question to be answered and added to prompt history
      */
-    private void newPrompt(Command command) throws IOException, InterruptedException {
+    private void newQuestion(Command command) throws IOException, InterruptedException {
         System.out.println("New Question");
-        Prompt currentPrompt = new Prompt(command);
+        Prompt currentPrompt = new Question(command.getTranscribed());
 
-        Platform.runLater(() -> {
-            try {
-                FrontEndAPIUtils.newPrompt(command, currentPrompt, MainController.uid);
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        this.pastPrompts.remove(this.pastPrompts.size() - 1);
-        this.pastPrompts.add(currentPrompt);
-        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
+        createPrompt(command, currentPrompt);
     }
 
     /**
@@ -288,6 +281,27 @@ public class MainController {
     private void setupEmail() throws IOException {
         System.out.println("Setup Email");
         SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.EMAIL_SETUP_UI);
+    }
+
+    private void createEmail(Command command) {
+        System.out.println("New Question");
+        Prompt currentPrompt = new EmailDraft(command.getTranscribed());
+
+        createPrompt(command, currentPrompt);
+    }
+
+    private void createPrompt(Command command, Prompt currentPrompt) {
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.newPrompt(command, currentPrompt, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        this.pastPrompts.remove(this.pastPrompts.size() - 1);
+        this.pastPrompts.add(currentPrompt);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 
     private void sendEmail() throws IOException, InterruptedException {
