@@ -76,10 +76,8 @@ public class AssistantController {
         if (lastAtBeforeSpaceIndex != -1) {
             result = result.substring(0, lastAtBeforeSpaceIndex) + "@" + result.substring(lastAtBeforeSpaceIndex + 2);
         }
-
-        result = result.replaceAll(" ", "");
         System.out.println(result);
-        return result;
+        return result.replaceAll(" ", "");
     }
 
     @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will " +

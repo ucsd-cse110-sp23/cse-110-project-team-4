@@ -245,17 +245,20 @@ public class FrontEndAPIUtils {
     }
 
     // TODO
-    public static void sendEmail(Prompt prompt, Command currentCommand, String command, String sentId, String userId)
+    public static void sendEmail(Prompt prompt, Command currentCommand, String command, Prompt selectedPrompt, String userId)
             throws IOException, InterruptedException {
         HttpRequest sendRequest =
                 HttpRequest.newBuilder().uri(URI.create(SERVER_URL + RETURNED_EMAIL_ENDPOINT + SEND_REQUEST + userId))
                         .header("Content-Type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(
-                                new ReturnedEmailModel(command, currentCommand.getTranscribed(),
-                                        currentCommand.getCommand_arguments(), sentId))))
+                                new ReturnedEmailModel(selectedPrompt.getId(), currentCommand.getCommand_arguments(),
+                                        command, currentCommand.getTranscribed()))))
                         .build();
 
         HttpClient client = HttpClient.newHttpClient();
+
+        System.out.println(new ReturnedEmailModel(selectedPrompt.getId(), currentCommand.getCommand_arguments(),
+                command, currentCommand.getTranscribed()));
 
         HttpResponse<String> response = client.send(sendRequest, HttpResponse.BodyHandlers.ofString());
 
