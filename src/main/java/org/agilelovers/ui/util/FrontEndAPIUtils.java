@@ -237,7 +237,7 @@ public class FrontEndAPIUtils {
     // TODO
     public static void setEmailConfig(EmailConfig config, String userId) throws IOException, InterruptedException {
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create(Constants.SERVER_URL + Constants.EMAIL_CONFIGURATION_ENDPOINT + Constants.POST_REQUEST + userId))
+                .uri(URI.create(Constants.SERVER_URL + Constants.EMAIL_CONFIGURATION_ENDPOINT + Constants.SAVE_REQUEST + userId))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(config)))
                 .build();

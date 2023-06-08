@@ -17,6 +17,7 @@ public class Constants {
     public final static String DELETE_ALL_REQUEST = "delete/all/";
     public final static String POST_REQUEST = "post/";
     public final static String SEND_REQUEST = "send/";
+    public final static String SAVE_REQUEST = "save/";
 
     public final static String QUESTION_COMMAND = "QUESTION";
     public final static String DELETE_PROMPT_COMMAND = "DELETE_PROMPT";
