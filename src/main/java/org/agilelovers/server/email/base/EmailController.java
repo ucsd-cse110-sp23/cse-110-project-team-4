@@ -63,12 +63,11 @@ public class EmailController {
         if(body.contains("[Your Name]")){
             body = body.substring(0, body.indexOf("[Your Name]"));
         }
-
         String displayName = user.getEmailInformation() == null ? "" : user.getEmailInformation().getDisplayName();
 
         return emails.save(EmailDocument.builder()
                 .entirePrompt(emailModel.getPrompt())
-                .body(body + "\n " + user.getEmailInformation().getDisplayName())
+                .body(body + displayName)
                 .userId(uid)
                 .build()
         );
