@@ -60,7 +60,10 @@ public class EmailController {
                 .orElseThrow(() -> new UserNotFoundError(uid));
         String body = this.client.getAnswer(emailModel.getPrompt());
 
-        body.substring(0, body.indexOf("[Your Name]"));
+        if(body.indexOf("[Your Name]") != -1){
+            body = body.substring(0, body.indexOf("[Your Name]"));
+        }
+
 
         return emails.save(EmailDocument.builder()
                 .entirePrompt(emailModel.getPrompt())

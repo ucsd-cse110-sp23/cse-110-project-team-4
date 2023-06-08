@@ -60,9 +60,9 @@ public class ReturnedEmailController {
     })
     @GetMapping("/get/{uid}")
     public ReturnedEmailDocument getReturnedEmail(@PathVariable @ApiParam(name = "uid", value = "User ID") String uid,
-                                                  @ApiParam(name = "id", value = "ID of returned email document") String id) {
+                                                  @RequestBody @ApiParam(name = "id", value = "ID of returned email document") String id) {
         return returnedEmailRepository.findById(id)
-                .orElseThrow(() -> new NoEmailFound(id));
+                .orElseThrow(() -> new NoEmailFound(uid));
     }
 
     @ApiOperation(value = "Delete a returned email", notes = "Deletes a returned Email")
