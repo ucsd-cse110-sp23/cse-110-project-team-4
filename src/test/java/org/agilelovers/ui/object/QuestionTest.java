@@ -1,6 +1,5 @@
 package org.agilelovers.ui.object;
 
-import org.agilelovers.ui.Controller;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
