@@ -7,5 +7,6 @@ public class CommandType {
     public static final String SETUP_EMAIL = "SETUP_EMAIL";
     public static final String CREATE_EMAIL = "CREATE_EMAIL";
     public static final String SEND_EMAIL = "SEND_EMAIL";
+    public static final String INVALID = "INVALID";
 }
 
