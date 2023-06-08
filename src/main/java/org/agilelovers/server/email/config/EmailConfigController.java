@@ -18,12 +18,12 @@ import java.util.Properties;
 @RestController
 @RequestMapping("/api/email/config")
 @ApiOperation("Email Configuration API")
-public class UserEmailConfigController {
+public class EmailConfigController {
 
     private final UserRepository users;
-    private final UserEmailConfigRepository emailConfigurations;
+    private final EmailConfigRepository emailConfigurations;
 
-    public UserEmailConfigController(UserRepository users, UserEmailConfigRepository emailConfigurations){
+    public EmailConfigController(UserRepository users, EmailConfigRepository emailConfigurations){
         this.users = users;
         this.emailConfigurations = emailConfigurations;
     }
@@ -34,7 +34,7 @@ public class UserEmailConfigController {
             @ApiResponse(code = 404, message = "User not found")
     })
     @GetMapping("/get/{uid}")
-    public UserEmailConfigDocument getEmailConfig(@PathVariable @ApiParam(name = "uid", value = "User ID") String uid) {
+    public EmailConfigDocument getEmailConfig(@PathVariable @ApiParam(name = "uid", value = "User ID") String uid) {
         return emailConfigurations.findByUserID(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
     }
@@ -42,9 +42,9 @@ public class UserEmailConfigController {
 
     @ApiOperation(value = "Email configuration", notes = "Set up email configurations to be able to send emails")
     @PostMapping("/post/{uid}")
-    public UserEmailConfigDocument saveEmailConfig(@RequestBody @ApiParam(name = "User Email Configuration",
-                                                value = "information relating to user email config") UserEmailConfigDocument emailConfig,
-                                                   @PathVariable @ApiParam(name = "uid", value = "User ID") String uid){
+    public EmailConfigDocument saveEmailConfig(@RequestBody @ApiParam(name = "User Email Configuration",
+                                                value = "information relating to user email config") EmailConfigDocument emailConfig,
+                                               @PathVariable @ApiParam(name = "uid", value = "User ID") String uid){
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
@@ -62,7 +62,7 @@ public class UserEmailConfigController {
                     emailConfig.getEmailPassword());
             transport.close();
 
-            return emailConfigurations.save(UserEmailConfigDocument.builder()
+            return emailConfigurations.save(EmailConfigDocument.builder()
                     .userID(emailConfig.getUserID())
                     .firstName(emailConfig.getFirstName())
                     .lastName(emailConfig.getLastName())

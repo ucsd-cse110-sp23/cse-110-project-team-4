@@ -10,7 +10,7 @@ import org.agilelovers.server.common.errors.NoEmailFound;
 import org.agilelovers.server.email.base.EmailData;
 import org.agilelovers.server.email.base.EmailDocument;
 import org.agilelovers.server.email.base.EmailRepository;
-import org.agilelovers.server.email.config.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.agilelovers.server.user.models.UserDocument;
 import org.springframework.web.bind.annotation.*;
@@ -102,7 +102,7 @@ public class ReturnedEmailController {
                 .orElseThrow(() -> new NoEmailFound(emailInfo.getSentId()));
         UserDocument currentUser = this.users.findById(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
-        UserEmailConfigDocument emailConfig = currentUser.getEmailInformation();
+        EmailConfigDocument emailConfig = currentUser.getEmailInformation();
 
         Properties props = new Properties();
         props.put("mail.smtp.host", emailConfig.getSmtpHost());

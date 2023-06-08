@@ -3,11 +3,11 @@ package org.agilelovers.server.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.agilelovers.server.Server;
-import org.agilelovers.server.email.config.UserEmailConfigRepository;
+import org.agilelovers.server.email.config.EmailConfigRepository;
 import org.agilelovers.server.user.models.ReducedUser;
 import org.agilelovers.server.user.models.SecureUser;
 import org.agilelovers.server.user.models.UserDocument;
-import org.agilelovers.server.email.config.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +49,7 @@ public class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private UserEmailConfigRepository userEmailConfigRepository;
+    private EmailConfigRepository emailConfigRepository;
 
     public UserControllerTest() {
         this.API_KEY = Dotenv.load().get("API_SECRET");
@@ -60,7 +60,7 @@ public class UserControllerTest {
      */
     @After
     public void resetDb() {
-        userEmailConfigRepository.deleteAll();
+        emailConfigRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -388,7 +388,7 @@ public class UserControllerTest {
         assertThat(found).extracting(UserDocument::getEmail).isNull();
 
         String id = found.getId();
-        UserEmailConfigDocument emailConfig = UserEmailConfigDocument.builder()
+        EmailConfigDocument emailConfig = EmailConfigDocument.builder()
                 .userID(id)
                 .firstName("Le Louie")
                 .lastName("Cai")

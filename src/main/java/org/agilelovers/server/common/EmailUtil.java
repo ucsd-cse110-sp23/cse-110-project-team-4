@@ -1,7 +1,7 @@
 package org.agilelovers.server.common;
 
 import org.agilelovers.server.email.returned.ReturnedEmailDocument;
-import org.agilelovers.server.email.config.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.EmailConfigDocument;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -18,7 +18,7 @@ public class EmailUtil {
      * @param toEmail
      * @param body
      */
-    public static ReturnedEmailDocument sendEmail(Session session, String toEmail, String body, UserEmailConfigDocument emailConfig, String entirePrompt) {
+    public static ReturnedEmailDocument sendEmail(Session session, String toEmail, String body, EmailConfigDocument emailConfig, String entirePrompt) {
         try {
             MimeMessage msg = new MimeMessage(session);
 

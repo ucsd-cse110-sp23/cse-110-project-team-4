@@ -3,9 +3,9 @@ package org.agilelovers.server.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.agilelovers.server.Server;
-import org.agilelovers.server.email.config.UserEmailConfigRepository;
+import org.agilelovers.server.email.config.EmailConfigRepository;
 import org.agilelovers.server.user.models.SecureUser;
-import org.agilelovers.server.email.config.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(
         locations = "classpath:application-test.properties"
 )
-public class UserEmailConfigControllerTest {
+public class EmailConfigControllerTest {
 
     private final String API_KEY;
 
@@ -55,14 +55,14 @@ public class UserEmailConfigControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private UserEmailConfigRepository userEmailConfigRepository;
+    private EmailConfigRepository emailConfigRepository;
 
     private SecureUser user;
-    private UserEmailConfigDocument configDocument;
+    private EmailConfigDocument configDocument;
 
     private String id;
 
-    public UserEmailConfigControllerTest() {
+    public EmailConfigControllerTest() {
         Dotenv env = Dotenv.load();
         this.API_KEY = env.get("API_SECRET");
         this.EMAIL_USERNAME = env.get("EMAIL_USERNAME");
@@ -87,7 +87,7 @@ public class UserEmailConfigControllerTest {
         id = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword())
                 .orElseThrow(TestAbortedException::new).getId();
 
-        configDocument = UserEmailConfigDocument.builder()
+        configDocument = EmailConfigDocument.builder()
                 .userID(id)
                 .firstName("cse110")
                 .lastName("testing")
@@ -104,7 +104,7 @@ public class UserEmailConfigControllerTest {
      */
     @After
     public void resetDb() {
-        userEmailConfigRepository.deleteAll();
+        emailConfigRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -122,7 +122,7 @@ public class UserEmailConfigControllerTest {
                 .content(mapper.writeValueAsString(configDocument))
         );
 
-        List<UserEmailConfigDocument> found = userEmailConfigRepository.findAll();
+        List<EmailConfigDocument> found = emailConfigRepository.findAll();
         assertThat(found.size()).isEqualTo(1);
         assertThat(found.get(0).getFirstName()).isEqualTo(configDocument.getFirstName());
     }
@@ -151,10 +151,10 @@ public class UserEmailConfigControllerTest {
         //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
         String str = httpResponse.getContentAsString();
 
-        UserEmailConfigDocument result = mapper.readValue(str, UserEmailConfigDocument.class);
+        EmailConfigDocument result = mapper.readValue(str, EmailConfigDocument.class);
 
         //Perform assertions to verify the retrieved user
-        assertThat(result).extracting(UserEmailConfigDocument::getEmail).isEqualTo(configDocument.getEmail());
+        assertThat(result).extracting(EmailConfigDocument::getEmail).isEqualTo(configDocument.getEmail());
     }
 
     @Test

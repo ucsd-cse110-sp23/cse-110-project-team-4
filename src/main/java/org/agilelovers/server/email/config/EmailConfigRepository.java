@@ -6,7 +6,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
-public interface UserEmailConfigRepository extends MongoRepository<UserEmailConfigDocument, String> {
+public interface EmailConfigRepository extends MongoRepository<EmailConfigDocument, String> {
 
-    Optional<UserEmailConfigDocument> findByUserID(String userID);
+    Optional<EmailConfigDocument> findByUserID(String userID);
 }

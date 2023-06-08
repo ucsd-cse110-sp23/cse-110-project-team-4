@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.agilelovers.server.email.config.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -44,7 +44,7 @@ public class UserDocument {
     private String email;
 
     @ApiModelProperty(notes = "Document containing email configuration, given during email setup ")
-    private UserEmailConfigDocument emailInformation;
+    private EmailConfigDocument emailInformation;
 
 
 }
