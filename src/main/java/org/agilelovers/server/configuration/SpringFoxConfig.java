@@ -36,7 +36,7 @@ public class SpringFoxConfig {
         return new ApiInfo(
                 "SayIt Assistant REST API",
                 "Built for CSE 110",
-                "2.2.1",
+                "2.2.2",
                 "",
                 new Contact("Anish Govind", "https://anishgovind.com", ""),
                 "", "", Collections.emptyList()
