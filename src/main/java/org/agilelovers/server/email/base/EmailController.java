@@ -38,7 +38,7 @@ public class EmailController {
 
     @GetMapping("/get/{uid}")
     public EmailDocument getEmailByaID(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
-                                      String emailID) {
+                                      @RequestBody String emailID) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
