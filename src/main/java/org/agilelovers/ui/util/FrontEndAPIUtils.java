@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.common.models.*;
+import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.object.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -249,6 +250,9 @@ public class FrontEndAPIUtils {
     // TODO
     public static void sendEmail(Prompt prompt, Command currentCommand, String command, Prompt selectedPrompt, String userId)
             throws IOException, InterruptedException {
+        if (selectedPrompt instanceof EmailDraft) {
+            command = CREATE_EMAIL_COMMAND;
+        }
         HttpRequest sendRequest =
                 HttpRequest.newBuilder().uri(URI.create(SERVER_URL + RETURNED_EMAIL_ENDPOINT + SEND_REQUEST + userId))
                         .header("Content-Type", "application/json")

@@ -285,6 +285,7 @@ public class MainController {
      */
     private void deletePrompt() throws IOException, InterruptedException {
         System.out.println("Delete Prompt");
+        System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
         if (this.pastPrompts.isEmpty()) return;
         if (this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()) == null) {
             noPromptSelectedError();
@@ -374,17 +375,19 @@ public class MainController {
 
     private void sendEmail(Command command) {
         System.out.println("Send Email");
+        Prompt selectedPrompt = this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex());
         if (this.pastPrompts.isEmpty()) return;
-        if (this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()) == null) {
+        if (selectedPrompt == null) {
             noPromptSelectedError();
             return;
         }
+        System.out.println(selectedPrompt.getCommand());
         Prompt currentPrompt = new ReturnedEmail(command.getTranscribed());
 
         Platform.runLater(() -> {
             try {
-                System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
-                FrontEndAPIUtils.sendEmail(currentPrompt, command, currentPrompt.getCommand(),
+                System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getCommand());
+                FrontEndAPIUtils.sendEmail(currentPrompt, command, selectedPrompt.getCommand(),
                         this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()),
                         MainController.uid);
             } catch (IOException | InterruptedException e) {
