@@ -5,10 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import org.agilelovers.ui.MainApplication;
 import org.agilelovers.ui.enums.SceneType;
 import org.agilelovers.ui.object.Command;
@@ -206,8 +203,22 @@ public class MainController {
             case SETUP_EMAIL -> setupEmail();
             case CREATE_EMAIL -> createEmail(command);
             case SEND_EMAIL -> sendEmail();
-            default -> throw new IllegalStateException("Please give a valid command");
+            default -> invalidCommand();
         }
+    }
+
+    private void invalidCommand() {
+        System.err.println("Invalid command");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Invalid Command");
+        alert.setContentText("Please give a valid command in the form of one of the following:\n" +
+                "1. \"Question: [question prompt]\"\n" +
+                "2. \"Delete prompt\"\n" +
+                "3. \"Clear all\"\n" +
+                "4. \"Setup email\"\n" +
+                "5. \"Create email [email prompt]\"\n" +
+                "6. \"send email to [email address]\"\n");
+        alert.show();
     }
 
     /**
