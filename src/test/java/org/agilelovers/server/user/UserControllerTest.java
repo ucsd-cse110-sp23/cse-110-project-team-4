@@ -246,6 +246,12 @@ public class UserControllerTest {
         ResultActions grabUser = mvc.perform(get("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(invalidUser)));
+
+        var httpResponse = grabUser.andReturn().getResponse();
+        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
+        String str = httpResponse.getContentAsString();
+
+        assertThat(str).isEqualTo("");
     }
 
     /**
@@ -268,12 +274,20 @@ public class UserControllerTest {
 
         mvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(user)));
+                .content(mapper.writeValueAsString(user))
+        );
 
         //except user not found error
         ResultActions grabUser = mvc.perform(get("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emptyUser)));
+                .content(mapper.writeValueAsString(emptyUser))
+        );
+
+        var httpResponse = grabUser.andReturn().getResponse();
+        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
+        String str = httpResponse.getContentAsString();
+
+        assertThat(str).isEqualTo("");
     }
 
     /**

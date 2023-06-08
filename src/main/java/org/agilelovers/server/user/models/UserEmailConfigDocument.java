@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -26,6 +27,9 @@ public class UserEmailConfigDocument {
     private String id;
 
     @ApiModelProperty(notes = "ID Of User this email information relate to")
+    @NotBlank
+    @NotEmpty
+    @NotNull
     private String userID;
 
     @ApiModelProperty(notes = "first name of user during email setup")

@@ -53,7 +53,5 @@ public class UserEmailConfigController {
                 .tlsPort(emailConfig.getTlsPort())
                 .build()
         );
-
     }
-
 }
