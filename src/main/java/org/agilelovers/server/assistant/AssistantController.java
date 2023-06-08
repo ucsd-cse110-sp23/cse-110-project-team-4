@@ -40,7 +40,8 @@ public class AssistantController {
             return CommandType.SETUP_EMAIL;
         else if (transcription.startsWith(CommandIdentifier.CREATE_EMAIL_COMMAND) | transcription.equals(CommandIdentifier.CREATE_EMAIL_COMMAND))
             return CommandType.CREATE_EMAIL;
-        else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND))
+        else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND) | transcription.startsWith("setup " +
+                "email"))
             return CommandType.SEND_EMAIL;
         else return null;
     }
@@ -65,7 +66,7 @@ public class AssistantController {
 
         result = transcription.substring(starting_index + 1).strip();
 
-        if (command.equals(CommandType.SEND_EMAIL)) emailReformat(result);
+        if (command.equals(CommandType.SEND_EMAIL)) result = emailReformat(result);
 
         return result;
     }
@@ -76,7 +77,7 @@ public class AssistantController {
         Matcher matcher = pattern.matcher(result);
 
         // Perform replacements
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         while (matcher.find()) {
             String match = matcher.group();
             if (match.equalsIgnoreCase("at")) {
