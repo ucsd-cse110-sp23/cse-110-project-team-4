@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -20,6 +22,8 @@ public class ReturnedEmailDocument {
     private String id;
 
     @ApiModelProperty(notes = "User ID this Email is related to")
+    @NotNull
+    @NotBlank
     private String userId;
 
     @ApiModelProperty(notes = "Timestamp this question was created at")

@@ -86,7 +86,7 @@ public class EmailController {
             @ApiResponse(code = 200, message = "Successfully deleted all emails by a user"),
             @ApiResponse(code = 404, message = "User not found")
     })
-    @DeleteMapping("/delete-all/{uid}")
+    @DeleteMapping("/delete/all/{uid}")
     public void deleteAllEmailsFromUser(@PathVariable String uid) {
         emails.deleteAll(emails.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid)));
