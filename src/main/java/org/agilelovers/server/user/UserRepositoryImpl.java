@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Optional;
 
 interface UserRepositoryInterface {
@@ -34,6 +35,9 @@ public class UserRepositoryImpl implements UserRepositoryInterface {
 
     @Override
     public UserDocument saveUsernameAndPassword(String username, String password) {
+        if (password == null || password.isEmpty()) {
+            throw new ConstraintViolationException("Password cannot be empty", null);
+        }
         String hashedPassword = encoder.encode(password);
         UserDocument user = UserDocument.builder()
                 .username(username)

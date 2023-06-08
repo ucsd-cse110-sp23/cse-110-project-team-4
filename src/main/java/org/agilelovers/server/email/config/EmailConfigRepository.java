@@ -1,12 +1,11 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.email.config;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.List;
 import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
-public interface EmailRepository extends MongoRepository<EmailDocument, String> {
-    Optional<List<EmailDocument>> findAllByUserId(String userId);
+public interface EmailConfigRepository extends MongoRepository<EmailConfigDocument, String> {
+    Optional<EmailConfigDocument> findByUserID(String userID);
 }

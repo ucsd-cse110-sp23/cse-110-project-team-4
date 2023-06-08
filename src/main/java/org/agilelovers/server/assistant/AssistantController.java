@@ -6,17 +6,16 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.agilelovers.common.CommandIdentifier;
 import org.agilelovers.common.CommandType;
+import org.agilelovers.common.models.AssistantResponseModel;
 import org.agilelovers.server.common.errors.NoAudioError;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.user.UserRepository;
 import org.agilelovers.server.common.errors.UserNotFoundError;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequestMapping("/api/assistant")
 @ApiOperation("Assistant API")
 public class AssistantController {
     private final UserRepository users;
@@ -72,9 +71,9 @@ public class AssistantController {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 406, message = "The audio file doesn't have any transcribe-able audio or its empty")
     })
-    @PostMapping("/api/assistant/{uid}")
-    public AssistantData transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
-                                           @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
+    @PostMapping("/ask/{uid}")
+    public AssistantResponseModel transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
+                                                    @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
@@ -86,7 +85,7 @@ public class AssistantController {
             String command = getCommand(transcription);
             String command_arguments = getCommandArguments(command, transcription);
 
-            return AssistantData.builder()
+            return AssistantResponseModel.builder()
                     .transcribed(transcription)
                     .command(command)
                     .command_arguments(command_arguments)
@@ -95,4 +94,5 @@ public class AssistantController {
         else
             throw new NoAudioError();
     }
+
 }

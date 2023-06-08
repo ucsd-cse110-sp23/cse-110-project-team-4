@@ -1,4 +1,4 @@
-package org.agilelovers.server.assistant;
+package org.agilelovers.common.models;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AssistantData {
+public class AssistantResponseModel {
 
     @ApiModelProperty(notes = "The transcribed string returned by whisper", required = true)
     private String transcribed;
