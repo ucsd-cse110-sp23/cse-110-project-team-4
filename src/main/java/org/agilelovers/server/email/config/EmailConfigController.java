@@ -73,10 +73,16 @@ public class EmailConfigController {
                         emailConfigDocument.setDisplayName(emailConfig.getDisplayName());
                         emailConfigDocument.setSmtpHost(emailConfig.getSmtpHost());
                         emailConfigDocument.setTlsPort(emailConfig.getTlsPort());
+                        users.findById(uid).map(
+                                userDocument -> {
+                                    userDocument.setEmailInformation(emailConfigDocument);
+                                    return users.save(userDocument);
+                                } );
                         return emailConfigurations.save(emailConfigDocument);
                     }
-            ).orElse(
-                emailConfigurations.save(EmailConfigDocument.builder()
+
+            ).orElseGet(() -> {
+                EmailConfigDocument newEmailConfigDocument = EmailConfigDocument.builder()
                         .userID(uid)
                         .firstName(emailConfig.getFirstName())
                         .lastName(emailConfig.getLastName())
@@ -85,9 +91,17 @@ public class EmailConfigController {
                         .displayName(emailConfig.getDisplayName())
                         .smtpHost(emailConfig.getSmtpHost())
                         .tlsPort(emailConfig.getTlsPort())
-                        .build()
-                )
-            );
+                        .build();
+
+                users.findById(uid).map(
+                        userDocument -> {
+                            userDocument.setEmailInformation(newEmailConfigDocument);
+                            return users.save(userDocument);
+                        }
+                );
+
+                return emailConfigurations.save(newEmailConfigDocument);
+            });
 
 
         } catch (AuthenticationFailedException e) {
