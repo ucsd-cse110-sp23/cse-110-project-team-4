@@ -14,6 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 
@@ -32,8 +33,7 @@ public class EmailDocument {
     private Date createdDate;
 
     @ApiModelProperty(notes = "User ID associated with this email", required = true)
-    @NotNull
-    @NotBlank
+    @NotEmpty
     private String userId;
 
     @ApiModelProperty(notes = "The email prompt used to generate the body", required = true)
