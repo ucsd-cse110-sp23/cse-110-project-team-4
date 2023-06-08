@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import org.agilelovers.common.documents.EmailDocument;
 import org.agilelovers.common.models.EmailModel;
 import org.agilelovers.server.common.OpenAIClient;
+import org.agilelovers.server.common.errors.NoEmailConfigured;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.common.errors.NoEmailFound;
 import org.agilelovers.server.email.returned.ReturnedEmailRepository;
@@ -24,7 +25,7 @@ public class EmailController {
     private final EmailRepository emails;
     private final OpenAIClient client;
 
-    public EmailController(EmailRepository emails, UserRepository users, ReturnedEmailRepository emailsSent) {
+    public EmailController(EmailRepository emails, UserRepository users) {
         this.emails = emails;
         this.users = users;
         this.client = new OpenAIClient();
@@ -60,11 +61,14 @@ public class EmailController {
                 .orElseThrow(() -> new UserNotFoundError(uid));
         String body = this.client.getAnswer(emailModel.getPrompt());
 
-        body.substring(0, body.indexOf("[Your Name]"));
+        body = body.substring(0, body.indexOf("[Your Name]"));
+
+        if (user.getEmailInformation() == null)
+            throw new NoEmailConfigured();
 
         return emails.save(EmailDocument.builder()
                 .entirePrompt(emailModel.getPrompt())
-                .body(body + "\n " + user.getEmailInformation().getDisplayName())
+                .body(body + user.getEmailInformation().getDisplayName())
                 .userId(uid)
                 .build()
         );
