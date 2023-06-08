@@ -30,7 +30,7 @@ public class EmailConfigDocument {
     @Id
     private String id;
 
-    @ApiModelProperty(notes = "ID Of User this email information relate to")
+    @ApiModelProperty(notes = "ID Of User this email information relate to", required = true)
     @NotBlank
     @NotEmpty
     @NotNull

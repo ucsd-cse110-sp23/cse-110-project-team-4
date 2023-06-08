@@ -27,7 +27,7 @@ public class EmailDocument {
     @Id
     private String id;
 
-    @ApiModelProperty(notes = "Timestamp this question was created at", required = true)
+    @ApiModelProperty(notes = "Timestamp this question was created at")
     @CreatedDate
     private Date createdDate;
 

@@ -41,6 +41,6 @@ public class UserDocument {
     @NotEmpty
     private String password;
 
-    @ApiModelProperty(notes = "Document containing email configuration, given during email setup ")
+    @ApiModelProperty(notes = "Document containing email configuration, given during email setup")
     private EmailConfigDocument emailInformation;
 }
