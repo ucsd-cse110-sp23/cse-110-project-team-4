@@ -1,9 +1,11 @@
 package org.agilelovers.common.models;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class ReturnedEmailModel {
     @ApiModelProperty(notes = "ID of original query passed on sendEmail method")
     private String sentId;

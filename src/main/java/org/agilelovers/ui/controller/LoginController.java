@@ -1,10 +1,12 @@
 package org.agilelovers.ui.controller;
 
+import com.sun.tools.javac.Main;
 import io.github.cdimascio.dotenv.Dotenv;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.agilelovers.common.models.ReducedUserModel;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.MainApplication;
 import org.agilelovers.ui.enums.SceneType;
@@ -55,7 +57,7 @@ public class LoginController {
      * @throws IOException if the user token file cannot be read
      */
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
 
     }
 
@@ -135,8 +137,9 @@ public class LoginController {
         this.disableButtons();
         Platform.runLater(() -> {
             try {
-                UserCredential credential = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText(), MainController.getUid());
-                this.promptAutoLogin(credential.getId());
+                String uid = FrontEndAPIUtils.login(this.usernameField.getText(), this.passwordField.getText());
+                MainController.setUid(uid);
+                this.promptAutoLogin(uid);
                 SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -174,6 +177,7 @@ public class LoginController {
     public void createAccount(ActionEvent event) {
         Dotenv dotenv = Dotenv.load();
         String apiPassword = dotenv.get("API_SECRET");
+        System.out.println(apiPassword);
         if (verifyEmptyFields()) {
             return;
         }
@@ -181,8 +185,10 @@ public class LoginController {
         // add username and password to database
         Platform.runLater(() -> {
             try {
-                UserCredential credential = FrontEndAPIUtils.createAccount(this.usernameField.getText(), this.passwordField.getText(), apiPassword);
-                this.promptAutoLogin(credential.getId());
+                String uid = FrontEndAPIUtils.createAccount(this.usernameField.getText(),
+                        this.passwordField.getText(),
+                        apiPassword);
+                this.promptAutoLogin(uid);
                 SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
 
             } catch (IOException | InterruptedException | URISyntaxException e) {

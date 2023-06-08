@@ -1,16 +1,16 @@
 package org.agilelovers.ui;
 
 public class Constants {
-    public final static String SERVER_URL = "https://server.agilelovers.org";
+    public final static String SERVER_URL = "http://localhost:8080";
     public final static String API_TRANSCRIBE_ENDPOINT = "/api/assistant/ask/";
-    public final static String USER_ENDPOINT = "/api/users/";
+    public final static String USER_ENDPOINT = "/api/user/";
     public final static String EMAIL_CONFIGURATION_ENDPOINT = "/api/email/config/";
     public final static String QUESTION_ENDPOINT = "/api/question/";
     public final static String EMAIL_ENDPOINT = "/api/email/";
     public final static String RETURNED_EMAIL_ENDPOINT = "/api/email/returned/";
 
-    public final static String SIGN_UP_REQUEST = "sign_up/";
-    public final static String SIGN_IN_REQUEST = "sign_in/";
+    public final static String SIGN_UP_REQUEST = "sign_up";
+    public final static String SIGN_IN_REQUEST = "sign_in";
     public final static String GET_REQUEST = "get/";
     public final static String GET_ALL_REQUEST = "get/all/";
     public final static String DELETE_REQUEST = "delete/";

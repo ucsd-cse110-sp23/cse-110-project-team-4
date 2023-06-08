@@ -1,7 +1,8 @@
 package org.agilelovers.ui.util;
 
+import com.sun.tools.javac.Main;
 import org.agilelovers.ui.Constants;
-import org.agilelovers.ui.object.AudioRecorder;
+import org.agilelovers.ui.controller.MainController;
 import org.agilelovers.ui.object.Command;
 
 import java.io.File;
@@ -12,14 +13,14 @@ public class RecordingUtils {
     private static AudioRecorder recorder = new AudioRecorder(audioFile);
 
 
-    public static Command endRecording(String id) throws IOException {
+    public static void endRecording(MainController controller, String id) throws IOException {
         // new thread for operations
         recorder.stop();
-
-        return FrontEndAPIUtils.sendAudio(id);
+        controller.setRecordingLabel(false);
     }
 
-    public static void startRecording() {
+    public static void startRecording(MainController controller) {
+        controller.setRecordingLabel(true);
         new Thread(() -> recorder.start()).start();
     }
 }

@@ -19,6 +19,16 @@ public class EmailConfig {
         this.tlsPort = tlsPort;
     }
 
+    public EmailConfig() {
+        this.firstName = "";
+        this.lastName = "";
+        this.displayName = "";
+        this.email = "";
+        this.emailPassword = "";
+        this.smtpHost = "";
+        this.tlsPort = "";
+    }
+
     public String getFirstName() {
         return firstName;
     }

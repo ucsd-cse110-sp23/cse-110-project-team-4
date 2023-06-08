@@ -47,6 +47,9 @@ public class MainController {
     @FXML
     protected Button startButton;
 
+    @FXML
+    protected Label recordingLabel;
+
     private static String uid;
 
     /**
@@ -60,6 +63,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        instance = this;
         System.out.println("Initializing Main Controller");
         if (MainController.uid == null) {
             throw new NullPointerException("MainController.uid is null");
@@ -68,6 +72,10 @@ public class MainController {
         Platform.runLater(() -> {
             try {
                 pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.QUESTION_COMMAND, MainController.uid));
+                pastPrompts.forEach((prompt) -> {
+                    System.out.print(prompt.getTitle() + " ");
+                    System.out.println(prompt.getCreatedDate());
+                });
                 pastPrompts.sort(null);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -134,6 +142,14 @@ public class MainController {
         });
     }
 
+    public void refreshHistoryList() {
+        Platform.runLater(() -> this.historyList.setItems(this.pastPrompts));
+    }
+
+    public void setRecordingLabel(boolean isRecording) {
+        this.recordingLabel.setText(isRecording ? "Recording..." : "");
+    }
+
     /**
      * Gets history list.
      *
@@ -170,31 +186,31 @@ public class MainController {
     }
 
     @FXML
-    private void newQuery(ActionEvent event) throws IOException {
+    private void newQuery(ActionEvent event) {
         if (this.isRecording) {
             // wait for ChatGPT to respond
             // Question stopRecording()
             Platform.runLater(() -> {
-                this.startButton.setDisable(true);
-                Command currentCommand = null;
                 try {
-                    currentCommand = RecordingUtils.endRecording(MainController.uid);
+                    RecordingUtils.endRecording(this, MainController.uid);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                System.err.println(currentCommand);
+                Command currentCommand;
                 try {
+                    currentCommand = FrontEndAPIUtils.sendAudio(MainController.uid);
                     this.runCommand(currentCommand);
+                    this.historyList.setDisable(false);
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
+                } finally {
+                    this.startButton.setText("Start");
                 }
-                this.startButton.setDisable(false);
             });
-            this.startButton.setText("Start");
         } else {
-            this.pastPrompts.add(new Question());
+            this.historyList.setDisable(true);
             // call a method that starts recording
-            RecordingUtils.startRecording();
+            RecordingUtils.startRecording(this);
             this.startButton.setText("Stop Recording");
         }
         this.isRecording = !this.isRecording;
@@ -214,15 +230,18 @@ public class MainController {
 
     private void invalidCommand() {
         System.err.println("Invalid command");
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setHeaderText("Invalid Command");
-        alert.setContentText("Please give a valid command in the form of one of the following:\n" +
-                "1. \"Question: [question prompt]\"\n" +
-                "2. \"Delete prompt\"\n" +
-                "3. \"Clear all\"\n" +
-                "4. \"Setup email\"\n" +
-                "5. \"Create email [email prompt]\"\n" +
-                "6. \"send email to [email address]\"\n");
+        alert.setContentText("""
+                Please give a valid command in the form of one of the following:
+                1. "Question: [question prompt]"
+                2. "Delete prompt"
+                3. "Clear all"
+                4. "Setup email"
+                5. "Create email [email prompt]"
+                6. "Send email to [email address]"
+                """);
         alert.show();
     }
 
@@ -253,20 +272,31 @@ public class MainController {
     private void deletePrompt() throws IOException, InterruptedException {
         System.out.println("Delete Prompt");
         if (this.pastPrompts.isEmpty()) return;
+        if (this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()) == null) {
+            deleteError();
+            return;
+        }
 
         Platform.runLater(() -> {
             try {
                 FrontEndAPIUtils.deletePrompt(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()));
+                this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
+                this.historyList.getSelectionModel().select(null);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
-        this.historyList.getSelectionModel().select(null);
         System.out.println("Successfully deleted question");
     }
 
+    private void deleteError() {
+        System.err.println("No question selected");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("No Question Selected");
+        alert.setContentText("Please select a question to delete");
+        alert.show();
+    }
     /**
      * Removes all questions from the history list.
      * <p>
@@ -314,6 +344,7 @@ public class MainController {
     }
 
     private void createPrompt(Command command, Prompt currentPrompt) {
+        System.out.println("Create Prompt");
         Platform.runLater(() -> {
             try {
                 FrontEndAPIUtils.newPrompt(command, currentPrompt, MainController.uid);
@@ -322,23 +353,26 @@ public class MainController {
             }
         });
 
-        this.pastPrompts.remove(this.pastPrompts.size() - 1);
         this.pastPrompts.add(currentPrompt);
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 
-    private void sendEmail(Command command) throws IOException, InterruptedException {
+    private void sendEmail(Command command) {
         System.out.println("Send Email");
         Prompt currentPrompt = new ReturnedEmail(command.getTranscribed());
 
         Platform.runLater(() -> {
-            FrontEndAPIUtils.sendEmail(command, currentPrompt.getCommand(), this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(), MainController.uid);
+            try {
+                FrontEndAPIUtils.sendEmail(currentPrompt, command, currentPrompt.getCommand(),
+                        this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(),
+                        MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         });
 
-        this.pastPrompts.remove(this.pastPrompts.size() - 1);
         this.pastPrompts.add(currentPrompt);
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
-
 }
 

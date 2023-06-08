@@ -1,10 +1,12 @@
 package org.agilelovers.ui.object;
 
 
+import org.agilelovers.ui.controller.MainController;
+
 import java.util.Date;
 
 public abstract class Prompt implements Comparable<Prompt> {
-    private String command;
+    String command;
     private String id;
     private Date createdDate;
 
@@ -32,16 +34,21 @@ public abstract class Prompt implements Comparable<Prompt> {
         return createdDate;
     }
 
-    public abstract void setTitle(String newTitle);
+    public void setTitle(String newTitle) {
+        MainController.instance.refreshLabels();
+    }
 
-    public abstract void setBody(String newBody);
+    public void setBody(String newBody) {
+        MainController.instance.refreshLabels();
+    }
+
     public abstract String getTitle();
 
     public abstract String getBody();
 
     @Override
     public String toString() {
-        return this.command;
+        return this.getTitle();
     }
 
     @Override

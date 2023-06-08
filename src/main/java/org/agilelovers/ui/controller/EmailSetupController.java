@@ -1,12 +1,12 @@
 package org.agilelovers.ui.controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.agilelovers.ui.MainApplication;
-import org.agilelovers.ui.enums.SceneType;
+import javafx.stage.Stage;
 import org.agilelovers.ui.object.EmailConfig;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 
@@ -64,15 +64,21 @@ public class EmailSetupController {
      * Otherwise, fields are left blank.
      */
     @FXML
-    private void initialize() throws IOException, InterruptedException {
-        EmailConfig config = FrontEndAPIUtils.getEmailConfig(MainController.getUid());
-        firstNameField.setText(config.getFirstName());
-        lastNameField.setText(config.getLastName());
-        displayNameField.setText(config.getDisplayName());
-        emailField.setText(config.getEmail());
-        passwordField.setText(config.getEmailPassword());
-        smtpHostField.setText(config.getSmtpHost());
-        tlsPortField.setText(config.getTlsPort());
+    private void initialize() {
+        Platform.runLater(() -> {
+            try {
+                EmailConfig config = FrontEndAPIUtils.getEmailConfig(MainController.getUid());
+                firstNameField.setText(config.getFirstName());
+                lastNameField.setText(config.getLastName());
+                displayNameField.setText(config.getDisplayName());
+                emailField.setText(config.getEmail());
+                passwordField.setText(config.getEmailPassword());
+                smtpHostField.setText(config.getSmtpHost());
+                tlsPortField.setText(config.getTlsPort());
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -83,9 +89,14 @@ public class EmailSetupController {
      */
     @FXML
     public void saveInfo(ActionEvent event) throws IOException, InterruptedException {
-        EmailConfig config = new EmailConfig(firstNameField.getText(), lastNameField.getText(), displayNameField.getText(), emailField.getText(), passwordField.getText(), smtpHostField.getText(), tlsPortField.getText());
+        EmailConfig config =
+                new EmailConfig(firstNameField.getText(), lastNameField.getText(), displayNameField.getText(),
+                        emailField.getText(), passwordField.getText(), smtpHostField.getText(), tlsPortField.getText());
+        System.out.println("SaveInfo UID: " + MainController.getUid());
         FrontEndAPIUtils.setEmailConfig(config, MainController.getUid());
-        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
+        ((Stage) this.saveButton.getScene().getWindow()).close();
+        //        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType
+        //        .MAIN_UI);
     }
 
     /**
@@ -95,7 +106,9 @@ public class EmailSetupController {
      */
     @FXML
     public void cancel(ActionEvent event) throws IOException {
-        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
+        //        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType
+        //        .MAIN_UI);
+        ((Stage) this.saveButton.getScene().getWindow()).close();
     }
 
 }

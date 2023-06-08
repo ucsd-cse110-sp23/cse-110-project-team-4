@@ -17,11 +17,24 @@ public class SceneChanger {
 
     public void switchScene(Stage stage, SceneType type) throws IOException {
         var fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("/MainExperimental.fxml"));
-        Parent root = fxmlLoader.load();
-        MainController.instance = fxmlLoader.getController();
-        stage.setTitle("SayItAssistant");
-        stage.setScene(new Scene(root, 600, 400));
-        stage.show();
+        switch (type) {
+            case MAIN_UI -> {
+                fxmlLoader.setLocation(getClass().getResource("/MainExperimental.fxml"));
+                Parent root = fxmlLoader.load();
+                MainController.instance = fxmlLoader.getController();
+                stage.setTitle("SayItAssistant");
+                stage.setScene(new Scene(root));
+                stage.show();
+            }
+            case EMAIL_SETUP_UI -> {
+                fxmlLoader.setLocation(getClass().getResource("/EmailSetup.fxml"));
+                Stage newStage = new Stage();
+                Parent root = fxmlLoader.load();
+                newStage.setTitle("SayItAssistant");
+                newStage.setScene(new Scene(root));
+                newStage.show();
+            }
+
+        }
     }
 }

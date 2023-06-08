@@ -27,6 +27,9 @@ public class Command {
     }
 
     public CommandType getQueryType() {
+        if (this.command == null) {
+            return CommandType.INVALID;
+        }
         if (this.command.equals(Constants.QUESTION_COMMAND)) {
             return CommandType.QUESTION;
         }

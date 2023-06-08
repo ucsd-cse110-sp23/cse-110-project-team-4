@@ -29,13 +29,13 @@ public class AssistantController {
     private String getCommand(String transcription) {
         if (transcription.startsWith(CommandIdentifier.QUESTION_COMMAND))
             return CommandType.ASK_QUESTION;
-        else if (transcription.equals(CommandIdentifier.DELETE_PROMPT_COMMAND))
+        else if (transcription.startsWith(CommandIdentifier.DELETE_PROMPT_COMMAND))
             return CommandType.DELETE_PROMPT;
-        else if (transcription.equals(CommandIdentifier.CLEAR_ALL_COMMAND))
+        else if (transcription.startsWith(CommandIdentifier.CLEAR_ALL_COMMAND))
             return CommandType.CLEAR_ALL;
-        else if (transcription.equals(CommandIdentifier.SETUP_EMAIL_COMMAND))
+        else if (transcription.startsWith(CommandIdentifier.SETUP_EMAIL_COMMAND))
             return CommandType.SETUP_EMAIL;
-        else if (transcription.startsWith(CommandIdentifier.CREATE_EMAIL_COMMAND))
+        else if (transcription.startsWith(CommandIdentifier.CREATE_EMAIL_COMMAND) | transcription.equals(CommandIdentifier.CREATE_EMAIL_COMMAND))
             return CommandType.CREATE_EMAIL;
         else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND))
             return CommandType.SEND_EMAIL;
