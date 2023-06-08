@@ -24,7 +24,7 @@ public class EmailController {
     private final EmailRepository emails;
     private final OpenAIClient client;
 
-    public EmailController(EmailRepository emails, UserRepository users, ReturnedEmailRepository emailsSent) {
+    public EmailController(EmailRepository emails, UserRepository users) {
         this.emails = emails;
         this.users = users;
         this.client = new OpenAIClient();
