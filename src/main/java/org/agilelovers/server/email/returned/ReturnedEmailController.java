@@ -60,9 +60,9 @@ public class ReturnedEmailController {
     })
     @GetMapping("/get/{uid}")
     public ReturnedEmailDocument getReturnedEmail(@PathVariable @ApiParam(name = "uid", value = "User ID") String uid,
-                                                  @RequestBody @ApiParam(name = "id", value = "ID of returned email document") String id) {
+                                                  @ApiParam(name = "id", value = "ID of returned email document") String id) {
         return returnedEmailRepository.findById(id)
-                .orElseThrow(() -> new NoEmailFound(uid));
+                .orElseThrow(() -> new NoEmailFound(id));
     }
 
     @ApiOperation(value = "Delete a returned email", notes = "Deletes a returned Email")
@@ -96,7 +96,7 @@ public class ReturnedEmailController {
             return returnedEmailRepository.save(ReturnedEmailDocument.builder()
                     .userId(uid)
                     .entirePrompt(emailInfo.getEntirePrompt())
-                    .confirmationOfEmailSent("Error: Please select an email draft to send")
+                    .confirmationOfEmailSent("Please select an email draft to send")
                     .build()
             );
         }

@@ -63,13 +63,6 @@ public class ExceptionAdvice {
         return err.getMessage();
     }
 
-    @ResponseBody
-    @ExceptionHandler(IllegalStateException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    String openAIOverloaded(IllegalStateException err) {
-        return "OpenAI's Servers are getting high volumes of requests.";
-    }
-
     // Mongo Writing Errors
     @ResponseBody
     @ExceptionHandler(MongoWriteException.class)

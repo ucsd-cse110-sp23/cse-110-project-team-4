@@ -24,7 +24,7 @@ public class EmailController {
     private final EmailRepository emails;
     private final OpenAIClient client;
 
-    public EmailController(EmailRepository emails, UserRepository users) {
+    public EmailController(EmailRepository emails, UserRepository users, ReturnedEmailRepository emailsSent) {
         this.emails = emails;
         this.users = users;
         this.client = new OpenAIClient();
@@ -38,7 +38,7 @@ public class EmailController {
 
     @GetMapping("/get/{uid}")
     public EmailDocument getEmailByaID(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
-                                      @RequestBody String emailID) {
+                                      String emailID) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
@@ -60,14 +60,11 @@ public class EmailController {
                 .orElseThrow(() -> new UserNotFoundError(uid));
         String body = this.client.getAnswer(emailModel.getPrompt());
 
-        if(body.contains("[Your Name]")){
-            body = body.substring(0, body.indexOf("[Your Name]"));
-        }
-        String displayName = user.getEmailInformation() == null ? "" : user.getEmailInformation().getDisplayName();
+        body.substring(0, body.indexOf("[Your Name]"));
 
         return emails.save(EmailDocument.builder()
                 .entirePrompt(emailModel.getPrompt())
-                .body(body + displayName)
+                .body(body + "\n " + user.getEmailInformation().getDisplayName())
                 .userId(uid)
                 .build()
         );

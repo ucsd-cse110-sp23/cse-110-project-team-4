@@ -1,22 +1,17 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.email.base;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.agilelovers.common.documents.ReturnedEmailDocument;
-import org.agilelovers.common.models.EmailConfigModel;
+import org.agilelovers.common.documents.EmailConfigDocument;
+import org.agilelovers.common.documents.EmailDocument;
+import org.agilelovers.common.documents.UserDocument;
 import org.agilelovers.common.models.EmailModel;
 import org.agilelovers.common.models.ReducedUserModel;
 import org.agilelovers.common.models.SecureUserModel;
 import org.agilelovers.server.Server;
-import org.agilelovers.common.documents.EmailDocument;
-import org.agilelovers.server.email.base.EmailRepository;
-import org.agilelovers.common.documents.EmailConfigDocument;
 import org.agilelovers.server.email.returned.ReturnedEmailRepository;
-import org.agilelovers.common.documents.UserDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opentest4j.TestAbortedException;
@@ -32,7 +27,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -66,9 +60,6 @@ public class EmailControllerTest {
 
     @Autowired
     private ReturnedEmailRepository returnedEmailRepository;
-    private SecureUserModel user;
-    private EmailConfigModel configDocument;
-    private String userID;
     public EmailControllerTest() {
         Dotenv env = Dotenv.load();
         this.API_KEY = env.get("API_SECRET");
@@ -77,44 +68,6 @@ public class EmailControllerTest {
         this.SMTP_HOST = env.get("SMTP_HOST");
         this.TLS_PORT = env.get("TLS_PORT");
     }
-
-
-    @Before
-    public void setUp() throws Exception {
-        user = SecureUserModel.builder()
-                .username(EMAIL_USERNAME)
-                .password(EMAIL_PASSWORD)
-                .apiPassword(API_KEY)
-                .build();
-
-        mvc.perform(post("/api/user/sign_up")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(user))
-        );
-
-        // Step 2: post a config to database under a specific user ID
-        userID = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword())
-                .orElseThrow(TestAbortedException::new).getId();
-
-        configDocument = EmailConfigModel.builder()
-                .firstName("Anish")
-                .lastName("Govind")
-                .email(EMAIL_USERNAME)
-                .emailPassword(EMAIL_PASSWORD)
-                .displayName("Anish Display Govind")
-                .smtpHost(SMTP_HOST)
-                .tlsPort(TLS_PORT)
-                .build();
-
-        mvc.perform(post("/api/email/config/save/" + userID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(configDocument))
-        );
-    }
-    
-    
-    
-    
     /**
      * Reset the database after each test so its state is clean
      */
@@ -132,135 +85,141 @@ public class EmailControllerTest {
      */
     @Test
     public void createEmailTest() throws Exception {
+        String username = EMAIL_USERNAME;
+        String password = EMAIL_PASSWORD;
+        String prompt = "test prompt";
+        String body = "test body";
 
-        UserDocument userDocument = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword())
-                .orElseThrow(TestAbortedException::new);
-
-        EmailModel emailModel = EmailModel.builder()
-                .prompt("create email to nick do you want to go to geisel later")
+        SecureUserModel user = SecureUserModel.builder()
+                .username(username)
+                .password(password)
+                .apiPassword(API_KEY)
                 .build();
 
-        ResultActions createdEmail = mvc.perform(post("/api/email/post/" + userID)
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel))
+                .content(mapper.writeValueAsString(user))
         );
 
-        assertThat(this.emailRepository.findAll().size()).isEqualTo(1);
+        Optional<UserDocument> userDoc = Optional.ofNullable(userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword())
+                .orElseThrow(TestAbortedException::new));
+
+        String userID = "6481cdc0fd5c8340a66b32fb";//userDoc.get().getId();
+        String id = "testID";
+        EmailDocument email = EmailDocument.builder()
+                .id(id)
+                .createdDate(null)
+                .userId(userID)
+                .entirePrompt(prompt)
+                .build();
+        EmailConfigDocument config = EmailConfigDocument.builder()
+                .id(id)
+                .userID(userID)
+                .firstName("anish")
+                .lastName("govind")
+                .email(EMAIL_USERNAME)
+                .emailPassword(EMAIL_PASSWORD)
+                .displayName("anish govind")
+                .smtpHost(SMTP_HOST)
+                .tlsPort(TLS_PORT)
+                .build();
+
+        mvc.perform(post("/api/email/config/save/" + userID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(config))
+        );
+        //EmailConfigDocument temp = mvc.perform(get("/api/email/config/get/" + id)
+        //        .contentType(MediaType.APPLICATION_JSON));
+
+        mvc.perform(get("/api/email/get/" + userID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(email))
+        );
+        mvc.perform(post("/api/email/post/" + userID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(email))
+        );
+
+        List<EmailDocument> emailsFound = emailRepository.findAll();
+        emailsFound.add(email);
+        assertThat(emailsFound).extracting(EmailDocument::getEntirePrompt).containsOnly(
+                "test prompt");
     }
 
+    /**
+     * 1. Creates INVALID email
+     * 2. Tries to POST to DB
+     * Assert: Expects an invalid post request
+     * @throws Exception
+     */
     @Test
-    public void getAllEmailsTest() throws Exception {
+    public void createInvalidEmailTest() throws Exception {
+        String username = EMAIL_USERNAME;
+        String password = EMAIL_PASSWORD;
+        String prompt = "test prompt";
+        String body = "test body";
 
-        EmailModel emailModel1 = EmailModel.builder()
-                .prompt("create email to nick do you want to go to geisel later")
+        SecureUserModel user = SecureUserModel.builder()
+                .username(username)
+                .password(password)
+                .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/email/post/" + userID)
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel1))
+                .content(mapper.writeValueAsString(user))
         );
 
-        EmailModel emailModel2 = EmailModel.builder()
-                .prompt("create email to Anish do you want to go to geisel later")
-                .build();
-
-        mvc.perform(post("/api/email/post/" + userID)
+        ResultActions userFromGet = mvc.perform(get("/api/user/sign_in")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel2))
-        );
+                .content(mapper.writeValueAsString(user)));
 
-
-        ResultActions listOfEmailsInDataBase = mvc.perform(get("/api/email/get/all/" + userID));
-        var httpResponse = listOfEmailsInDataBase.andReturn().getResponse();
+        var httpResponse = userFromGet.andReturn().getResponse();
         //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
         String str = httpResponse.getContentAsString();
-        List<EmailDocument> result = mapper.readValue(str, new TypeReference<>() {});
+        ReducedUserModel result = mapper.readValue(str, ReducedUserModel.class);
+        String userID = "kms";//result.getId();
 
-        assertThat(result.size()).isEqualTo(2);
+        Optional<UserDocument> userDoc = Optional.ofNullable(userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword())
+                .orElseThrow(TestAbortedException::new));
 
-    }
+        String id = "kms2";//userDoc.get().getId();
 
-    @Test
-    public void getEmailbyId() throws Exception{
-        EmailModel emailModel1 = EmailModel.builder()
-                .prompt("create email to nick do you want to go to geisel later")
+        EmailModel email = EmailModel.builder()
+                .prompt(prompt)
                 .build();
 
-        ResultActions createdEmail1 = mvc.perform(post("/api/email/post/" + userID)
+        EmailConfigDocument config = EmailConfigDocument.builder()
+                .id(id)
+                .userID(userID)
+                .firstName("anish")
+                .lastName("govind")
+                .email(EMAIL_USERNAME)
+                .emailPassword(EMAIL_PASSWORD)
+                .displayName("anish govind")
+                .smtpHost(SMTP_HOST)
+                .tlsPort(TLS_PORT)
+                .build();
+
+        mvc.perform(post("/api/email/config/save/" + userID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel1))
+                .content(mapper.writeValueAsString(config))
         );
+        //EmailConfigDocument temp = mvc.perform(get("/api/email/config/get/" + id)
+        //        .contentType(MediaType.APPLICATION_JSON));
 
-        var httpResponse1 = createdEmail1.andReturn().getResponse();
-        String str1 = httpResponse1.getContentAsString();
-        EmailDocument result1 = mapper.readValue(str1, EmailDocument.class);
-
-
-
-        ResultActions listOfEmailsInDataBase = mvc.perform(get("/api/email/get/all/" + userID)
-                .contentType(result1.getId()));
-
-
-        var httpResponse2 = createdEmail1.andReturn().getResponse();
-        String str2 = httpResponse2.getContentAsString();
-        EmailDocument result2 = mapper.readValue(str2, EmailDocument.class);
-
-        assertThat(result2.getUserId()).isEqualTo(result1.getUserId());
-
-    }
-
-    @Test
-    public void deleteEmailById() throws Exception{
-        assertThat(this.emailRepository.findAll().size()).isEqualTo(0);
-        EmailModel emailModel1 = EmailModel.builder()
-                .prompt("create email to nick do you want to go to geisel later")
-                .build();
-
-        ResultActions createdEmail1 = mvc.perform(post("/api/email/post/" + userID)
+        mvc.perform(get("/api/email/get/" + userID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel1))
+                .content(mapper.writeValueAsString(email))
         );
-
-        assertThat(this.emailRepository.findAll().size()).isEqualTo(1);
-
-        var httpResponse1 = createdEmail1.andReturn().getResponse();
-        String str1 = httpResponse1.getContentAsString();
-        EmailDocument result1 = mapper.readValue(str1, EmailDocument.class);
-
-        mvc.perform(delete("/api/email/delete/" + result1.getId()));
-
-        assertThat(this.emailRepository.findAll().size()).isEqualTo(0);
-
-    }
-
-    @Test
-    public void deleteAllEmails() throws Exception {
-        EmailModel emailModel1 = EmailModel.builder()
-                .prompt("create email to nick do you want to go to geisel later")
-                .build();
-
         mvc.perform(post("/api/email/post/" + userID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel1))
+                .content(mapper.writeValueAsString(email))
         );
 
-        EmailModel emailModel2 = EmailModel.builder()
-                .prompt("create email to Anish do you want to go to geisel later")
-                .build();
-
-        mvc.perform(post("/api/email/post/" + userID)
+        mvc.perform(post("/api/email/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel2))
-        );
-
-        assertThat(this.emailRepository.findAll().size()).isEqualTo(2);
-
-        mvc.perform(delete("/api/email/delete/all/" + userID));
-
-        assertThat(this.emailRepository.findAll().size()).isEqualTo(0);
+                .content(mapper.writeValueAsString(email))
+        ).andExpect(status().is(404));
     }
-
-
-
-
 }

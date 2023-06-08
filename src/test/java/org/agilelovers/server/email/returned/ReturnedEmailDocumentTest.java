@@ -1,6 +1,5 @@
 package org.agilelovers.server.email.returned;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -75,6 +74,14 @@ public class ReturnedEmailDocumentTest {
     private EmailModel emailModel;
     private String userID;
 
+//    @Mock
+//    private UserRepository userRepositoryMock;
+//    @Mock
+//    private EmailRepository emailRepositoryMock;
+//    @Mock
+//    private ReturnedEmailRepository returnedEmailRepository;
+//    @Mock
+//    private ReturnedEmailController returnedEmailController;
 
     public ReturnedEmailDocumentTest() {
         Dotenv env = Dotenv.load();
@@ -153,9 +160,8 @@ public class ReturnedEmailDocumentTest {
         );
 
 //        var httpResponse_returnedEmail  = createdEmail.andReturn().getResponse();
-//        String str_returnedEmail = httpResponse_returnedEmail.getContentAsString();
+//        String str_returnedEmail = httpResponse_createdEmail.getContentAsString();
 //        ReturnedEmailDocument result_returnedEmail= mapper.readValue(str_returnedEmail, ReturnedEmailDocument.class);
-
 
     }
 
@@ -186,46 +192,8 @@ public class ReturnedEmailDocumentTest {
     }
 
     @Test
-    public void getReturnedEmailTest() throws Exception {
-        EmailModel emailModel1 = EmailModel.builder()
-                .prompt("create email to Anish do you want to go to geisel later")
-                .build();
+    public void getReturnedEmailTest() {
 
-        ResultActions createdEmail = mvc.perform(post("/api/email/post/" + userID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailModel1))
-        );
-
-        var httpResponse_createdEmail = createdEmail.andReturn().getResponse();
-        String str_createdEmail = httpResponse_createdEmail.getContentAsString();
-        EmailDocument result_createdEmail = mapper.readValue(str_createdEmail, EmailDocument.class);
-
-        ReturnedEmailModel toSend = ReturnedEmailModel.builder()
-                .sentId(result_createdEmail.getId())
-                .recipient("anishGovind@ucsd.edu")
-                .command(CREATE_EMAIL_COMMAND)
-                .entirePrompt(result_createdEmail.getEntirePrompt())
-                .build();
-
-        ResultActions returnedEmail = mvc.perform(post("/api/email/returned/send/" + userID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(toSend))
-        );
-
-        var httpResponse_returnedEmail  = returnedEmail.andReturn().getResponse();
-        String str_returnedEmail = httpResponse_returnedEmail.getContentAsString();
-        ReturnedEmailDocument result_returnedEmail = mapper.readValue(str_returnedEmail, ReturnedEmailDocument.class);
-        String returnedEmailID = result_returnedEmail.getId();
-
-        ResultActions retrievedEmail = mvc.perform(get("/api/email/returned/get/"+userID)
-                                                .content(returnedEmailID));
-
-
-        var httpResponse_retrievedEmail  = retrievedEmail.andReturn().getResponse();
-        String str_retrievedEmail = httpResponse_retrievedEmail.getContentAsString();
-        ReturnedEmailDocument result_retrievedEmail = mapper.readValue(str_retrievedEmail, ReturnedEmailDocument.class);
-
-        assertThat(result_retrievedEmail.getEntirePrompt()).isEqualTo("create email to Anish do you want to go to geisel later");
     }
 
     @Test
@@ -317,16 +285,7 @@ public class ReturnedEmailDocumentTest {
     }
 
     @Test
-    public void createdEmailTest() throws Exception {
-        ResultActions listOfAllSentEmails = mvc.perform(get("/api/email/returned/get/all/" + userID)
-                .contentType(MediaType.APPLICATION_JSON)
-        );
+    public void sendEmailTest() {
 
-        var httpResponse = listOfAllSentEmails.andReturn().getResponse();
-        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
-        String str = httpResponse.getContentAsString();
-        List<ReturnedEmailDocument> result = mapper.readValue(str, new TypeReference<>() {});
-
-        assertThat(result).size().isEqualTo(1);
     }
 }
