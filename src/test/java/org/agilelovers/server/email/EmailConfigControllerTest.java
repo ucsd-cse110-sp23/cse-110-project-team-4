@@ -198,4 +198,45 @@ public class EmailConfigControllerTest {
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));
     }
+
+    @Test
+    public void saveBadEmailPasswordTest() throws Exception {
+        configDocument.setEmailPassword("badPassword");
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
+    @Test
+    public void saveNullDisplayNameTest() throws Exception {
+        configDocument.setDisplayName(null);
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
+    @Test
+    public void saveNullLastNameTest() throws Exception {
+        configDocument.setLastName(null);
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
+    @Test
+    public void saveNullFirstNameTest() throws Exception {
+        configDocument.setFirstName(null);
+
+        mvc.perform(post("/api/email/config/save/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(configDocument))
+                ).andExpect(status().is(406));
+    }
+
 }
