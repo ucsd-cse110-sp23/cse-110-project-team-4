@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.documents.EmailConfigDocument;
 import org.agilelovers.common.models.EmailConfigModel;
 import org.agilelovers.server.common.errors.EmailAuthenticationError;
 import org.agilelovers.server.common.errors.EmailSetupError;

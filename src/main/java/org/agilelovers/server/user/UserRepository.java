@@ -1,5 +1,6 @@
 package org.agilelovers.server.user;
 
+import org.agilelovers.common.documents.UserDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

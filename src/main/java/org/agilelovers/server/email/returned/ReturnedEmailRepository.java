@@ -1,5 +1,6 @@
 package org.agilelovers.server.email.returned;
 
+import org.agilelovers.common.documents.ReturnedEmailDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

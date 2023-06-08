@@ -6,7 +6,7 @@ import org.agilelovers.common.models.EmailConfigModel;
 import org.agilelovers.server.Server;
 import org.agilelovers.server.email.config.EmailConfigRepository;
 import org.agilelovers.common.models.SecureUserModel;
-import org.agilelovers.server.email.config.EmailConfigDocument;
+import org.agilelovers.common.documents.EmailConfigDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.junit.After;
 import org.junit.Before;

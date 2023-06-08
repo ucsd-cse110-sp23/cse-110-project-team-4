@@ -1,7 +1,7 @@
 package org.agilelovers.server.common;
 
-import org.agilelovers.server.email.returned.ReturnedEmailDocument;
-import org.agilelovers.server.email.config.EmailConfigDocument;
+import org.agilelovers.common.documents.ReturnedEmailDocument;
+import org.agilelovers.common.documents.EmailConfigDocument;
 
 import javax.mail.Message;
 import javax.mail.Session;

@@ -1,5 +1,6 @@
 package org.agilelovers.server.user;
 
+import org.agilelovers.common.documents.UserDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

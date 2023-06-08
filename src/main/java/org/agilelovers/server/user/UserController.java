@@ -1,15 +1,14 @@
 package org.agilelovers.server.user;
 
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.documents.UserDocument;
 import org.agilelovers.common.models.UserModel;
 import org.agilelovers.server.common.errors.NotAuthorizedError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.common.models.ReducedUserModel;
 import org.agilelovers.common.models.SecureUserModel;
-import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 

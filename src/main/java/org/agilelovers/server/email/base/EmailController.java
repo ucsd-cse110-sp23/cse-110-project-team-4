@@ -4,12 +4,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.documents.EmailDocument;
 import org.agilelovers.common.models.EmailModel;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.common.errors.NoEmailFound;
 import org.agilelovers.server.email.returned.ReturnedEmailRepository;
-import org.agilelovers.server.user.UserDocument;
+import org.agilelovers.common.documents.UserDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
