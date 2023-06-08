@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.agilelovers.common.documents.QuestionDocument;
+import org.agilelovers.common.models.QuestionModel;
 import org.agilelovers.common.models.ReducedUserModel;
 import org.agilelovers.common.models.SecureUserModel;
 import org.agilelovers.server.Server;
@@ -59,6 +60,9 @@ public class QuestionControllerTest {
         this.EMAIL_PASSWORD = env.get("EMAIL_PASSWORD");
     }
 
+    /**
+     * Create a user before each test
+     */
     @Before
     public void setup () throws Exception{
         user = SecureUserModel.builder()
@@ -73,14 +77,23 @@ public class QuestionControllerTest {
         );
     }
 
+    /**
+     * Reset the database after each test so its state is clean
+     */
     @After
     public void resetDb() {
         questionRepository.deleteAll();
         userRepository.deleteAll();
     }
 
+    /**
+     * UNIT TEST
+     * 1. Creates a question and adds it to the database
+     * Assert that the question is in the database
+     * @throws Exception
+     */
     @Test
-    public void getAllQuestions() throws Exception {
+    public void test_CreateASingleQuestion() throws Exception {
         ResultActions userFromGet = mvc.perform(get("/api/user/sign_in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user)));
@@ -89,24 +102,78 @@ public class QuestionControllerTest {
         //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
         String str = httpResponse.getContentAsString();
         ReducedUserModel result = mapper.readValue(str, ReducedUserModel.class);
-        String id = result.getId();;
+        String userId = result.getId();
 
         String prompt_1 = "question How far away is the sun from the Earth";
-        mvc.perform(post("/api/question/post/" + id)
+        QuestionModel prompt_model1 = QuestionModel.builder()
+                .prompt(prompt_1)
+                .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(prompt_1));
+                .content(mapper.writeValueAsString(prompt_model1)));
+
+        ResultActions grabAllQuestionsInDatabase = mvc.perform(get("/api/question/get/all/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        var mvcResult = grabAllQuestionsInDatabase.andReturn().getResponse();
+        String responseContent = mvcResult.getContentAsString();
+        List<QuestionDocument> listOfQuestions = mapper.readValue(responseContent,
+                new TypeReference<List<QuestionDocument>>() {});
+
+        assertThat(listOfQuestions.size() == 1);
+        assertThat(listOfQuestions.get(0)).extracting(QuestionDocument::getEntirePrompt)
+                .isEqualTo("question How far away is the sun from the Earth");
+    }
+
+    /**
+     * UNIT TEST
+     * 1. Creates 3 questions and adds it to the database
+     * Assert that all three questions are in the database
+     * Assert that all questions in the database match the original questions
+     * @throws Exception
+     */
+    @Test
+    public void test_GetAllQuestions() throws Exception {
+        ResultActions userFromGet = mvc.perform(get("/api/user/sign_in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)));
+
+        var httpResponse = userFromGet.andReturn().getResponse();
+        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
+        String str = httpResponse.getContentAsString();
+        ReducedUserModel result = mapper.readValue(str, ReducedUserModel.class);
+        String userId = result.getId();;
+
+        String prompt_1 = "question How far away is the sun from the Earth";
+        QuestionModel prompt_model1 = QuestionModel.builder()
+                        .prompt(prompt_1)
+                        .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(prompt_model1)));
 
         String prompt_2 = "question How many apples should I eat a day";
-        mvc.perform(post("/api/question/post/" + id)
+        QuestionModel prompt_model2 = QuestionModel.builder()
+                .prompt(prompt_2)
+                .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(prompt_2));
+                .content(mapper.writeValueAsString(prompt_model2)));
 
         String prompt_3 = "question How many grams does the average potato weigh";
-        mvc.perform(post("/api/question/post/" + id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(prompt_3));
+        QuestionModel prompt_model3 = QuestionModel.builder()
+                .prompt(prompt_3)
+                .build();
 
-        ResultActions grabAllQuestionsInDatabase = mvc.perform(get("/api/question/get/all/" + id)
+        mvc.perform(post("/api/question/post/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(prompt_model3)));
+
+        ResultActions grabAllQuestionsInDatabase = mvc.perform(get("/api/question/get/all/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
         );
         var mvcResult = grabAllQuestionsInDatabase.andReturn().getResponse();
@@ -114,12 +181,120 @@ public class QuestionControllerTest {
         List<QuestionDocument> listOfQuestions = mapper.readValue(responseContent,
                                                 new TypeReference<List<QuestionDocument>>() {});
 
-//        assertThat(listOfQuestions.get(0)).extracting(QuestionDocument::getEntirePrompt)
-//                .isEqualTo("question How far away is the sun from the Earth");
-//        assertThat(listOfQuestions.get(1)).extracting(QuestionDocument::getEntirePrompt)
-//                .isEqualTo("question How many apples should I eat a day");
-//        assertThat(listOfQuestions.get(2)).extracting(QuestionDocument::getEntirePrompt)
-//                .isEqualTo("question How many grams does the average potato weigh");
+        assertThat(listOfQuestions.get(0)).extracting(QuestionDocument::getEntirePrompt)
+                .isEqualTo("question How far away is the sun from the Earth");
+        assertThat(listOfQuestions.get(1)).extracting(QuestionDocument::getEntirePrompt)
+                .isEqualTo("question How many apples should I eat a day");
+        assertThat(listOfQuestions.get(2)).extracting(QuestionDocument::getEntirePrompt)
+                .isEqualTo("question How many grams does the average potato weigh");
+    }
+
+    /**
+     * UNIT TEST
+     * 1. Creates 1 question and adds it to the database
+     * 2. Deletes all questions from the database
+     * Assert that the database is empty
+     * @throws Exception
+     */
+    @Test
+    public void test_deleteAQuestion() throws Exception {
+        ResultActions userFromGet = mvc.perform(get("/api/user/sign_in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)));
+
+        var httpResponse = userFromGet.andReturn().getResponse();
+        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
+        String str = httpResponse.getContentAsString();
+        ReducedUserModel result = mapper.readValue(str, ReducedUserModel.class);
+        String userId = result.getId();
+
+        String prompt_1 = "question How far away is the sun from the Earth";
+        QuestionModel prompt_model1 = QuestionModel.builder()
+                .prompt(prompt_1)
+                .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(prompt_model1)));
+
+        ResultActions grabAllQuestionsInDatabase = mvc.perform(get("/api/question/get/all/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        var mvcResult = grabAllQuestionsInDatabase.andReturn().getResponse();
+        String responseContent = mvcResult.getContentAsString();
+        List<QuestionDocument> listOfQuestions = mapper.readValue(responseContent,
+                new TypeReference<List<QuestionDocument>>() {});
+
+        assertThat(listOfQuestions.size() == 1);
+        assertThat(listOfQuestions.get(0)).extracting(QuestionDocument::getEntirePrompt)
+                .isEqualTo("question How far away is the sun from the Earth");
+
+        mvc.perform(delete("/api/question/delete/" + userId)
+                .content(listOfQuestions.get(0).getId())
+        );
+
+        assertThat(listOfQuestions.size() == 0);
+    }
+
+    /**
+     * UNIT TEST
+     * 1. Creates 3 questions and adds it to the database
+     * 2. Deletes all questions from the database
+     * Assert that the database is empty
+     * @throws Exception
+     */
+    @Test
+    public void test_DeleteAllQuestionsFromSpecificUser() throws Exception {
+        ResultActions userFromGet = mvc.perform(get("/api/user/sign_in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)));
+
+        var httpResponse = userFromGet.andReturn().getResponse();
+        //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
+        String str = httpResponse.getContentAsString();
+        ReducedUserModel result = mapper.readValue(str, ReducedUserModel.class);
+        String userId = result.getId();;
+
+        String prompt_1 = "question How far away is the sun from the Earth";
+        QuestionModel prompt_model1 = QuestionModel.builder()
+                .prompt(prompt_1)
+                .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(prompt_model1)));
+
+        String prompt_2 = "question How many apples should I eat a day";
+        QuestionModel prompt_model2 = QuestionModel.builder()
+                .prompt(prompt_2)
+                .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(prompt_model2)));
+
+        String prompt_3 = "question How many grams does the average potato weigh";
+        QuestionModel prompt_model3 = QuestionModel.builder()
+                .prompt(prompt_3)
+                .build();
+
+        mvc.perform(post("/api/question/post/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(prompt_model3)));
+
+        ResultActions grabAllQuestionsInDatabase = mvc.perform(get("/api/question/get/all/" + userId)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        var mvcResult = grabAllQuestionsInDatabase.andReturn().getResponse();
+        String responseContent = mvcResult.getContentAsString();
+        List<QuestionDocument> listOfQuestions = mapper.readValue(responseContent,
+                new TypeReference<List<QuestionDocument>>() {});
+
+        assertThat(listOfQuestions.size() == 3);
+
+        mvc.perform(delete("/api/question/delete/all/" + userId));
+        assertThat(listOfQuestions.size() == 0);
     }
 
 }

@@ -108,7 +108,7 @@ public class UserControllerTest {
         mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
-                .andExpect(status().is(406)); // Expecting a 404 error
+                .andExpect(status().is(406)); // Expecting a 406 error
     }
 
     /**
