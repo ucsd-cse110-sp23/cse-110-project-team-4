@@ -14,9 +14,6 @@ import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @RestController
 @RequestMapping("/api/assistant")
 @ApiOperation("Assistant API")
@@ -40,13 +37,14 @@ public class AssistantController {
             return CommandType.SETUP_EMAIL;
         else if (transcription.startsWith(CommandIdentifier.CREATE_EMAIL_COMMAND) | transcription.equals(CommandIdentifier.CREATE_EMAIL_COMMAND))
             return CommandType.CREATE_EMAIL;
-        else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND))
+        else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND) | transcription.startsWith("setup " +
+                "email"))
             return CommandType.SEND_EMAIL;
-        else return null;
+        else return CommandType.INVALID;
     }
 
     private String getCommandArguments(String command, String transcription) {
-        if (command == null ||
+        if (command.equals(CommandType.INVALID) ||
                 command.equals(CommandType.SETUP_EMAIL) ||
                 command.equals(CommandType.DELETE_PROMPT) ||
                 command.equals(CommandType.CLEAR_ALL)) return null;
@@ -65,29 +63,23 @@ public class AssistantController {
 
         result = transcription.substring(starting_index + 1).strip();
 
-        if (command.equals(CommandType.SEND_EMAIL)) emailReformat(result);
+        if (command.equals(CommandType.SEND_EMAIL)) result = emailReformat(result);
 
         return result;
     }
 
     private static String emailReformat(String result) {
-        // Regular expression pattern to match "at" and "dot" representations
-        Pattern pattern = Pattern.compile("\b(at|dot)\b", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(result);
+        System.out.println(result);
 
-        // Perform replacements
-        StringBuffer buffer = new StringBuffer();
-        while (matcher.find()) {
-            String match = matcher.group();
-            if (match.equalsIgnoreCase("at")) {
-                matcher.appendReplacement(buffer, "@");
-            } else if (match.equalsIgnoreCase("dot")) {
-                matcher.appendReplacement(buffer, ".");
-            }
+        if (result.lastIndexOf(" ") == -1) return result;
+        int lastAtBeforeSpaceIndex = result.substring(0, result.lastIndexOf(" ")).lastIndexOf("at");
+        if (lastAtBeforeSpaceIndex != -1) {
+            result = result.substring(0, lastAtBeforeSpaceIndex) + "@" + result.substring(lastAtBeforeSpaceIndex + 2);
         }
-        matcher.appendTail(buffer);
 
-        return buffer.toString().replace(" ", "");
+        result = result.replaceAll(" ", "");
+        System.out.println(result);
+        return result;
     }
 
     @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will " +
@@ -109,6 +101,10 @@ public class AssistantController {
 
             String command = getCommand(transcription);
             String command_arguments = getCommandArguments(command, transcription);
+
+            if (command.equals(CommandType.SEND_EMAIL)) {
+                transcription = CommandIdentifier.SEND_EMAIL_COMMAND + " " + command_arguments;
+            }
 
             return AssistantResponseModel.builder()
                     .transcribed(transcription)
