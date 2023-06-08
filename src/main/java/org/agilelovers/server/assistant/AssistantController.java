@@ -14,9 +14,6 @@ import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @RestController
 @RequestMapping("/api/assistant")
 @ApiOperation("Assistant API")
@@ -72,23 +69,17 @@ public class AssistantController {
     }
 
     private static String emailReformat(String result) {
-        // Regular expression pattern to match "at" and "dot" representations
-        Pattern pattern = Pattern.compile("\b(at|dot)\b", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(result);
+        System.out.println(result);
 
-        // Perform replacements
-        StringBuilder buffer = new StringBuilder();
-        while (matcher.find()) {
-            String match = matcher.group();
-            if (match.equalsIgnoreCase("at")) {
-                matcher.appendReplacement(buffer, "@");
-            } else if (match.equalsIgnoreCase("dot")) {
-                matcher.appendReplacement(buffer, ".");
-            }
+        if (result.lastIndexOf(" ") == -1) return result;
+        int lastAtBeforeSpaceIndex = result.substring(0, result.lastIndexOf(" ")).lastIndexOf("at");
+        if (lastAtBeforeSpaceIndex != -1) {
+            result = result.substring(0, lastAtBeforeSpaceIndex) + "@" + result.substring(lastAtBeforeSpaceIndex + 2);
         }
-        matcher.appendTail(buffer);
 
-        return buffer.toString().replace(" ", "");
+        result = result.replaceAll(" ", "");
+        System.out.println(result);
+        return result;
     }
 
     @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will " +
@@ -110,6 +101,10 @@ public class AssistantController {
 
             String command = getCommand(transcription);
             String command_arguments = getCommandArguments(command, transcription);
+
+            if (command.equals(CommandType.SEND_EMAIL)) {
+                transcription = command + " " + command_arguments;
+            }
 
             return AssistantResponseModel.builder()
                     .transcribed(transcription)

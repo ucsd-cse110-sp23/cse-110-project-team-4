@@ -96,7 +96,7 @@ public class ReturnedEmailController {
             return returnedEmailRepository.save(ReturnedEmailDocument.builder()
                     .userId(uid)
                     .entirePrompt(emailInfo.getEntirePrompt())
-                    .confirmationOfEmailSent("Please select an email draft to send")
+                    .confirmationOfEmailSent("Error: Please select an email draft to send")
                     .build()
             );
         }
