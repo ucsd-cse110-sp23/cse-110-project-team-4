@@ -1,4 +1,4 @@
-package org.agilelovers.server.question;
+package org.agilelovers.common.documents;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

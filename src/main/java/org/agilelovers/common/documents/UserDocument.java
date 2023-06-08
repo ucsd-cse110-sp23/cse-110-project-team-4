@@ -1,11 +1,11 @@
-package org.agilelovers.server.user;
+package org.agilelovers.common.documents;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.agilelovers.server.email.config.EmailConfigDocument;
+import org.agilelovers.common.documents.EmailConfigDocument;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;

@@ -1,4 +1,4 @@
-package org.agilelovers.server.email.config;
+package org.agilelovers.common.documents;
 
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.Hidden;
