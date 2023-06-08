@@ -91,48 +91,4 @@ public class EmailController {
         emails.deleteAll(emails.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid)));
     }
-
-    @ApiOperation(value = "Send email", notes = "Sends email towards a specified user")
-    @PostMapping("/send/{uid}")
-    public ReturnedEmailDocument sendEmail(@PathVariable String uid,
-                                           @RequestBody @ApiParam(name = "email information",
-                                               value = "information required to send an email")
-                                           EmailData emailInfo) {
-
-        if (!users.existsById(uid))
-            throw new UserNotFoundError(uid);
-
-        if (!emailInfo.getCommand().equals(CREATE_EMAIL)){
-            return emailsSent.save(ReturnedEmailDocument.builder()
-                    .userId(emailInfo.getUserId())
-                    .entirePrompt(emailInfo.getEntirePrompt())
-                    .confirmationOfEmailSent("Please select an email draft to send")
-                    .build()
-            );
-        }
-
-        EmailDocument email = emails.findById(emailInfo.getSentId())
-                .orElseThrow(() -> new NoEmailFound(emailInfo.getSentId()));
-        UserDocument currentUser = this.users.findById(uid)
-                .orElseThrow(() -> new UserNotFoundError(uid));
-        UserEmailConfigDocument emailConfig = currentUser.getEmailInformation();
-
-        Properties props = new Properties();
-        props.put("mail.smtp.host", emailConfig.getSmtpHost());
-        props.put("mail.smtp.port", emailConfig.getTlsPort());
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-
-        javax.mail.Authenticator auth = new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(emailConfig.getEmail(), emailConfig.getEmailPassword());
-            }
-        };
-
-        Session session = Session.getInstance(props, auth);
-
-        return  emailsSent.save(EmailUtil.sendEmail(session, emailInfo.getRecipient(),  email.getBody(),
-                                emailConfig, emailInfo.getEntirePrompt()));
-
-    }
 }
