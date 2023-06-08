@@ -141,9 +141,9 @@ public class LoginController {
                 MainController.setUid(uid);
                 this.promptAutoLogin(uid);
                 SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | InterruptedException e) {
                 this.loginFailed();
             }
         });

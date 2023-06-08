@@ -40,11 +40,11 @@ public class AssistantController {
         else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND) | transcription.startsWith("setup " +
                 "email"))
             return CommandType.SEND_EMAIL;
-        else return null;
+        else return CommandType.INVALID;
     }
 
     private String getCommandArguments(String command, String transcription) {
-        if (command == null ||
+        if (command.equals(CommandType.INVALID) ||
                 command.equals(CommandType.SETUP_EMAIL) ||
                 command.equals(CommandType.DELETE_PROMPT) ||
                 command.equals(CommandType.CLEAR_ALL)) return null;
@@ -103,7 +103,7 @@ public class AssistantController {
             String command_arguments = getCommandArguments(command, transcription);
 
             if (command.equals(CommandType.SEND_EMAIL)) {
-                transcription = command + " " + command_arguments;
+                transcription = CommandIdentifier.SEND_EMAIL_COMMAND + " " + command_arguments;
             }
 
             return AssistantResponseModel.builder()
