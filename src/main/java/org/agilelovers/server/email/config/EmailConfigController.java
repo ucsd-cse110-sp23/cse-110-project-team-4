@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.models.EmailConfigModel;
 import org.agilelovers.server.common.errors.EmailAuthenticationError;
 import org.agilelovers.server.common.errors.EmailSetupError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
@@ -41,9 +42,10 @@ public class EmailConfigController {
 
 
     @ApiOperation(value = "Email configuration", notes = "Set up email configurations to be able to send emails")
-    @PostMapping("/post/{uid}")
+    @PostMapping("/save/{uid}")
+    @PutMapping("/update/{uid}")
     public EmailConfigDocument saveEmailConfig(@RequestBody @ApiParam(name = "User Email Configuration",
-                                                value = "information relating to user email config") EmailConfigDocument emailConfig,
+                                                value = "information relating to user email config") EmailConfigModel emailConfig,
                                                @PathVariable @ApiParam(name = "uid", value = "User ID") String uid){
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
@@ -62,17 +64,32 @@ public class EmailConfigController {
                     emailConfig.getEmailPassword());
             transport.close();
 
-            return emailConfigurations.save(EmailConfigDocument.builder()
-                    .userID(emailConfig.getUserID())
-                    .firstName(emailConfig.getFirstName())
-                    .lastName(emailConfig.getLastName())
-                    .email(emailConfig.getEmail())
-                    .emailPassword(emailConfig.getEmailPassword())
-                    .displayName(emailConfig.getDisplayName())
-                    .smtpHost(emailConfig.getSmtpHost())
-                    .tlsPort(emailConfig.getTlsPort())
-                    .build()
+            return emailConfigurations.findByUserID(uid).map(
+                    emailConfigDocument -> {
+                        emailConfigDocument.setFirstName(emailConfig.getFirstName());
+                        emailConfigDocument.setLastName(emailConfig.getLastName());
+                        emailConfigDocument.setEmail(emailConfig.getEmail());
+                        emailConfigDocument.setEmailPassword(emailConfig.getEmailPassword());
+                        emailConfigDocument.setDisplayName(emailConfig.getDisplayName());
+                        emailConfigDocument.setSmtpHost(emailConfig.getSmtpHost());
+                        emailConfigDocument.setTlsPort(emailConfig.getTlsPort());
+                        return emailConfigurations.save(emailConfigDocument);
+                    }
+            ).orElse(
+                emailConfigurations.save(EmailConfigDocument.builder()
+                        .userID(uid)
+                        .firstName(emailConfig.getFirstName())
+                        .lastName(emailConfig.getLastName())
+                        .email(emailConfig.getEmail())
+                        .emailPassword(emailConfig.getEmailPassword())
+                        .displayName(emailConfig.getDisplayName())
+                        .smtpHost(emailConfig.getSmtpHost())
+                        .tlsPort(emailConfig.getTlsPort())
+                        .build()
+                )
             );
+
+
         } catch (AuthenticationFailedException e) {
             throw new EmailAuthenticationError(
                     emailConfig.getEmail(),

@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.agilelovers.server.Server;
 import org.agilelovers.server.email.config.EmailConfigRepository;
-import org.agilelovers.server.user.models.ReducedUser;
-import org.agilelovers.server.user.models.SecureUser;
-import org.agilelovers.server.user.models.UserDocument;
+import org.agilelovers.common.models.ReducedUserModel;
+import org.agilelovers.common.models.SecureUserModel;
 import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.junit.After;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class UserControllerTest {
     public void createUserTest() throws Exception {
         String username = "testing@test.com";
         String password = "getplaintext";
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(username)
                 .password(password)
                 .apiPassword(API_KEY)
@@ -101,7 +100,7 @@ public class UserControllerTest {
         String invalidUsername = "nosign.com";
         String password = "plaintext";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(invalidUsername)
                 .password(password)
                 .apiPassword(API_KEY)
@@ -124,7 +123,7 @@ public class UserControllerTest {
         String validUsername = "good@username.com";
         String invalidPassword = "";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(validUsername)
                 .password(invalidPassword)
                 .apiPassword(API_KEY)
@@ -147,7 +146,7 @@ public class UserControllerTest {
         String invalidUsername = "";
         String validPassword = "greatpasswordnothackableatall";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(invalidUsername)
                 .password(validPassword)
                 .apiPassword(API_KEY)
@@ -170,7 +169,7 @@ public class UserControllerTest {
         String invalidUsername = "";
         String invalidPassword = "";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(invalidUsername)
                 .password(invalidPassword)
                 .apiPassword(API_KEY)
@@ -194,7 +193,7 @@ public class UserControllerTest {
         String username = "testing@get.com";
         String password = "getplaintext";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(username)
                 .password(password)
                 .apiPassword(API_KEY)
@@ -215,10 +214,10 @@ public class UserControllerTest {
         //turn HttpResponse JSON content into string to pass into JsonUtil.fromJson
         String str = httpResponse.getContentAsString();
 
-        ReducedUser result = mapper.readValue(str, ReducedUser.class);
+        ReducedUserModel result = mapper.readValue(str, ReducedUserModel.class);
 
         //Perform assertions to verify the retrieved user
-        assertThat(result).extracting(ReducedUser::getUsername).isEqualTo(username);
+        assertThat(result).extracting(ReducedUserModel::getUsername).isEqualTo(username);
     }
 
     /**
@@ -233,7 +232,7 @@ public class UserControllerTest {
         String invalidUser = "wrong@user.com";
         String password = "getplaintext";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(username)
                 .password(password)
                 .apiPassword(API_KEY)
@@ -267,7 +266,7 @@ public class UserControllerTest {
         String password = "getplaintext";
         String emptyUser = "";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(username)
                 .password(password)
                 .apiPassword(API_KEY)
@@ -302,7 +301,7 @@ public class UserControllerTest {
         String validUsername = "good@username.com";
         String validPassword = "greatpasswordnothackableatall";
 
-        SecureUser user = SecureUser.builder()
+        SecureUserModel user = SecureUserModel.builder()
                 .username(validUsername)
                 .password(validPassword)
                 .apiPassword(API_KEY)
@@ -332,13 +331,13 @@ public class UserControllerTest {
         String firstPassword = "greatpasswordnothackableatall";
         String secondPassword = "badpassword";
 
-        SecureUser user1 = SecureUser.builder()
+        SecureUserModel user1 = SecureUserModel.builder()
                 .username(validUsername)
                 .password(firstPassword)
                 .apiPassword(API_KEY)
                 .build();
 
-        SecureUser user2 = SecureUser.builder()
+        SecureUserModel user2 = SecureUserModel.builder()
                 .username(validUsername)
                 .password(secondPassword)
                 .apiPassword(API_KEY)
@@ -353,101 +352,6 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user2)))
                 .andExpect(status().is(406));
-    }
-
-
-    /**
-     * UNIT TEST
-     * 1. Creating a VALID user
-     * 2. POST the user to DB
-     * 3. find the user in DB
-     * 4. PUT (update) the user's email
-     * @throws Exception
-     */
-    @Test
-    public void updateEmailTest() throws Exception {
-        String username = "unsure_testing@test.com";
-        String email = "now_sure_testing@test.com";
-        String password = "plaintext";
-
-        SecureUser user = SecureUser.builder()
-                .username(username)
-                .password(password)
-                .apiPassword(API_KEY)
-                .build();
-
-        mvc.perform(post("/api/user/sign_up")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(user))
-        );
-
-        UserDocument found = userRepository.findByUsernameAndPassword(username, password)
-                .orElseThrow(TestAbortedException::new);
-
-        assertThat(found).extracting(UserDocument::getUsername).isEqualTo(username);
-        assertThat(found).extracting(UserDocument::getEmail).isNull();
-
-        String id = found.getId();
-        EmailConfigDocument emailConfig = EmailConfigDocument.builder()
-                .userID(id)
-                .firstName("Le Louie")
-                .lastName("Cai")
-                .email(email)
-                .emailPassword("password")
-                .displayName("Le Louie Cai")
-                .smtpHost("smtp.gmail.com")
-                .tlsPort("587")
-                .build();
-
-        mvc.perform(put("/api/user/update/email/" + id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(emailConfig))
-        );
-
-        found = userRepository.findById(id)
-                .orElseThrow(TestAbortedException::new);
-
-        assertThat(found).extracting(UserDocument::getUsername).isEqualTo(username);
-        assertThat(found).extracting(UserDocument::getEmail).isEqualTo(email);
-    }
-
-    /**
-     * 1. Creating a VALID user with VALID email
-     * 2. POST the user to DB
-     * 3. find the user in DB
-     * 4. PUT (update) the user's email with an INVALID email
-     * Asserts: Expects an invalid email error
-     * @throws Exception
-     */
-    @Test
-    public void updateEmailInvalidEmailTest() throws Exception {
-        String username = "testing@user.com";
-        String email = "testing@email.com";
-        String invalidEmail = "invalidemail";
-        String password = "plaintext";
-
-        SecureUser user = SecureUser.builder()
-                .username(username)
-                .password(password)
-                .email(email)
-                .apiPassword(API_KEY)
-                .build();
-
-        mvc.perform(post("/api/user/sign_up")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(user))
-        );
-
-        UserDocument found = userRepository.findByUsernameAndPassword(username, password)
-                .orElseThrow(TestAbortedException::new);
-
-        assertThat(found).extracting(UserDocument::getUsername).isEqualTo(username);
-
-        String id = found.getId();
-
-        mvc.perform(put("/api/user/update/email/" + id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidEmail)).andExpect(status().isBadRequest());
     }
 }
 

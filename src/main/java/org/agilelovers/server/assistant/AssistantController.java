@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.agilelovers.common.CommandIdentifier;
 import org.agilelovers.common.CommandType;
+import org.agilelovers.common.models.AssistantResponseModel;
 import org.agilelovers.server.common.errors.NoAudioError;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.user.UserRepository;
@@ -71,8 +72,8 @@ public class AssistantController {
             @ApiResponse(code = 406, message = "The audio file doesn't have any transcribe-able audio or its empty")
     })
     @PostMapping("/ask/{uid}")
-    public AssistantData transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
-                                           @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
+    public AssistantResponseModel transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
+                                                    @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
@@ -84,7 +85,7 @@ public class AssistantController {
             String command = getCommand(transcription);
             String command_arguments = getCommandArguments(command, transcription);
 
-            return AssistantData.builder()
+            return AssistantResponseModel.builder()
                     .transcribed(transcription)
                     .command(command)
                     .command_arguments(command_arguments)

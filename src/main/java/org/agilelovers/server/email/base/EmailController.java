@@ -4,11 +4,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.models.EmailModel;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.common.errors.NoEmailFound;
 import org.agilelovers.server.email.returned.ReturnedEmailRepository;
-import org.agilelovers.server.user.models.UserDocument;
+import org.agilelovers.server.user.UserDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +21,11 @@ public class EmailController {
 
     private final UserRepository users;
     private final EmailRepository emails;
-    private final ReturnedEmailRepository emailsSent;
     private final OpenAIClient client;
 
     public EmailController(EmailRepository emails, UserRepository users, ReturnedEmailRepository emailsSent) {
         this.emails = emails;
         this.users = users;
-        this.emailsSent = emailsSent;
         this.client = new OpenAIClient();
     }
 
@@ -51,17 +50,17 @@ public class EmailController {
     @PostMapping("/post/{uid}")
     public EmailDocument createEmail(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
                                      @RequestBody @ApiParam(name = "prompt",
-                                             value = "Email prompt used to generate the email body") String prompt) {
+                                             value = "Email prompt used to generate the email body") EmailModel emailModel) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
         UserDocument user = users.findById(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
-        String body = this.client.getAnswer(prompt);
+        String body = this.client.getAnswer(emailModel.getPrompt());
 
         return emails.save(EmailDocument.builder()
-                .entirePrompt(prompt)
+                .entirePrompt(emailModel.getPrompt())
                 .body(body + "\n " + user.getEmailInformation().getDisplayName())
                 .userId(uid)
                 .build()

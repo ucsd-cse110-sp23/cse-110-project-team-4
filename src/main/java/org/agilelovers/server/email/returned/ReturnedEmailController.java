@@ -7,12 +7,12 @@ import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.EmailUtil;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.common.errors.NoEmailFound;
-import org.agilelovers.server.email.base.EmailData;
+import org.agilelovers.common.models.ReturnedEmailModel;
 import org.agilelovers.server.email.base.EmailDocument;
 import org.agilelovers.server.email.base.EmailRepository;
 import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.agilelovers.server.user.UserRepository;
-import org.agilelovers.server.user.models.UserDocument;
+import org.agilelovers.server.user.UserDocument;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.PasswordAuthentication;
@@ -84,14 +84,14 @@ public class ReturnedEmailController {
     public ReturnedEmailDocument sendEmail(@PathVariable String uid,
                                            @RequestBody @ApiParam(name = "email information",
                                                    value = "information required to send an email")
-                                           EmailData emailInfo) {
+                                           ReturnedEmailModel emailInfo) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
         if (!emailInfo.getCommand().equals(CREATE_EMAIL)){
             return returnedEmailRepository.save(ReturnedEmailDocument.builder()
-                    .userId(emailInfo.getUserId())
+                    .userId(uid)
                     .entirePrompt(emailInfo.getEntirePrompt())
                     .confirmationOfEmailSent("Please select an email draft to send")
                     .build()

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.models.QuestionModel;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.user.UserRepository;
 import org.agilelovers.server.common.errors.UserNotFoundError;
@@ -39,15 +40,15 @@ public class QuestionController {
     @PostMapping("/post/{uid}")
     public QuestionDocument createQuestion(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
                                            @RequestBody @ApiParam(name = "question",
-                                                   value = "Question to get the answer of") String entirePrompt) {
+                                                   value = "Question to get the answer of") QuestionModel questionModel) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        String answer = this.client.getAnswer(entirePrompt);
+        String answer = this.client.getAnswer(questionModel.getPrompt());
 
         return questions.save(QuestionDocument.builder()
-                .entirePrompt(entirePrompt)
+                .entirePrompt(questionModel.getPrompt())
                 .answer(answer)
                 .userId(uid)
                 .build()

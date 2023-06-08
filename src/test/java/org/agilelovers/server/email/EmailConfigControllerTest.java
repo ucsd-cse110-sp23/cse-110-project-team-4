@@ -1,11 +1,13 @@
-package org.agilelovers.server.user;
+package org.agilelovers.server.email;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.agilelovers.common.models.EmailConfigModel;
 import org.agilelovers.server.Server;
 import org.agilelovers.server.email.config.EmailConfigRepository;
-import org.agilelovers.server.user.models.SecureUser;
+import org.agilelovers.common.models.SecureUserModel;
 import org.agilelovers.server.email.config.EmailConfigDocument;
+import org.agilelovers.server.user.UserRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,8 +59,8 @@ public class EmailConfigControllerTest {
     @Autowired
     private EmailConfigRepository emailConfigRepository;
 
-    private SecureUser user;
-    private EmailConfigDocument configDocument;
+    private SecureUserModel user;
+    private EmailConfigModel configDocument;
 
     private String id;
 
@@ -73,7 +75,7 @@ public class EmailConfigControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        user = SecureUser.builder()
+        user = SecureUserModel.builder()
                 .username("cse110-test@anishgovind.com")
                 .password("password")
                 .apiPassword(API_KEY)
@@ -87,8 +89,7 @@ public class EmailConfigControllerTest {
         id = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword())
                 .orElseThrow(TestAbortedException::new).getId();
 
-        configDocument = EmailConfigDocument.builder()
-                .userID(id)
+        configDocument = EmailConfigModel.builder()
                 .firstName("cse110")
                 .lastName("testing")
                 .email(this.EMAIL_USERNAME)
@@ -117,7 +118,7 @@ public class EmailConfigControllerTest {
      */
     @Test
     public void saveEmailConfigTest() throws Exception {
-        mvc.perform(post("/api/email/config/post/" + id)
+        mvc.perform(post("/api/email/config/save/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
         );
@@ -136,7 +137,7 @@ public class EmailConfigControllerTest {
      */
     @Test
     public void getEmailConfigTest() throws Exception {
-        mvc.perform(post("/api/email/config/post/" + id)
+        mvc.perform(post("/api/email/config/save/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
         );
@@ -159,7 +160,7 @@ public class EmailConfigControllerTest {
 
     @Test
     public void getBadUserIdTest() throws Exception {
-        mvc.perform(post("/api/email/config/post/" + id)
+        mvc.perform(post("/api/email/config/save/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
         );
@@ -172,7 +173,7 @@ public class EmailConfigControllerTest {
     public void saveBadEmailTest() throws Exception {
         configDocument.setEmail("badEmail");
 
-        mvc.perform(post("/api/email/config/post/" + id)
+        mvc.perform(post("/api/email/config/save/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));
@@ -182,7 +183,7 @@ public class EmailConfigControllerTest {
     public void saveBadTLSPortTest() throws Exception {
         configDocument.setTlsPort("badPort");
 
-        mvc.perform(post("/api/email/config/post/" + id)
+        mvc.perform(post("/api/email/config/save/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));
@@ -192,7 +193,7 @@ public class EmailConfigControllerTest {
     public void saveBadSMTPHostTest() throws Exception {
         configDocument.setSmtpHost("badHost");
 
-        mvc.perform(post("/api/email/config/post/" + id)
+        mvc.perform(post("/api/email/config/save/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));

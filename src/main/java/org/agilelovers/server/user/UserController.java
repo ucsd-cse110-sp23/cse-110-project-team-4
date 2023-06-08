@@ -4,11 +4,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.models.UserModel;
 import org.agilelovers.server.common.errors.NotAuthorizedError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
-import org.agilelovers.server.user.models.ReducedUser;
-import org.agilelovers.server.user.models.SecureUser;
-import org.agilelovers.server.user.models.UserDocument;
+import org.agilelovers.common.models.ReducedUserModel;
+import org.agilelovers.common.models.SecureUserModel;
 import org.agilelovers.server.email.config.EmailConfigDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -33,48 +33,25 @@ public class UserController {
             @ApiResponse(code = 404, message = "User not found"),
     })
     @GetMapping("/sign_in")
-    public ReducedUser getUser(@RequestBody UserDocument user) {
+    public ReducedUserModel getUser(@RequestBody UserModel user) {
         UserDocument foundUser = users.findByUsernameAndPassword(user.getUsername(), user.getPassword())
                 .orElseThrow(() -> new UserNotFoundError(user.getUsername()));
 
-        return ReducedUser.builder()
+        return ReducedUserModel.builder()
                 .username(foundUser.getUsername())
-                .email(foundUser.getEmail())
                 .id(foundUser.getId())
                 .build();
     }
 
     @ApiOperation(value = "Sign up", notes = "Sign up with a username and password")
     @PostMapping("/sign_up")
-    public ReducedUser createUser(@RequestBody SecureUser user) {
+    public ReducedUserModel createUser(@RequestBody SecureUserModel user) {
         if (user.getApiPassword() != null && user.getApiPassword().equals(this.apiPassword)) {
             UserDocument savedUser = users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
-            return ReducedUser.builder()
+            return ReducedUserModel.builder()
                     .username(savedUser.getUsername())
-                    .email(savedUser.getEmail())
                     .id(savedUser.getId())
                     .build();
         } else throw new NotAuthorizedError();
-    }
-
-    @ApiOperation(value = "Update email", notes = "Update a user's email")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully updated a user's email"),
-            @ApiResponse(code = 404, message = "User not found"),
-    })
-    @PutMapping("/update/email/{uid}")
-    public ReducedUser updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") EmailConfigDocument emailDoc,
-                                   @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
-        return users.findById(uid)
-                .map(user -> {
-                    user.setEmail(emailDoc.getEmail());
-                    user.setEmailInformation(emailDoc);
-                    users.save(user);
-                    return ReducedUser.builder()
-                            .username(user.getUsername())
-                            .email(user.getEmail())
-                            .id(user.getId())
-                            .build();
-                }).orElseThrow(() -> new UserNotFoundError(uid));
     }
 }
