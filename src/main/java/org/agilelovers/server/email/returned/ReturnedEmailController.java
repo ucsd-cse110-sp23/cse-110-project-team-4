@@ -33,7 +33,8 @@ public class ReturnedEmailController {
     private final EmailRepository emails;
     private final ReturnedEmailRepository returnedEmailRepository;
     public ReturnedEmailController(UserRepository users,
-                                   EmailRepository emails, ReturnedEmailRepository returnedEmailRepository) {
+                                   EmailRepository emails,
+                                   ReturnedEmailRepository returnedEmailRepository) {
         this.users = users;
         this.emails = emails;
         this.returnedEmailRepository = returnedEmailRepository;
@@ -76,7 +77,7 @@ public class ReturnedEmailController {
             @ApiResponse(code = 404, message = "User not found")
     })
     @DeleteMapping("/delete/all/{uid}")
-    public void deleteAllQuestionsFromUser(@PathVariable String uid) {
+    public void deleteAllReturnedEmailsFromUser(@PathVariable String uid) {
         returnedEmailRepository.deleteAll(returnedEmailRepository.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid)));
     }
