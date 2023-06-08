@@ -181,6 +181,7 @@ public class QuestionControllerTest {
         List<QuestionDocument> listOfQuestions = mapper.readValue(responseContent,
                                                 new TypeReference<List<QuestionDocument>>() {});
 
+        assertThat(listOfQuestions.size()).isEqualTo(3);
         assertThat(listOfQuestions.get(0)).extracting(QuestionDocument::getEntirePrompt)
                 .isEqualTo("question How far away is the sun from the Earth");
         assertThat(listOfQuestions.get(1)).extracting(QuestionDocument::getEntirePrompt)
