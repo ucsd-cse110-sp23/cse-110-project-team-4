@@ -6,12 +6,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.MainApplication;
 import org.agilelovers.ui.enums.SceneType;
-import org.agilelovers.ui.object.Command;
-import org.agilelovers.ui.object.EmailDraft;
-import org.agilelovers.ui.object.Prompt;
-import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.object.*;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
 
@@ -60,7 +58,6 @@ public class MainController {
 
     protected boolean isRecording = false;
 
-    // TODO: chronological ordering
     @FXML
     private void initialize() {
         System.out.println("Initializing Main Controller");
@@ -70,7 +67,7 @@ public class MainController {
         answerTextArea.setEditable(false);
         Platform.runLater(() -> {
             try {
-                pastPrompts.addAll(FrontEndAPIUtils.fetchQuestionHistory(MainController.uid));
+                pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.QUESTION_COMMAND, MainController.uid));
                 pastPrompts.sort(null);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -78,7 +75,15 @@ public class MainController {
         });
         Platform.runLater(() -> {
             try {
-                pastPrompts.addAll(FrontEndAPIUtils.fetchEmailHistory(MainController.uid));
+                pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.CREATE_EMAIL_COMMAND, MainController.uid));
+                pastPrompts.sort(null);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Platform.runLater(() -> {
+            try {
+                pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.SEND_EMAIL_COMMAND, MainController.uid));
                 pastPrompts.sort(null);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -202,7 +207,7 @@ public class MainController {
             case CLEAR_ALL -> clearAll();
             case SETUP_EMAIL -> setupEmail();
             case CREATE_EMAIL -> createEmail(command);
-            case SEND_EMAIL -> sendEmail();
+            case SEND_EMAIL -> sendEmail(command);
             default -> invalidCommand();
         }
     }
@@ -272,14 +277,21 @@ public class MainController {
 
         Platform.runLater(() -> {
             try {
-                FrontEndAPIUtils.clearAll(MainController.uid, true);
+                FrontEndAPIUtils.clearAll(Constants.QUESTION_COMMAND, MainController.uid);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
         Platform.runLater(() -> {
             try {
-                FrontEndAPIUtils.clearAll(MainController.uid, false);
+                FrontEndAPIUtils.clearAll(Constants.CREATE_EMAIL_COMMAND, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.clearAll(Constants.SEND_EMAIL_COMMAND, MainController.uid);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -315,15 +327,17 @@ public class MainController {
         this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 
-    private void sendEmail() throws IOException, InterruptedException {
+    private void sendEmail(Command command) throws IOException, InterruptedException {
         System.out.println("Send Email");
-//        Platform.runLater(() -> {
-//            try {
-//                FrontEndAPIUtils.sendEmail(MainController.uid);
-//            } catch (IOException | InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
+        Prompt currentPrompt = new ReturnedEmail(command.getTranscribed());
+
+        Platform.runLater(() -> {
+            FrontEndAPIUtils.sendEmail(command, currentPrompt.getCommand(), this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(), MainController.uid);
+        });
+
+        this.pastPrompts.remove(this.pastPrompts.size() - 1);
+        this.pastPrompts.add(currentPrompt);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 
 }

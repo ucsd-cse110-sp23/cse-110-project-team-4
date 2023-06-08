@@ -5,7 +5,7 @@ public class EmailConfig {
     private String lastName;
     private String displayName;
     private String email;
-    private String password;
+    private String emailPassword;
     private String smtpHost;
     private String tlsPort;
 
@@ -14,7 +14,7 @@ public class EmailConfig {
         this.lastName = lastName;
         this.displayName = displayName;
         this.email = email;
-        this.password = password;
+        this.emailPassword = password;
         this.smtpHost = smtpHost;
         this.tlsPort = tlsPort;
     }
@@ -35,8 +35,8 @@ public class EmailConfig {
         return email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getEmailPassword() {
+        return emailPassword;
     }
 
     public String getSmtpHost() {

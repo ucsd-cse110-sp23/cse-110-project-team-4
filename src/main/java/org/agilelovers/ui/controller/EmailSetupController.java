@@ -64,13 +64,13 @@ public class EmailSetupController {
      * Otherwise, fields are left blank.
      */
     @FXML
-    private void initialize() {
+    private void initialize() throws IOException, InterruptedException {
         EmailConfig config = FrontEndAPIUtils.getEmailConfig(MainController.getUid());
         firstNameField.setText(config.getFirstName());
         lastNameField.setText(config.getLastName());
         displayNameField.setText(config.getDisplayName());
         emailField.setText(config.getEmail());
-        passwordField.setText(config.getPassword());
+        passwordField.setText(config.getEmailPassword());
         smtpHostField.setText(config.getSmtpHost());
         tlsPortField.setText(config.getTlsPort());
     }
@@ -82,7 +82,7 @@ public class EmailSetupController {
      * @throws IOException
      */
     @FXML
-    public void saveInfo(ActionEvent event) throws IOException {
+    public void saveInfo(ActionEvent event) throws IOException, InterruptedException {
         EmailConfig config = new EmailConfig(firstNameField.getText(), lastNameField.getText(), displayNameField.getText(), emailField.getText(), passwordField.getText(), smtpHostField.getText(), tlsPortField.getText());
         FrontEndAPIUtils.setEmailConfig(config, MainController.getUid());
         SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);

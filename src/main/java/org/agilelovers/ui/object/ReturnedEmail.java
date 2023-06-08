@@ -2,10 +2,15 @@ package org.agilelovers.ui.object;
 
 import org.agilelovers.ui.Constants;
 
-public class EmailSent extends Prompt {
+public class ReturnedEmail extends Prompt {
     private String command = Constants.SEND_EMAIL_COMMAND;
     private String entirePrompt;
     private String confirmationOfEmailSent;
+
+    public ReturnedEmail(String transcribed) {
+        super();
+        entirePrompt = transcribed;
+    }
 
     @Override
     public void setTitle(String newTitle) {

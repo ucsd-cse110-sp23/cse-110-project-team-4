@@ -48,7 +48,7 @@ public class FrontEndAPIUtils {
      */
     public static UserCredential createAccount(String username, String password, String apiPassword)
             throws URISyntaxException, IOException, InterruptedException, IllegalArgumentException {
-        HttpRequest postRequest = HttpRequest.newBuilder().uri(new URI(Constants.SERVER_URL + Constants.USER_ENDPOINT))
+        HttpRequest postRequest = HttpRequest.newBuilder().uri(new URI(Constants.SERVER_URL + Constants.USER_ENDPOINT + Constants.SIGN_UP_REQUEST))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(new UserCredentialWithKey(username, password, null, null, apiPassword).toString()))
                 .build();
@@ -73,22 +73,22 @@ public class FrontEndAPIUtils {
      *
      * @param username username of the account
      * @param password password of the account
-     * @param id       id of the account
+     * @param userId       id of the account
      * @return the user credential of the account
      * @throws IOException              thrown if the request cannot be sent
      * @throws InterruptedException     thrown if the request is interrupted
      * @throws IllegalArgumentException thrown if the user credentials are invalid
      */
-    public static UserCredential login(String username, String password, String id) throws IOException,
+    public static UserCredential login(String username, String password, String userId) throws IOException,
             InterruptedException,
             IllegalArgumentException {
         // send a get request to the api endpoint
         HttpRequest getRequest =
-                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.USER_ENDPOINT))
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.USER_ENDPOINT + Constants.SIGN_IN_REQUEST))
                         .header("Content-Type", "application/json")
                         .method("GET",
                                 HttpRequest.BodyPublishers.ofString(
-                                        new UserCredential(username, password, null, id).toString()))
+                                        new UserCredential(username, password, null, userId).toString()))
                         .build();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -104,46 +104,23 @@ public class FrontEndAPIUtils {
     }
 
     /**
-     * Fetch question history list.
-     *
-     * @param id the id
-     * @return the list
-     * @throws IOException          the io exception
-     * @throws InterruptedException the interrupted exception
-     */
-    public static List<Prompt> fetchQuestionHistory(String id) throws IOException, InterruptedException {
-        HttpRequest getRequest = HttpRequest.newBuilder()
-                .uri(URI.create(Constants.SERVER_URL + Constants.QUESTION_ENDPOINT + id))
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200) {
-            System.err.println("Response code: " + response.statusCode());
-            System.err.println("Response body: " + response.body());
-            System.err.println(id);
-            throw new RuntimeException("Fetch history failed.");
-        }
-
-        Type listType = new TypeToken<List<Prompt>>() {
-        }.getType();
-        return new Gson().fromJson(response.body(), listType);
-    }
-
-    /**
      * Fetch email history list.
      *
-     * @param id the id
+     * @param userId the userId
      * @return the list
      * @throws IOException          the io exception
      * @throws InterruptedException the interrupted exception
      */
-    public static List<Prompt> fetchEmailHistory(String id) throws IOException, InterruptedException {
+    public static List<Prompt> fetchPromptHistory(String command, String userId) throws IOException, InterruptedException {
+        String endpoint = switch (command) {
+            case Constants.QUESTION_COMMAND -> Constants.QUESTION_ENDPOINT;
+            case Constants.CREATE_EMAIL_COMMAND -> Constants.EMAIL_ENDPOINT;
+            case Constants.SEND_EMAIL_COMMAND -> Constants.RETURNED_EMAIL_ENDPOINT;
+            default -> throw new IllegalArgumentException("Invalid prompt type.");
+        };
+
         HttpRequest getRequest = HttpRequest.newBuilder()
-                .uri(URI.create(Constants.SERVER_URL + Constants.EMAIL_ENDPOINT + id))
+                .uri(URI.create(Constants.SERVER_URL + endpoint + Constants.GET_ALL_REQUEST + userId))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -154,7 +131,7 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) {
             System.err.println("Response code: " + response.statusCode());
             System.err.println("Response body: " + response.body());
-            System.err.println(id);
+            System.err.println(userId);
             throw new RuntimeException("Fetch history failed.");
         }
 
@@ -163,8 +140,8 @@ public class FrontEndAPIUtils {
         return new Gson().fromJson(response.body(), listType);
     }
 
-    public static Prompt newPrompt(Command command, Prompt prompt, String uid) throws IOException, InterruptedException {
-        HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (command.getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_ENDPOINT : Constants.EMAIL_ENDPOINT) + uid))
+    public static Prompt newPrompt(Command command, Prompt prompt, String userId) throws IOException, InterruptedException {
+        HttpRequest postRequest = HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (command.getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_ENDPOINT : Constants.EMAIL_ENDPOINT) + Constants.POST_REQUEST + userId))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(command.getTranscribed()))
                 .build();
@@ -187,8 +164,15 @@ public class FrontEndAPIUtils {
     }
 
     public static void deletePrompt(Prompt prompt) throws IOException, InterruptedException {
+        String endpoint = switch (prompt.getCommand()) {
+            case Constants.QUESTION_COMMAND -> Constants.QUESTION_ENDPOINT;
+            case Constants.CREATE_EMAIL_COMMAND -> Constants.EMAIL_ENDPOINT;
+            case Constants.SEND_EMAIL_COMMAND -> Constants.RETURNED_EMAIL_ENDPOINT;
+            default -> throw new IllegalArgumentException("Invalid prompt type.");
+        };
+
         HttpRequest deleteRequest =
-                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (prompt.getCommand().equals(Constants.QUESTION_COMMAND) ? Constants.QUESTION_DELETION_ENDPOINT : Constants.EMAIL_DELETION_ENDPOINT) + prompt.getId()))
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + endpoint + Constants.DELETE_REQUEST + prompt.getId()))
                         .DELETE()
                         .build();
 
@@ -198,9 +182,16 @@ public class FrontEndAPIUtils {
         if (response.statusCode() != 200) throw new RuntimeException("Question deletion failed.");
     }
 
-    public static void clearAll(String uid, boolean isQuestion) throws IOException, InterruptedException {
+    public static void clearAll(String command, String uid) throws IOException, InterruptedException {
+        String endpoint = switch (command) {
+            case Constants.QUESTION_COMMAND -> Constants.QUESTION_ENDPOINT;
+            case Constants.CREATE_EMAIL_COMMAND -> Constants.EMAIL_ENDPOINT;
+            case Constants.SEND_EMAIL_COMMAND -> Constants.RETURNED_EMAIL_ENDPOINT;
+            default -> throw new IllegalArgumentException("Invalid prompt type.");
+        };
+
         HttpRequest deleteRequest =
-                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + (isQuestion ? Constants.DELETE_ALL_QUESTIONS_ENDPOINT : Constants.DELETE_ALL_EMAILS_ENDPOINT) + uid))
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + endpoint + Constants.DELETE_ALL_REQUEST + uid))
                         .DELETE()
                         .build();
 
@@ -211,21 +202,55 @@ public class FrontEndAPIUtils {
     }
 
     // TODO
-    public static Prompt sendEmail(Command command, Prompt prompt, String id, String uid) {
+    public static Prompt sendEmail(Command currentCommand, String command, String SentId, String userId) {
         // command is for email address
         // prompt is for checking valid email draft
-        return new EmailSent();
+        EmailInformation info = new EmailInformation(command, currentCommand.getTranscribed(), currentCommand.getCommand_arguments(), SentId);
+        HttpRequest sendRequest =
+                HttpRequest.newBuilder().uri(URI.create(Constants.SERVER_URL + Constants.RETURNED_EMAIL_ENDPOINT + Constants.SEND_REQUEST + userId))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(info)))
+                        .build();
+        return null;
+    }
+
+    public static EmailConfig getEmailConfig(String userId) throws IOException, InterruptedException {
+        HttpRequest getRequest = HttpRequest.newBuilder()
+                .uri(URI.create(Constants.SERVER_URL + Constants.EMAIL_CONFIGURATION_ENDPOINT + Constants.GET_REQUEST + userId))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse<String> response = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            System.err.println("Response code: " + response.statusCode());
+            System.err.println("Response body: " + response.body());
+            System.err.println(userId);
+            throw new RuntimeException("Fetch history failed.");
+        }
+
+        return new Gson().fromJson(response.body(), EmailConfig.class);
     }
 
     // TODO
-    public static EmailConfig getEmailConfig(String uid) {
-        String temp = "";
-        return new Gson().fromJson(temp, EmailConfig.class);
-    }
+    public static void setEmailConfig(EmailConfig config, String userId) throws IOException, InterruptedException {
+        HttpRequest postRequest = HttpRequest.newBuilder()
+                .uri(URI.create(Constants.SERVER_URL + Constants.EMAIL_CONFIGURATION_ENDPOINT + Constants.POST_REQUEST + userId))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(config)))
+                .build();
 
-    // TODO
-    public static void setEmailConfig(EmailConfig config, String uid) {
+        HttpClient client = HttpClient.newHttpClient();
 
+        HttpResponse<String> response = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            System.err.println("Response code: " + response.statusCode());
+            System.err.println("Response body: " + response.body());
+            System.err.println(userId);
+            throw new RuntimeException("Set email config failed.");
+        }
     }
 
     /**
