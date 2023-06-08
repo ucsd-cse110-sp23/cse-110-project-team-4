@@ -49,6 +49,20 @@ public class ExceptionAdvice {
         return err.getMessage();
     }
 
+    @ResponseBody
+    @ExceptionHandler(EmailSetupError.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String emailSetupErr(EmailSetupError err) {
+        return err.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(EmailAuthenticationError.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    String emailAuthError(EmailAuthenticationError err) {
+        return err.getMessage();
+    }
+
     // Mongo Writing Errors
     @ResponseBody
     @ExceptionHandler(MongoWriteException.class)

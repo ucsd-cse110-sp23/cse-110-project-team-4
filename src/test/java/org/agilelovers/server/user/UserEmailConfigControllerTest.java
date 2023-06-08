@@ -41,6 +41,11 @@ public class UserEmailConfigControllerTest {
 
     private final String API_KEY;
 
+    private final String EMAIL_USERNAME;
+    private final String EMAIL_PASSWORD;
+    private final String SMTP_HOST;
+    private final String TLS_PORT;
+
     private final static ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
@@ -58,13 +63,18 @@ public class UserEmailConfigControllerTest {
     private String id;
 
     public UserEmailConfigControllerTest() {
-        this.API_KEY = Dotenv.load().get("API_SECRET");
+        Dotenv env = Dotenv.load();
+        this.API_KEY = env.get("API_SECRET");
+        this.EMAIL_USERNAME = env.get("EMAIL_USERNAME");
+        this.EMAIL_PASSWORD = env.get("EMAIL_PASSWORD");
+        this.SMTP_HOST = env.get("SMTP_HOST");
+        this.TLS_PORT = env.get("TLS_PORT");
     }
 
     @Before
     public void setUp() throws Exception {
         user = SecureUser.builder()
-                .username("louie@cai.com")
+                .username("cse110-test@anishgovind.com")
                 .password("password")
                 .apiPassword(API_KEY)
                 .build();
@@ -79,13 +89,13 @@ public class UserEmailConfigControllerTest {
 
         configDocument = UserEmailConfigDocument.builder()
                 .userID(id)
-                .firstName("Louie")
-                .lastName("Cai")
-                .email("louie@cai.com")
-                .emailPassword("password")
-                .displayName("Louie Cai")
-                .smtpHost("smtp.gmail.com")
-                .tlsPort("587")
+                .firstName("cse110")
+                .lastName("testing")
+                .email(this.EMAIL_USERNAME)
+                .emailPassword(this.EMAIL_PASSWORD)
+                .displayName("CSE110")
+                .smtpHost(this.SMTP_HOST)
+                .tlsPort(this.TLS_PORT)
                 .build();
     }
 
@@ -107,7 +117,7 @@ public class UserEmailConfigControllerTest {
      */
     @Test
     public void saveEmailConfigTest() throws Exception {
-        mvc.perform(post("/api/email/config/post/{uid}", id)
+        mvc.perform(post("/api/email/config/post/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
         );
@@ -126,12 +136,12 @@ public class UserEmailConfigControllerTest {
      */
     @Test
     public void getEmailConfigTest() throws Exception {
-        mvc.perform(post("/api/email/config/post/{uid}", id)
+        mvc.perform(post("/api/email/config/post/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
         );
 
-        ResultActions grabUser =  mvc.perform(get("/api/email/config/get/{uid}", id)
+        ResultActions grabUser =  mvc.perform(get("/api/email/config/get/" + id)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
                         );
@@ -149,12 +159,12 @@ public class UserEmailConfigControllerTest {
 
     @Test
     public void getBadUserIdTest() throws Exception {
-        mvc.perform(post("/api/email/config/post/{uid}", id)
+        mvc.perform(post("/api/email/config/post/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
         );
 
-        mvc.perform(get("/api/emailconfig/{uid}", "badId")
+        mvc.perform(get("/api/email/config/badId")
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
@@ -162,7 +172,7 @@ public class UserEmailConfigControllerTest {
     public void saveBadEmailTest() throws Exception {
         configDocument.setEmail("badEmail");
 
-        mvc.perform(post("/api/email/config/post/{uid}", id)
+        mvc.perform(post("/api/email/config/post/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));
@@ -172,7 +182,7 @@ public class UserEmailConfigControllerTest {
     public void saveBadTLSPortTest() throws Exception {
         configDocument.setTlsPort("badPort");
 
-        mvc.perform(post("/api/email/config/post/{uid}", id)
+        mvc.perform(post("/api/email/config/post/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));
@@ -182,7 +192,7 @@ public class UserEmailConfigControllerTest {
     public void saveBadSMTPHostTest() throws Exception {
         configDocument.setSmtpHost("badHost");
 
-        mvc.perform(post("/api/email/config/post/{uid}", id)
+        mvc.perform(post("/api/email/config/post/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(configDocument))
                 ).andExpect(status().is(406));

@@ -4,11 +4,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.agilelovers.server.common.errors.EmailAuthenticationError;
+import org.agilelovers.server.common.errors.EmailSetupError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.bind.annotation.*;
+
+import javax.mail.*;
+import java.util.Properties;
 
 @RestController
 @RequestMapping("/api/email/config")
@@ -43,16 +48,43 @@ public class UserEmailConfigController {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        return emailConfigurations.save(UserEmailConfigDocument.builder()
-                .userID(emailConfig.getUserID())
-                .firstName(emailConfig.getFirstName())
-                .lastName(emailConfig.getLastName())
-                .email(emailConfig.getEmail())
-                .emailPassword(emailConfig.getEmailPassword())
-                .displayName(emailConfig.getDisplayName())
-                .smtpHost(emailConfig.getSmtpHost())
-                .tlsPort(emailConfig.getTlsPort())
-                .build()
-        );
+        try {
+            Properties props = new Properties();
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.auth", "true");
+
+            Session session = Session.getInstance(props, null);
+            Transport transport = session.getTransport("smtp");
+            transport.connect(
+                    emailConfig.getSmtpHost(),
+                    Integer.parseInt(emailConfig.getTlsPort()),
+                    emailConfig.getEmail(),
+                    emailConfig.getEmailPassword());
+            transport.close();
+
+            return emailConfigurations.save(UserEmailConfigDocument.builder()
+                    .userID(emailConfig.getUserID())
+                    .firstName(emailConfig.getFirstName())
+                    .lastName(emailConfig.getLastName())
+                    .email(emailConfig.getEmail())
+                    .emailPassword(emailConfig.getEmailPassword())
+                    .displayName(emailConfig.getDisplayName())
+                    .smtpHost(emailConfig.getSmtpHost())
+                    .tlsPort(emailConfig.getTlsPort())
+                    .build()
+            );
+        } catch (AuthenticationFailedException e) {
+            throw new EmailAuthenticationError(
+                    emailConfig.getEmail(),
+                    emailConfig.getEmailPassword()
+            );
+        } catch (NumberFormatException | MessagingException e) {
+            throw new EmailSetupError(
+                    emailConfig.getSmtpHost(),
+                    emailConfig.getTlsPort(),
+                    emailConfig.getEmail(),
+                    emailConfig.getEmailPassword()
+            );
+        }
     }
 }
