@@ -13,5 +13,7 @@ public interface ReturnedEmailRepository  extends MongoRepository<ReturnedEmailD
 
     Optional<List<ReturnedEmailDocument>> findAllByUserId(String userID);
 
-    Optional<ReturnedEmailDocument> findById(String Id);
+    Optional<ReturnedEmailDocument> findById(String id);
+
+    void deleteById(String id);
 }

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailModel {
-    @ApiModelProperty(notes = "The question transcribed by OpenAI Whisper", required = true)
+    @ApiModelProperty(notes = "The query transcribed by OpenAI Whisper", required = true)
     private String prompt;
 }
