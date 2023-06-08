@@ -35,6 +35,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.8.0
+      with:
+        mongodb-version: '6.0'
     - name: Test with Maven
       run: mvn -B surefire-report:report --file pom.xml -Dmaven.test.failure.ignore=true
 

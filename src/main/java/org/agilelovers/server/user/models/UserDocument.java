@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Document("sayit-users")
@@ -34,6 +35,7 @@ public class UserDocument {
     @ApiModelProperty(notes = "Password of the user", required = true)
     @NotNull
     @NotBlank
+    @NotEmpty
     private String password;
 
     @ApiModelProperty(notes = "Email of the user inputted during email setup")

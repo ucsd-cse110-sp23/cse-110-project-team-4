@@ -5,11 +5,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.agilelovers.server.common.errors.NotAuthorizedError;
-import org.agilelovers.server.common.errors.UserAlreadyExistError;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.models.ReducedUser;
-import org.agilelovers.server.user.models.UserDocument;
 import org.agilelovers.server.user.models.SecureUser;
+import org.agilelovers.server.user.models.UserDocument;
 import org.agilelovers.server.user.models.UserEmailConfigDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +48,6 @@ public class UserController {
     public ReducedUser createUser(@RequestBody SecureUser user) {
         if (user.getApiPassword() != null && user.getApiPassword().equals(this.apiPassword)) {
             UserDocument savedUser = users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
-            if (users.findByUsername(user.getUsername()).isPresent()) {
-                throw new UserAlreadyExistError(user.getUsername());
-            }
             return ReducedUser.builder()
                     .username(savedUser.getUsername())
                     .email(savedUser.getEmail())
