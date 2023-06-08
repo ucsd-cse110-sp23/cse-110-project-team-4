@@ -81,6 +81,7 @@ public class EmailSetupController {
      * @param event event triggered by "Save" button click
      * @throws IOException
      */
+    @FXML
     public void saveInfo(ActionEvent event) throws IOException {
         EmailConfig config = new EmailConfig(firstNameField.getText(), lastNameField.getText(), displayNameField.getText(), emailField.getText(), passwordField.getText(), smtpHostField.getText(), tlsPortField.getText());
         FrontEndAPIUtils.setEmailConfig(config, MainController.getUid());
@@ -92,6 +93,7 @@ public class EmailSetupController {
      * @param event event triggered by "Cancel" button click
      * @throws IOException
      */
+    @FXML
     public void cancel(ActionEvent event) throws IOException {
         SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
     }

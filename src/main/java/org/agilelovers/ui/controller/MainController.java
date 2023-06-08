@@ -165,6 +165,7 @@ public class MainController {
         MainController.uid = uid;
     }
 
+    @FXML
     private void newQuery(ActionEvent event) throws IOException {
         if (this.isRecording) {
             // wait for ChatGPT to respond
