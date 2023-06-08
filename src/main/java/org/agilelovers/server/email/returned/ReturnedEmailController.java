@@ -124,5 +124,4 @@ public class ReturnedEmailController {
                 emailConfig, emailInfo.getEntirePrompt()));
 
     }
-
 }
