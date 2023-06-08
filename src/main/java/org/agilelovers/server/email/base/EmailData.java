@@ -1,4 +1,4 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.email.base;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-public class PassedEmailDocument {
+public class EmailData {
 
     @ApiModelProperty(notes = "User ID associated with this email", required = true)
     @NotNull

@@ -1,4 +1,4 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.email.returned;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

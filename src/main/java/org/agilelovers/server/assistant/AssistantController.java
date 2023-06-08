@@ -10,13 +10,11 @@ import org.agilelovers.server.common.errors.NoAudioError;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.user.UserRepository;
 import org.agilelovers.server.common.errors.UserNotFoundError;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequestMapping("/api/assistant")
 @ApiOperation("Assistant API")
 public class AssistantController {
     private final UserRepository users;
@@ -72,7 +70,7 @@ public class AssistantController {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 406, message = "The audio file doesn't have any transcribe-able audio or its empty")
     })
-    @PostMapping("/api/assistant/{uid}")
+    @PostMapping("/ask/{uid}")
     public AssistantData transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
                                            @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         if (!users.existsById(uid))

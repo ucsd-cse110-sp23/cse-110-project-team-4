@@ -1,4 +1,4 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.email.base;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -8,43 +8,42 @@ import org.agilelovers.server.common.EmailUtil;
 import org.agilelovers.server.common.OpenAIClient;
 import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.common.errors.NoEmailFound;
+import org.agilelovers.server.email.returned.ReturnedEmailDocument;
+import org.agilelovers.server.email.returned.ReturnedEmailRepository;
 import org.agilelovers.server.user.models.UserDocument;
-import org.agilelovers.server.user.models.UserEmailConfigDocument;
-import org.agilelovers.server.user.UserEmailRepository;
+import org.agilelovers.server.email.config.UserEmailConfigDocument;
 import org.agilelovers.server.user.UserRepository;
 import org.springframework.web.bind.annotation.*;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 import static org.agilelovers.common.CommandType.CREATE_EMAIL;
 
 @RestController
+@RequestMapping("/api/email")
 public class EmailController {
 
     private final UserRepository users;
     private final EmailRepository emails;
-    private final UserEmailRepository emailConfigurations;
     private final ReturnedEmailRepository emailsSent;
     private final OpenAIClient client;
 
-    public EmailController(EmailRepository emails, UserRepository users, UserEmailRepository emailConfigurations, ReturnedEmailRepository emailsSent) {
+    public EmailController(EmailRepository emails, UserRepository users, ReturnedEmailRepository emailsSent) {
         this.emails = emails;
         this.users = users;
-        this.emailConfigurations = emailConfigurations;
         this.emailsSent = emailsSent;
         this.client = new OpenAIClient();
     }
 
-    @GetMapping("/api/emails/all/{uid}")
+    @GetMapping("/get/all/{uid}")
     public List<EmailDocument> getAllEmailsFromUserId(@PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         return emails.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
     }
 
-    @GetMapping("/api/emails/{uid}")
+    @GetMapping("/get/{uid}")
     public EmailDocument getEmailByID(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
                                       String emailID) {
 
@@ -56,7 +55,7 @@ public class EmailController {
 
     }
 
-    @PostMapping("/api/emails/{uid}")
+    @PostMapping("/post/{uid}")
     public EmailDocument createEmail(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
                                      @RequestBody @ApiParam(name = "prompt",
                                              value = "Email prompt used to generate the email body") String prompt) {
@@ -64,19 +63,20 @@ public class EmailController {
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
 
-        Optional<UserDocument> user = users.findById(uid);
+        UserDocument user = users.findById(uid)
+                .orElseThrow(() -> new UserNotFoundError(uid));
         String body = this.client.getAnswer(prompt);
 
         return emails.save(EmailDocument.builder()
                 .entirePrompt(prompt)
-                .body(body + "\n " + user.get().getEmailInformation().getDisplayName())
+                .body(body + "\n " + user.getEmailInformation().getDisplayName())
                 .userId(uid)
                 .build()
         );
     }
 
     @ApiOperation(value = "Delete an email", notes = "Deletes an email")
-    @DeleteMapping("/api/emails/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public void deleteEmail(@PathVariable @ApiParam(name = "id", value = "Email ID") String id) {
         emails.deleteById(id);
     }
@@ -86,18 +86,18 @@ public class EmailController {
             @ApiResponse(code = 200, message = "Successfully deleted all emails by a user"),
             @ApiResponse(code = 404, message = "User not found")
     })
-    @DeleteMapping("/api/emails/delete-all/{uid}")
+    @DeleteMapping("/delete-all/{uid}")
     public void deleteAllEmailsFromUser(@PathVariable String uid) {
         emails.deleteAll(emails.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid)));
     }
 
     @ApiOperation(value = "Send email", notes = "Sends email towards a specified user")
-    @PostMapping("/api/emails/send/{uid}")
+    @PostMapping("/send/{uid}")
     public ReturnedEmailDocument sendEmail(@PathVariable String uid,
                                            @RequestBody @ApiParam(name = "email information",
                                                value = "information required to send an email")
-                                               PassedEmailDocument emailInfo) {
+                                           EmailData emailInfo) {
 
         if (!users.existsById(uid))
             throw new UserNotFoundError(uid);
@@ -111,9 +111,11 @@ public class EmailController {
             );
         }
 
-        Optional<EmailDocument> email = emails.findById(emailInfo.getSentId());
-        Optional<UserDocument> currentUser = this.users.findById(uid);
-        UserEmailConfigDocument emailConfig = currentUser.get().getEmailInformation();
+        EmailDocument email = emails.findById(emailInfo.getSentId())
+                .orElseThrow(() -> new NoEmailFound(emailInfo.getSentId()));
+        UserDocument currentUser = this.users.findById(uid)
+                .orElseThrow(() -> new UserNotFoundError(uid));
+        UserEmailConfigDocument emailConfig = currentUser.getEmailInformation();
 
         Properties props = new Properties();
         props.put("mail.smtp.host", emailConfig.getSmtpHost());
@@ -129,7 +131,7 @@ public class EmailController {
 
         Session session = Session.getInstance(props, auth);
 
-        return  emailsSent.save(EmailUtil.sendEmail(session, emailInfo.getRecipient(),  email.get().getBody(),
+        return  emailsSent.save(EmailUtil.sendEmail(session, emailInfo.getRecipient(),  email.getBody(),
                                 emailConfig, emailInfo.getEntirePrompt()));
 
     }

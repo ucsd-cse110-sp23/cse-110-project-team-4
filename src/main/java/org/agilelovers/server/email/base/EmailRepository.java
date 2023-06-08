@@ -1,4 +1,4 @@
-package org.agilelovers.server.email;
+package org.agilelovers.server.email.base;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;

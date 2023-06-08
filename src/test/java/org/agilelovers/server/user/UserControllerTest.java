@@ -3,10 +3,11 @@ package org.agilelovers.server.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.agilelovers.server.Server;
+import org.agilelovers.server.email.config.UserEmailConfigRepository;
 import org.agilelovers.server.user.models.ReducedUser;
 import org.agilelovers.server.user.models.SecureUser;
 import org.agilelovers.server.user.models.UserDocument;
-import org.agilelovers.server.user.models.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.UserEmailConfigDocument;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +49,7 @@ public class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private UserEmailRepository userEmailRepository;
+    private UserEmailConfigRepository userEmailConfigRepository;
 
     public UserControllerTest() {
         this.API_KEY = Dotenv.load().get("API_SECRET");
@@ -59,7 +60,7 @@ public class UserControllerTest {
      */
     @After
     public void resetDb() {
-        userEmailRepository.deleteAll();
+        userEmailConfigRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -79,7 +80,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
@@ -106,7 +107,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
                 .andExpect(status().is(406)); // Expecting a 404 error
@@ -129,7 +130,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
                 .andExpect(status().is(406));
@@ -152,7 +153,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
                 .andExpect(status().is(406));
@@ -175,7 +176,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
                 .andExpect(status().is(406));
@@ -199,12 +200,12 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
 
-        ResultActions grabUser = mvc.perform(get("/api/users")
+        ResultActions grabUser = mvc.perform(get("/api/user/sign_in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
@@ -238,12 +239,12 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user)));
 
         //except user not found error
-        ResultActions grabUser = mvc.perform(get("/api/users")
+        ResultActions grabUser = mvc.perform(get("/api/user/sign_in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(invalidUser)));
 
@@ -272,13 +273,13 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
 
         //except user not found error
-        ResultActions grabUser = mvc.perform(get("/api/users")
+        ResultActions grabUser = mvc.perform(get("/api/user/sign_in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(emptyUser))
         );
@@ -307,13 +308,13 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
 
         //except "this user has already been created" error
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user)))
                 .andExpect(status().is(406));
@@ -343,12 +344,12 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user1)));
 
         //except "this user has already been created" error
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user2)))
                 .andExpect(status().is(406));
@@ -375,7 +376,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
@@ -398,7 +399,7 @@ public class UserControllerTest {
                 .tlsPort("587")
                 .build();
 
-        mvc.perform(put("/api/users/" + id)
+        mvc.perform(put("/api/user/update/email/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(emailConfig))
         );
@@ -432,7 +433,7 @@ public class UserControllerTest {
                 .apiPassword(API_KEY)
                 .build();
 
-        mvc.perform(post("/api/users")
+        mvc.perform(post("/api/user/sign_up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user))
         );
@@ -444,7 +445,7 @@ public class UserControllerTest {
 
         String id = found.getId();
 
-        mvc.perform(put("/api/users/" + id)
+        mvc.perform(put("/api/user/update/email/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidEmail)).andExpect(status().isBadRequest());
     }

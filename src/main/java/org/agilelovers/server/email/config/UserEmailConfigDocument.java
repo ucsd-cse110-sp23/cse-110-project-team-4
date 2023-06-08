@@ -1,10 +1,11 @@
-package org.agilelovers.server.user.models;
+package org.agilelovers.server.email.config;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.agilelovers.server.common.URLConstraint;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 
-@Document("sayit-emailconfig")
+@Document("sayit-email-config")
 @Data
 @Builder
 @AllArgsConstructor
@@ -56,6 +57,7 @@ public class UserEmailConfigDocument {
 
     @ApiModelProperty(notes = "SmtpHost of email given during email setup")
     @NotEmpty
+    @URLConstraint
     private String smtpHost;
 
     @ApiModelProperty(notes = "tlsPort of email given during email setup")

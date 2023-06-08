@@ -9,11 +9,12 @@ import org.agilelovers.server.common.errors.UserNotFoundError;
 import org.agilelovers.server.user.models.ReducedUser;
 import org.agilelovers.server.user.models.SecureUser;
 import org.agilelovers.server.user.models.UserDocument;
-import org.agilelovers.server.user.models.UserEmailConfigDocument;
+import org.agilelovers.server.email.config.UserEmailConfigDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/user")
 @ApiOperation("Users API")
 public class UserController {
 
@@ -31,7 +32,7 @@ public class UserController {
             @ApiResponse(code = 200, message = "Successfully retrieved User ID"),
             @ApiResponse(code = 404, message = "User not found"),
     })
-    @GetMapping("/api/users")
+    @GetMapping("/sign_in")
     public ReducedUser getUser(@RequestBody UserDocument user) {
         UserDocument foundUser = users.findByUsernameAndPassword(user.getUsername(), user.getPassword())
                 .orElseThrow(() -> new UserNotFoundError(user.getUsername()));
@@ -44,7 +45,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Sign up", notes = "Sign up with a username and password")
-    @PostMapping("/api/users")
+    @PostMapping("/sign_up")
     public ReducedUser createUser(@RequestBody SecureUser user) {
         if (user.getApiPassword() != null && user.getApiPassword().equals(this.apiPassword)) {
             UserDocument savedUser = users.saveUsernameAndPassword(user.getUsername(), user.getPassword());
@@ -61,10 +62,10 @@ public class UserController {
             @ApiResponse(code = 200, message = "Successfully updated a user's email"),
             @ApiResponse(code = 404, message = "User not found"),
     })
-    @PutMapping("/api/users/{id}")
+    @PutMapping("/update/email/{uid}")
     public ReducedUser updateEmail(@RequestBody @ApiParam(name = "emailDocument", value = "User email information") UserEmailConfigDocument emailDoc,
-                                   @PathVariable @ApiParam(name = "id", value = "User ID") String id) {
-        return users.findById(id)
+                                   @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
+        return users.findById(uid)
                 .map(user -> {
                     user.setEmail(emailDoc.getEmail());
                     user.setEmailInformation(emailDoc);
@@ -74,6 +75,6 @@ public class UserController {
                             .email(user.getEmail())
                             .id(user.getId())
                             .build();
-                }).orElseThrow(() -> new UserNotFoundError(id));
+                }).orElseThrow(() -> new UserNotFoundError(uid));
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/question")
 @ApiOperation("Questions API")
 public class QuestionController {
     private final QuestionRepository questions;
@@ -29,13 +30,13 @@ public class QuestionController {
             @ApiResponse(code = 200, message = "Successfully got all questions"),
             @ApiResponse(code = 404, message = "User not found")
     })
-    @GetMapping("/api/questions/{uid}")
+    @GetMapping("/get/all/{uid}")
     public List<QuestionDocument> getAllQuestionsFromUserId(@PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
         return questions.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid));
     }
 
-    @PostMapping("/api/questions/{uid}")
+    @PostMapping("/post/{uid}")
     public QuestionDocument createQuestion(@PathVariable @ApiParam(name = "id", value = "User ID") String uid,
                                            @RequestBody @ApiParam(name = "question",
                                                    value = "Question to get the answer of") String entirePrompt) {
@@ -54,7 +55,7 @@ public class QuestionController {
     }
 
     @ApiOperation(value = "Delete a question", notes = "Deletes a question")
-    @DeleteMapping("/api/questions/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public void deleteQuestion(@PathVariable @ApiParam(name = "id", value = "Question ID") String id) {
         questions.deleteById(id);
     }
@@ -64,7 +65,7 @@ public class QuestionController {
             @ApiResponse(code = 200, message = "Successfully deleted all questions by a user"),
             @ApiResponse(code = 404, message = "User not found")
     })
-    @DeleteMapping("/api/questions/delete-all/{uid}")
+    @DeleteMapping("/delete/all/{uid}")
     public void deleteAllQuestionsFromUser(@PathVariable String uid) {
         questions.deleteAll(questions.findAllByUserId(uid)
                 .orElseThrow(() -> new UserNotFoundError(uid)));
