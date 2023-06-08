@@ -217,9 +217,6 @@ public class MainController {
                     this.historyList.setDisable(false);
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
-                } catch (IllegalStateException e) {
-                    System.err.println("OpenAI's Servers are getting high volumes of requests.");
-                    this.historyList.setDisable(false);
                 } finally {
                     this.startButton.setText("Start");
                 }

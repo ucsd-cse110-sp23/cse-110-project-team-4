@@ -1,19 +1,18 @@
 package org.agilelovers.ui.controller;
 
-import com.sun.tools.javac.Main;
 import io.github.cdimascio.dotenv.Dotenv;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import org.agilelovers.common.models.ReducedUserModel;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.MainApplication;
 import org.agilelovers.ui.enums.SceneType;
-import org.agilelovers.ui.object.UserCredential;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
@@ -141,9 +140,9 @@ public class LoginController {
                 MainController.setUid(uid);
                 this.promptAutoLogin(uid);
                 SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.MAIN_UI);
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
-            } catch (IllegalArgumentException | InterruptedException e) {
+            } catch (IllegalArgumentException e) {
                 this.loginFailed();
             }
         });
