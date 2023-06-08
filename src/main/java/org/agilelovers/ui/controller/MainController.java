@@ -61,6 +61,10 @@ public class MainController {
 
     protected boolean isRecording = false;
 
+    private boolean areQuestionsLoaded = false;
+    private boolean areEmailsLoaded = false;
+    private boolean areSentEmailsLoaded = false;
+
     @FXML
     private void initialize() {
         instance = this;
@@ -72,11 +76,10 @@ public class MainController {
         Platform.runLater(() -> {
             try {
                 pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.QUESTION_COMMAND, MainController.uid));
-                pastPrompts.forEach((prompt) -> {
-                    System.out.print(prompt.getTitle() + " ");
-                    System.out.println(prompt.getCreatedDate());
-                });
-                pastPrompts.sort(null);
+                this.areQuestionsLoaded = true;
+                if (this.areEmailsLoaded && this.areSentEmailsLoaded) {
+                    initHistoryList();
+                }
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -84,7 +87,10 @@ public class MainController {
         Platform.runLater(() -> {
             try {
                 pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.CREATE_EMAIL_COMMAND, MainController.uid));
-                pastPrompts.sort(null);
+                this.areEmailsLoaded = true;
+                if (this.areQuestionsLoaded && this.areSentEmailsLoaded) {
+                    initHistoryList();
+                }
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -92,7 +98,10 @@ public class MainController {
         Platform.runLater(() -> {
             try {
                 pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.SEND_EMAIL_COMMAND, MainController.uid));
-                pastPrompts.sort(null);
+                this.areSentEmailsLoaded = true;
+                if (this.areQuestionsLoaded && this.areEmailsLoaded) {
+                    initHistoryList();
+                }
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -111,6 +120,11 @@ public class MainController {
      * If not, the question and answer labels will be empty.
      */
     public void initHistoryList() {
+        pastPrompts.forEach((prompt) -> {
+            System.out.print(prompt.getTitle() + " ");
+            System.out.println(prompt.getCreatedDate());
+        });
+        this.pastPrompts.sort(null);
         this.historyList.setItems(this.pastPrompts);
         this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
@@ -279,6 +293,7 @@ public class MainController {
 
         Platform.runLater(() -> {
             try {
+                System.out.println("Current prompt to delete: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
                 FrontEndAPIUtils.deletePrompt(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()));
                 this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
                 this.historyList.getSelectionModel().select(null);
@@ -363,6 +378,7 @@ public class MainController {
 
         Platform.runLater(() -> {
             try {
+                System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
                 FrontEndAPIUtils.sendEmail(currentPrompt, command, currentPrompt.getCommand(),
                         this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(),
                         MainController.uid);

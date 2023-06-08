@@ -25,7 +25,7 @@ public class QuestionDocument {
 
     @ApiModelProperty(notes = "Timestamp this question was created at")
     @CreatedDate
-    private Date createdAt;
+    private Date createdDate;
 
     @ApiModelProperty(notes = "User ID associated with this question", required = true)
     @NotNull

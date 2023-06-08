@@ -3,6 +3,7 @@ package org.agilelovers.ui.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.agilelovers.common.models.*;
 import org.agilelovers.ui.object.*;
@@ -143,19 +144,22 @@ public class FrontEndAPIUtils {
             throw new RuntimeException("Fetch history failed.");
         }
 
+        System.out.println(response.body());
+
         List<Prompt> output = new ArrayList<>();
 
         switch (command) {
             case QUESTION_COMMAND ->
-                    output.addAll(mapper.readValue(response.body(), new TypeReference<List<Question>>() {
-                    }));
-            case CREATE_EMAIL_COMMAND -> output.addAll(mapper.readValue(response.body(),
-                    new TypeReference<List<EmailDraft>>() {
-                    }));
-            case SEND_EMAIL_COMMAND -> new Gson().fromJson(response.body(),
-                    new TypeToken<List<ReturnedEmail>>() {
-                    }.getType());
-            default -> throw new IllegalArgumentException("Invalid prompt type.");
+                    output.addAll(new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").create().fromJson(
+                            response.body(), new TypeToken<List<Question>>() {
+                            }.getType()));
+
+            case CREATE_EMAIL_COMMAND -> output.addAll(new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+                    .create().fromJson(response.body(), new TypeToken<List<EmailDraft>>() {
+                    }.getType()));
+            case SEND_EMAIL_COMMAND -> output.addAll(new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+                    .create().fromJson(response.body(), new TypeToken<List<ReturnedEmail>>() {
+                    }.getType()));
         }
 
         return output;
@@ -192,12 +196,23 @@ public class FrontEndAPIUtils {
     }
 
     public static void deletePrompt(Prompt prompt) throws IOException, InterruptedException {
-        String endpoint = switch (prompt.getCommand()) {
-            case QUESTION_COMMAND -> QUESTION_ENDPOINT;
-            case CREATE_EMAIL_COMMAND -> EMAIL_ENDPOINT;
-            case SEND_EMAIL_COMMAND -> RETURNED_EMAIL_ENDPOINT;
-            default -> throw new IllegalArgumentException("Invalid prompt type.");
-        };
+        System.out.println(prompt.getCommand());
+//        String endpoint = switch (prompt.getCommand()) {
+//            case QUESTION_COMMAND -> QUESTION_ENDPOINT;
+//            case CREATE_EMAIL_COMMAND -> EMAIL_ENDPOINT;
+//            case SEND_EMAIL_COMMAND -> RETURNED_EMAIL_ENDPOINT;
+//            default -> throw new IllegalArgumentException("Invalid prompt type.");
+//        };
+        String endpoint;
+        if (prompt instanceof Question) {
+            endpoint = QUESTION_ENDPOINT;
+        } else if (prompt instanceof EmailDraft) {
+            endpoint = EMAIL_ENDPOINT;
+        } else if (prompt instanceof ReturnedEmail) {
+            endpoint = RETURNED_EMAIL_ENDPOINT;
+        } else {
+            throw new IllegalArgumentException("Invalid prompt type.");
+        }
 
         HttpRequest deleteRequest =
                 HttpRequest.newBuilder().uri(URI.create(SERVER_URL + endpoint + DELETE_REQUEST + prompt.getId()))
@@ -230,14 +245,14 @@ public class FrontEndAPIUtils {
     }
 
     // TODO
-    public static void sendEmail(Prompt prompt, Command currentCommand, String command, String SentId, String userId)
+    public static void sendEmail(Prompt prompt, Command currentCommand, String command, String sentId, String userId)
             throws IOException, InterruptedException {
         HttpRequest sendRequest =
                 HttpRequest.newBuilder().uri(URI.create(SERVER_URL + RETURNED_EMAIL_ENDPOINT + SEND_REQUEST + userId))
                         .header("Content-Type", "application/json")
                         .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(
                                 new ReturnedEmailModel(command, currentCommand.getTranscribed(),
-                                        currentCommand.getCommand_arguments(), SentId))))
+                                        currentCommand.getCommand_arguments(), sentId))))
                         .build();
 
         HttpClient client = HttpClient.newHttpClient();
@@ -250,7 +265,8 @@ public class FrontEndAPIUtils {
             throw new IllegalArgumentException(response.body());
         }
 
-        Prompt responsePrompt = new Gson().fromJson(response.body(), ReturnedEmail.class);
+        Prompt responsePrompt = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+                    .create().fromJson(response.body(), ReturnedEmail.class);
         prompt.setBody(responsePrompt.getBody());
         prompt.setId(responsePrompt.getId());
         prompt.setCreatedDate(responsePrompt.getCreatedDate());
