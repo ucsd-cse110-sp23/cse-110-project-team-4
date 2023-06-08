@@ -1,4 +1,4 @@
-package org.agilelovers.server;
+package org.agilelovers.server.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

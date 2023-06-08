@@ -1,4 +1,4 @@
-package org.agilelovers.server;
+package org.agilelovers.server.question;
 
 public class QuestionControllerTest {
 }

@@ -1,7 +1,7 @@
-package org.agilelovers.server;
+package org.agilelovers.server.user;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.agilelovers.server.user.UserRepository;
+import org.agilelovers.server.Server;
 import org.agilelovers.server.user.models.ReducedUser;
 import org.agilelovers.server.user.models.SecureUser;
 import org.agilelovers.server.user.models.UserDocument;
