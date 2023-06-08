@@ -287,7 +287,7 @@ public class MainController {
         System.out.println("Delete Prompt");
         if (this.pastPrompts.isEmpty()) return;
         if (this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()) == null) {
-            deleteError();
+            noPromptSelectedError();
             return;
         }
 
@@ -305,11 +305,11 @@ public class MainController {
         System.out.println("Successfully deleted question");
     }
 
-    private void deleteError() {
-        System.err.println("No question selected");
+    private void noPromptSelectedError() {
+        System.err.println("No prompt selected");
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("No Question Selected");
-        alert.setContentText("Please select a question to delete");
+        alert.setHeaderText("No prompt Selected");
+        alert.setContentText("Given command requires you to select a prompt");
         alert.show();
     }
     /**
@@ -374,13 +374,18 @@ public class MainController {
 
     private void sendEmail(Command command) {
         System.out.println("Send Email");
+        if (this.pastPrompts.isEmpty()) return;
+        if (this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()) == null) {
+            noPromptSelectedError();
+            return;
+        }
         Prompt currentPrompt = new ReturnedEmail(command.getTranscribed());
 
         Platform.runLater(() -> {
             try {
                 System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
                 FrontEndAPIUtils.sendEmail(currentPrompt, command, currentPrompt.getCommand(),
-                        this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getId(),
+                        this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()),
                         MainController.uid);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);

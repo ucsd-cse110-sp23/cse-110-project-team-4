@@ -214,6 +214,8 @@ public class FrontEndAPIUtils {
             throw new IllegalArgumentException("Invalid prompt type.");
         }
 
+        System.out.println(prompt.getId());
+
         HttpRequest deleteRequest =
                 HttpRequest.newBuilder().uri(URI.create(SERVER_URL + endpoint + DELETE_REQUEST + prompt.getId()))
                         .DELETE()
