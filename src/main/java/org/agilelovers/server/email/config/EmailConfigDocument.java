@@ -31,29 +31,37 @@ public class EmailConfigDocument {
     private String id;
 
     @ApiModelProperty(notes = "ID Of User this email information relate to", required = true)
+    @NotNull
     private String userID;
 
     @ApiModelProperty(notes = "first name of user during email setup")
+    @NotNull
     private String firstName;
 
     @ApiModelProperty(notes = "last name of user during email setup")
+    @NotNull
     private String lastName;
 
     @ApiModelProperty(notes = "Email of the user inputted during email setup")
+    @NotNull
     @Email
     private String email;
 
     @ApiModelProperty(notes = "Email password of the email given by user in email setup")
+    @NotNull
     private String emailPassword;
 
     @ApiModelProperty(notes = "Display name to be shown on email sent, given in email setup")
+    @NotNull
     @Indexed(name = "display name")
     private String displayName;
 
     @ApiModelProperty(notes = "SmtpHost of email given during email setup")
     @URLConstraint
+    @NotNull
     private String smtpHost;
 
     @ApiModelProperty(notes = "tlsPort of email given during email setup")
+    @NotNull
     private String tlsPort;
 }
