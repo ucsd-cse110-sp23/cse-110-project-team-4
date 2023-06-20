@@ -51,6 +51,8 @@ public class OpenAIClient {
             throw new RuntimeException(e);
         }
 
+        System.out.println(this.API_KEY);
+
         OpenAI whisper = OpenAI.builder()
                 .setApiKey(this.API_KEY)
                 .createTranscription(AudioData.create(audioFile.toPath()))

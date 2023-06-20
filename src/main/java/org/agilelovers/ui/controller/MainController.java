@@ -205,7 +205,8 @@ public class MainController {
         if (this.isRecording) {
             // wait for ChatGPT to respond
             // Question stopRecording()
-            Platform.runLater(() -> {
+            this.startButton.setDisable(true);
+            new Thread(() -> {
                 try {
                     RecordingUtils.endRecording(this, MainController.uid);
                 } catch (IOException e) {
@@ -214,14 +215,23 @@ public class MainController {
                 Command currentCommand;
                 try {
                     currentCommand = FrontEndAPIUtils.sendAudio(MainController.uid);
-                    this.runCommand(currentCommand);
-                    this.historyList.setDisable(false);
-                } catch (IOException | InterruptedException e) {
+                    Platform.runLater(() -> {
+                        try {
+                            this.runCommand(currentCommand);
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        this.historyList.setDisable(false);
+                    });
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 } finally {
-                    this.startButton.setText("Start");
+                    Platform.runLater(() -> {
+                        this.startButton.setDisable(false);
+                        this.startButton.setText("Start");
+                    });
                 }
-            });
+            }).start();
         } else {
             this.historyList.setDisable(true);
             // call a method that starts recording

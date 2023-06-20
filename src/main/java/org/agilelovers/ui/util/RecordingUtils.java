@@ -1,9 +1,8 @@
 package org.agilelovers.ui.util;
 
-import com.sun.tools.javac.Main;
+import javafx.application.Platform;
 import org.agilelovers.ui.Constants;
 import org.agilelovers.ui.controller.MainController;
-import org.agilelovers.ui.object.Command;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,7 @@ public class RecordingUtils {
     public static void endRecording(MainController controller, String id) throws IOException {
         // new thread for operations
         recorder.stop();
-        controller.setRecordingLabel(false);
+        Platform.runLater(() -> controller.setRecordingLabel(false));
     }
 
     public static void startRecording(MainController controller) {
