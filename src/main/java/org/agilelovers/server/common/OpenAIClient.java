@@ -15,13 +15,12 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class OpenAIClient {
-
     private final String API_KEY;
 
     public OpenAIClient() {
-        Dotenv dotenv = Dotenv.load();
-        this.API_KEY = dotenv.get("OPENAI_API_KEY");
+        this.API_KEY = Dotenv.load().get("OPENAI_API_KEY");
     }
+
     public String getAnswer(String question) {
         ChatCompletionMessageData messageData = ChatCompletionMessageData.builder()
                 .setRole("user")
@@ -51,6 +50,8 @@ public class OpenAIClient {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println(this.API_KEY);
 
         OpenAI whisper = OpenAI.builder()
                 .setApiKey(this.API_KEY)

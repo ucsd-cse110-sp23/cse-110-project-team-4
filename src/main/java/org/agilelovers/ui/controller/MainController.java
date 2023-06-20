@@ -1,22 +1,22 @@
 package org.agilelovers.ui.controller;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import org.agilelovers.ui.Constants;
-import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.MainApplication;
+import org.agilelovers.ui.enums.SceneType;
+import org.agilelovers.ui.object.*;
 import org.agilelovers.ui.util.FrontEndAPIUtils;
 import org.agilelovers.ui.util.RecordingUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
+// TODO: redo documentation
 /**
  * Controller class for the UI.
  * This class is responsible for handling user input and updating the UI accordingly. It also handles the interaction
@@ -48,39 +48,65 @@ public class MainController {
     @FXML
     protected Button startButton;
 
-    public static String getId() {
-        return id;
-    }
+    @FXML
+    protected Label recordingLabel;
 
-    public static void setId(String id) {
-        MainController.id = id;
-    }
-
-    private static String id;
+    private static String uid;
 
     /**
-     * A list that contains all the question objects.
+     * A list that contains all the prompt objects.
      */
-    protected ObservableList<Question> pastQueries = FXCollections.observableArrayList();
+    protected ObservableList<Prompt> pastPrompts = FXCollections.observableArrayList();
 
     public static MainController instance;
 
     protected boolean isRecording = false;
 
+    private boolean areQuestionsLoaded = false;
+    private boolean areEmailsLoaded = false;
+    private boolean areSentEmailsLoaded = false;
+
     @FXML
-    private void initialize() throws IOException {
-        System.out.println("Initializing Controller");
+    private void initialize() {
+        instance = this;
+        System.out.println("Initializing Main Controller");
+        if (MainController.uid == null) {
+            throw new NullPointerException("MainController.uid is null");
+        }
         answerTextArea.setEditable(false);
         Platform.runLater(() -> {
             try {
-                FrontEndAPIUtils.fetchHistory(MainController.id);
+                pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.QUESTION_COMMAND, MainController.uid));
+                this.areQuestionsLoaded = true;
+                if (this.areEmailsLoaded && this.areSentEmailsLoaded) {
+                    initHistoryList();
+                }
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
-        for (Question question : pastQueries) {
-            System.out.println(question);
-        }
+        Platform.runLater(() -> {
+            try {
+                pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.CREATE_EMAIL_COMMAND, MainController.uid));
+                this.areEmailsLoaded = true;
+                if (this.areQuestionsLoaded && this.areSentEmailsLoaded) {
+                    initHistoryList();
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Platform.runLater(() -> {
+            try {
+                pastPrompts.addAll(FrontEndAPIUtils.fetchPromptHistory(Constants.SEND_EMAIL_COMMAND, MainController.uid));
+                this.areSentEmailsLoaded = true;
+                if (this.areQuestionsLoaded && this.areEmailsLoaded) {
+                    initHistoryList();
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         initHistoryList();
     }
 
@@ -95,16 +121,21 @@ public class MainController {
      * If not, the question and answer labels will be empty.
      */
     public void initHistoryList() {
-        this.historyList.setItems(this.pastQueries);
+        pastPrompts.forEach((prompt) -> {
+            System.out.print(prompt.getTitle() + " ");
+            System.out.println(prompt.getCreatedDate());
+        });
+        this.pastPrompts.sort(null);
+        this.historyList.setItems(this.pastPrompts);
         this.historyList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 questionLabel.setText("");
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = (Question) newValue;
-            questionLabel.setText(currentQuestion.getQuestion());
-            answerTextArea.setText(currentQuestion.getAnswer());
+            Prompt currentPrompt = (Prompt) newValue;
+            questionLabel.setText(currentPrompt.getTitle());
+            answerTextArea.setText(currentPrompt.getBody());
         });
     }
 
@@ -120,10 +151,18 @@ public class MainController {
                 answerTextArea.setText("");
                 return;
             }
-            Question currentQuestion = this.pastQueries.get(index);
-            questionLabel.setText(currentQuestion.getQuestion());
-            answerTextArea.setText(currentQuestion.getAnswer());
+            Prompt currentPrompt = this.pastPrompts.get(index);
+            questionLabel.setText(currentPrompt.getTitle());
+            answerTextArea.setText(currentPrompt.getBody());
         });
+    }
+
+    public void refreshHistoryList() {
+        Platform.runLater(() -> this.historyList.setItems(this.pastPrompts));
+    }
+
+    public void setRecordingLabel(boolean isRecording) {
+        this.recordingLabel.setText(isRecording ? "Recording..." : "");
     }
 
     /**
@@ -153,24 +192,100 @@ public class MainController {
         return this.answerTextArea;
     }
 
-    /**
-     * Removes all questions from the history list.
-     * <p>
-     * If no questions are in the list, nothing will happen.
-     */
-    public void clearAll() {
-        System.out.println("Clear All");
-        for (Question pastQuestion : this.pastQueries) {
-            Platform.runLater(() -> {
+    public static String getUid() {
+        return uid;
+    }
+
+    public static void setUid(String uid) {
+        MainController.uid = uid;
+    }
+
+    @FXML
+    private void newQuery(ActionEvent event) {
+        if (this.isRecording) {
+            // wait for ChatGPT to respond
+            // Question stopRecording()
+            this.startButton.setDisable(true);
+            new Thread(() -> {
                 try {
-                    FrontEndAPIUtils.deleteAll(MainController.id);
-                } catch (IOException | InterruptedException e) {
+                    RecordingUtils.endRecording(this, MainController.uid);
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            });
+                Command currentCommand;
+                try {
+                    currentCommand = FrontEndAPIUtils.sendAudio(MainController.uid);
+                    Platform.runLater(() -> {
+                        try {
+                            this.runCommand(currentCommand);
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        this.historyList.setDisable(false);
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    Platform.runLater(() -> {
+                        this.startButton.setDisable(false);
+                        this.startButton.setText("Start");
+                    });
+                }
+            }).start();
+        } else {
+            this.historyList.setDisable(true);
+            // call a method that starts recording
+            RecordingUtils.startRecording(this);
+            this.startButton.setText("Stop Recording");
         }
-        this.pastQueries.clear();
-        this.historyList.getSelectionModel().select(null);
+        this.isRecording = !this.isRecording;
+    }
+
+    private void runCommand(Command command) throws IOException, InterruptedException {
+        switch (command.getQueryType()) {
+            case QUESTION -> newQuestion(command);
+            case DELETE_PROMPT -> deletePrompt();
+            case CLEAR_ALL -> clearAll();
+            case SETUP_EMAIL -> setupEmail();
+            case CREATE_EMAIL -> createEmail(command);
+            case SEND_EMAIL -> sendEmail(command);
+            default -> invalidCommand();
+        }
+    }
+
+    private void invalidCommand() {
+        System.err.println("Invalid command");
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Invalid Command");
+        alert.setContentText("""
+                Please give a valid command in the form of one of the following:
+                1. "Question: [question prompt]"
+                2. "Delete prompt"
+                3. "Clear all"
+                4. "Setup email"
+                5. "Create email [email prompt]"
+                6. "Send email to [email address]"
+                """);
+        alert.show();
+    }
+
+    /**
+     * Adds a new question to the history list.
+     * This method is called when the user stops recording a question.
+     * The new question is added to the history list and set as the current question.
+     * The "new question" button label is changed to "new question".
+     * The "delete" and "clear all" buttons are re-enabled.
+     * The question and answer labels updated to reflect the new question.
+     * The new question sent to the backend to be processed.
+     *
+     * @param command the command containing question to be answered and added to prompt history
+     */
+    private void newQuestion(Command command) throws IOException, InterruptedException {
+        System.out.println("New Question");
+        Prompt currentPrompt = new Question(command.getTranscribed());
+
+        createPrompt(command, currentPrompt);
     }
 
     /**
@@ -179,83 +294,122 @@ public class MainController {
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
      */
-    public void deleteQuestion() {
-        System.out.println("Delete Question");
-        if (!this.pastQueries.isEmpty()) {
-            Platform.runLater(() -> {
-                try {
-                    FrontEndAPIUtils.deleteQuestion(this.pastQueries.get(this.historyList.getFocusModel().getFocusedIndex()).getId());
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            this.pastQueries.remove(this.historyList.getFocusModel().getFocusedIndex());
-            this.historyList.getSelectionModel().select(null);
-            System.out.println("Successfully deleted question");
+    private void deletePrompt() {
+        System.out.println("Delete Prompt");
+        if (this.pastPrompts.isEmpty() || this.historyList.getFocusModel().getFocusedIndex() == -1) {
+            noPromptSelectedError();
+            return;
         }
-    }
+        System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
 
-    /**
-     * Allows the user to ask a question to SayIt Assistant.
-     * <p>
-     * When "new question" button is clicked, starts a new recording for
-     * the user question and changes the button label to "stop recording".
-     * The "delete" and "clear all" buttons are disabled while recording.
-     * <p>
-     * Clicking the "stop recording" button will stop the recording and change
-     * the button label to "new question". Adds new question to history list and
-     * sets as current. Re-enables the "delete" and "clear all" buttons.
-     *
-     * @param event event triggered by the "new question" button click
-     */
-    public void newQuery(ActionEvent event) throws IOException {
-        if (this.isRecording) {
-            // wait for chatgpt to response
-            // Question stopRecording()
-            var currentQuestion = RecordingUtils.endRecording(MainController.id, new Question());
-            System.err.println(currentQuestion);
-            this.runCommand(currentQuestion.getQuestion(), currentQuestion);
-        } else {
-            this.pastQueries.add(new Question("", "", "RECORDING", ""));
-            // call a method that starts recording
-            RecordingUtils.startRecording();
-            this.startButton.setText("Stop Recording");
-        }
-        this.isRecording = !this.isRecording;
-    }
-    public void newQuestion(Question currentQuestion) {
-        this.pastQueries.remove(this.pastQueries.size() - 1);
-        this.pastQueries.add(currentQuestion);
-        this.historyList.getSelectionModel().select(this.pastQueries.size() - 1);
-        // change back to new question
         Platform.runLater(() -> {
             try {
-                FrontEndAPIUtils.readQuestion(MainController.id, currentQuestion);
-            } catch (IOException | InterruptedException | URISyntaxException e) {
+                System.out.println("Current prompt to delete: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
+                FrontEndAPIUtils.deletePrompt(this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()));
+                this.pastPrompts.remove(this.historyList.getFocusModel().getFocusedIndex());
+                this.historyList.getSelectionModel().select(null);
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
-        this.startButton.setText("New Question");
+
+        System.out.println("Successfully deleted question");
+    }
+
+    private void noPromptSelectedError() {
+        System.err.println("No prompt selected");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("No prompt Selected");
+        alert.setContentText("Given command requires you to select a prompt");
+        alert.show();
     }
     /**
-     * Runs the command specified by the user.
-     *
-     * @param command string that specifies which command to run
+     * Removes all questions from the history list.
+     * <p>
+     * If no questions are in the list, nothing will happen.
      */
-    public void runCommand(String command, Question currentQuestion) throws IOException {
-        System.err.println("RUNNING COMMAND");
-        // logic for determining which command to run
-        if (command.isEmpty()) return;
+    private void clearAll() throws IOException, InterruptedException {
+        System.out.println("Clear All");
 
-        command = command.toLowerCase();
-        if (command.startsWith(Constants.NEW_QUESTION_COMMAND)) {
-            currentQuestion.setQuestion(command.substring(Constants.NEW_QUESTION_COMMAND.length()));
-            this.newQuestion(currentQuestion);
-        } else if (command.startsWith(Constants.DELETE_PROMPT_COMMAND)) {
-            this.deleteQuestion();
-        } else if (command.startsWith(Constants.DELETE_ALL_PROMPTS_COMMAND)) {
-            this.clearAll();
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.clearAll(Constants.QUESTION_COMMAND, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.clearAll(Constants.CREATE_EMAIL_COMMAND, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.clearAll(Constants.SEND_EMAIL_COMMAND, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        this.pastPrompts.clear();
+        this.historyList.getSelectionModel().select(null);
+    }
+
+    private void setupEmail() throws IOException {
+        System.out.println("Setup Email");
+        SceneChanger.getInstance().switchScene(MainApplication.getInstance().getCurrentStage(), SceneType.EMAIL_SETUP_UI);
+    }
+
+    private void createEmail(Command command) {
+        System.out.println("New Question");
+        Prompt currentPrompt = new EmailDraft(command.getTranscribed());
+
+        createPrompt(command, currentPrompt);
+    }
+
+    private void createPrompt(Command command, Prompt currentPrompt) {
+        System.out.println("Create Prompt");
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.newPrompt(command, currentPrompt, MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        this.pastPrompts.add(currentPrompt);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
+    }
+
+    private void sendEmail(Command command) {
+        if (this.pastPrompts.isEmpty() || this.historyList.getFocusModel().getFocusedIndex() == -1) {
+            noPromptSelectedError();
+            return;
         }
+        System.out.println("Send Email");
+        Prompt selectedPrompt = this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex());
+        if (this.pastPrompts.isEmpty()) return;
+        if (selectedPrompt == null) {
+            noPromptSelectedError();
+            return;
+        }
+        System.out.println(new Gson().toJson(selectedPrompt));
+        Prompt currentPrompt = new ReturnedEmail(command.getTranscribed());
+
+        Platform.runLater(() -> {
+            try {
+                FrontEndAPIUtils.sendEmail(currentPrompt, command, selectedPrompt.getCommand(),
+                        selectedPrompt,
+                        MainController.uid);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        this.pastPrompts.add(currentPrompt);
+        this.historyList.getSelectionModel().select(this.pastPrompts.size() - 1);
     }
 }
+

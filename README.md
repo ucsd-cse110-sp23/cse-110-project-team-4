@@ -3,7 +3,8 @@
 
 *Team 4: Louie Cai, Anish Govind, Lilian Kong, Nicholas Lam, Billy Phan, Shera Zhong*
 
----
+## Documentations
+- [Frontend/UI Code Documentation](./docs/frontend.md)
 
 ## Prerequisite installations
 Our project is running on **JDK 20** and utilizes **Maven** as our package manager. Please make sure you have these installed on your machine before running our project ( *If you're running Linux or MacOS, you can use Homebrew to install Maven (https://maven.apache.org))*.
@@ -27,75 +28,123 @@ Once you've run this command, a window should appear on your screen. It should l
 ---
 
 # How to use the "SayItAssistant" app
-Generating an AI generated response to a recorded query (question/statement). 
+Generating an AI generated response to a recorded command (prompt/statement). 
 
-The purpose of the **SayItAssistant** application is to let the user speak out loud their question or statement. Within seconds, a response should be displayed on the screen according to their question or statement. 
+The purpose of the **SayItAssistant** application is to let the user speak out loud their prompt or statement. Within seconds, a response should be displayed on the screen according to their prompt or statement. 
 
-On our application, there are several buttons the user should know about:
-1. "New Question"
-   * the button initiates a recording for the user 
-   * The user should start speaking their question or statement 
-   * Once the user is finished with their query, click "End Recording"
-2. "Delete Question"
-   * The user should click on the question they wish to delete
-   * Once the user has selected their question, click on the "Delete Question" button
+On our application, there are 6 commands that the user should know about:
+1. "Question"
+   * Click on the start button and give the command
+   * After the command, the user should start asking their question
+   * the SayItAssistant app will generate an answer for the question and store it in the database
+2. "Delete Prompt"
+   * The user should click on the prompt they wish to delete before giving the command
+   * Once the user has selected their prompt, click on the start button and give the command
+   * This will delete the selected prompt
 3. "Clear All"
-   * Clears all questions from the question list and no questions should be displayed
+   * Click on the start button and give the command
+   * This will clear all the prompts and responses on the screen and in the database
+4. "Setup Email"
+   * Click on the start button and give the command
+   * A window will pop up and give the user the option to fill or update in the information for their email configurations
+   * The user will be able to save or discard any changes they make
+5. "Create Email"
+   * Click on the start button and give the command
+   * After the command, the user should give the prompt for the email they want to generate
+   * the SayItAssistant app will generate an email based on the provided prompt and sign it with the user's given display name
+6. "Send Email"
+   * The user should click on the email draft (created email) from the prompt history that they want to send
+   * Once the user has selected their email draft, click on the start button and give the command as well as the recipeint email address
+   * the SayItAssistant app will attempt to send the email to the recipient and display either a success message or an error message depending on the result
 
 ---
 
-## Milestone 1 Delivery Checklist
+## Milestone 2 Delivery Checklist
 
 #### Software design – 10 points
-- [x] tidy code (indented, consistent naming, file-/method-level comments as needed) (1 pts)
-- [x] classes other than Activities (2 pts)
-- [] wide use of SRP and DRY (5 pts) 
-- [x] code sounds like the requirements (2 pts)
+- [ ] Tidy code (indented, naming conventions, file/method-level comments as needed)
+- [ ] – Extensive application of SRP and DRY
+- [ ] – Evidence of OOD (objects and messages sounds like requirements)
+- [ ] – Appropriate use of design patterns and/or dependency inversion to achieve OCP and SRP
+- [ ] – Adapter/Mock of local Web API to support testing server functionality
 
 #### Demo: satisfaction of all milestone requirements – 35 points [priority] - points:
 
-- [x] Story 1: **Ask a question** [H] - 12 pts 
-  - As a user I want the app to display an answer when I ask a question verbally so that I don’t have to type in my questions
+- [ ] Story 8: Scalable to work on multiple platforms [H] - 2 pts (moved from MS1)
+  - As a user I want an app that would eventually be ported to multiple platforms so that I can use the program from any device
 
-- [x] Story 2: **Copy and paste answers** [M] - 2 pts 
-  - As a user I want copy parts of an answer so that I can paste them into another program like Google Documents so that I can add part of the answer to my research paper
+- [ ] Story 8a: Display error message if server is unavailable [H] - 1 pts (part of #8 from MS1)
+  - As a user I want the app to display an error message if the server is unavailable so that I know why the app isn’t working
 
-- [x] Story 3: **Browse question prompt history** [H] - 5 pts 
-  - As a user I want to be able to view a list of past questions so that I can see what questions I already asked
+- [ ] Story 9: Create account [H] - 2 pts
+  - As a user I want to be able to create an account using my email and password so that I am able to log in to my account
 
-- [x] Story 4: **Persistence of old prompts and answers** [M] - 2 pts 
-  - As a user I want older questions and answers to still be available after the program is killed and restarted so that I can find the information and topics again
+- [ ] Story 10: Login [H] - 2 pts
+  - As a user I want to be able to log in to my account so that I am the only one able to access my prompt history
 
-- [x] Story 5: **Read old question prompt and answer** [H] - 5 pts 
-  - As a user I want to be able to view the answer to a past question when I click on it the question history so that I can review a previous answer
+- [ ] Story 10a: Automatic login [L] - 1 pts
+  - As a user I want to be able to automatically log in to my account so that I do not need to login to access my prompt history
 
-- [x] Story 6: **Delete old question prompt and answer** [M] - 3 pts 
-  - As a user I want to be able to select a past question and then delete it so that I can remove unneeded questions so I can more easily find important information
+- [ ] Story 11: Access prompt history from multiple devices [H] - 2 pts 
+  - As a user I want to be able to view a list of past questions on multiple devices so that I can see all the questions I asked no matter my location
 
-- [x] Story 7: **Clear all older question prompts and answers** [M] - 3 pts 
-  - As a user I want to be able to clear all past questions when I no longer need them so that I can prevent my screen from being cluttered when researching new topics
+- [ ] Story 12: Use voice commands instead of buttons [H] - 2 pts 
+  - As a user I want to be able to use a single button and voice commands instead of using a lot of buttons so that the app is easier to use and has less components on the screen
 
-- [x] Story 8: **Scalable to work on multiple platforms** [M] - 3 pts
-*Details for Story 8:*
-- We won’t actually be doing multiple platforms due to the lack of time.
-- The best way to accomplish this and cut development time is to use a 3 (or more) tier architecture that separates the front-end from the middleware and backend. 
-- For a program that is supported by multiple platforms:
-  - the middleware should be hosted on a server (such as an HTTP server) so that only the front-end needs to be created for each platform
-  - the middleware and backend would stay the same, reducing development time for both new UIs as well as business logic updates.
+- [ ] Story 12a: Ask question using voice command [H] - 2 pts 
+  - As a user I want to be able to give a voice command followed by the question so that the app is easier to use
 
-#### Testing – 25 points
-- [ ] Tests with non-trivial testing-class coverage (all testable non-trivial methods tested, e.g., can exclude field getter/setter methods) (15 pts)
-- [x] Local testing: All tests automated, tied into JUnit (run and show pass/fail) (5 pts)
-- [x] Continuous Integration: All tests run on GitHub Actions (5 pts)
+- [ ] Story 12b: Delete prompt using from prompt history using voice command [M] - 2 pts
+  - As a user I want to be able to give a voice command to delete the currently selected prompt from the prompt history so that the app is easier to use
+
+- [ ] Story 12c: Clear all prompts from prompt history using voice command [M] - 2 pts
+  - As a user I want to be able to give a voice command to clear all prompts from the history so that the app is easier to use
+
+- [ ] Story 13: Command shows up in the question prompt history [M] - 2 pts
+  - As a user I want to know see the command in front of the question in the prompt history so that I can see what command was given for the prompt
+
+- [ ] Story 14: Setup email screen [H] - 2 pts
+  - As a user I want to a screen be able to edit the SMTP and email settings so that I can set up my email settings to send emails
+
+- [ ] Story 14a: Setup email voice command [M] - 2 pts
+  - As a user I want to be able to give a voice command to open the setup screen so that I can set up my email settings to send emails
+
+- [ ] Story 14b: Access setup email from multiple devices [L] - 2 pts 
+  - As a user I want to be able edit email settings from multiple devices so that I can fix my email settings regardless of which device I’m using
+
+- [ ] Story 15: Create email voice command [H] - 2 pts
+  - As a user I want to be able to give a voice command to create an email in ChatGPT and display the email so that I don’t have to type in my email
+
+- [ ] Story 15a: Name added to bottom of email [M] - 2 pts
+  - As a user I want my name from the email settings to appear under the closing of the email so that I don’t have to edit the email to add my name
+
+- [ ] Story 15b: Create email command and results shows up in the prompt history [M] - 2 pts
+  - As a user I want to know see the command in front of the email results in the prompt history so that I can see what command was given for the prompt
+
+- [ ] Story 16: Send email voice command [H] - 2 pts
+  - As a user I want to be able to send the currently selected email using a voice command to the specified email address so that I don’t have to copy and paste the email to send it
+
+- [ ] Story 16a: Send email results should be displayed [M] - 2 pts
+  - As a user I want to know see the results of the send email command so that I can see whether the email was successfully sent or if it failed to send
+
+- [ ] Story 16b: Send email command and results shows up in the prompt history [M] - 2 pts
+  - As a user I want to know see the command in front of the send email results in the prompt history so that I can see what command was given for the prompt
 
 
-#### Github Project – 9 points
-- [ ] User Stories started in priority order; iterations run in sequence (3 pts)
-- [x] Tasks assigned to developers, all team members assigned tasks (3 pts)
-- [x] Burndown chart looks good (steady progress, not all work at end) (3 pts)
+#### Testing – 24 points
+- [ ] – Automated Story Testing - at least one BDD scenario per story (with JUnit, etc.)
+- [ ] – App/classes designed for testability/demo (Mocking for local Web API))
+- [ ] – Local testing: All tests automated, tied into JUnit (run and show pass/fail)
+- [ ] – Continuous Integration: All non-instrumented tests run on GitHub Actions CI
 
-#### GitHub - 10 points
-- [x] Consistent use, all team members contributed (4 pts)
-- [x] Each push labelled with its GitHub Project issue number (2 pts) 
-- [x] Protected master branch (pull requests passed tests on GitHub Actions and passed code review) (2 pts)
-- [x] Merged protected branch story-by-story (2 pts)
+
+#### Github Project – 4 points
+- [ ] – Github Project tidy (all items are where they belong, in right order)
+- [ ] – Tasks assigned to developers
+- [ ] – Burn down chart looks good (steady progress, not all work at end)
+
+#### GitHub – 5 points
+- [ ] – Protected master branch (pull requests passed tests on GitHub Actions CI and passed code review)
+- [ ] – Written code reviews for all merged Story branches
+- [ ] – Merged protected branch story-by-story
+- [ ] – Each push labelled with its Github issue number

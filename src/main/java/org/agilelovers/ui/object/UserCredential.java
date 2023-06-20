@@ -8,11 +8,13 @@ import com.google.gson.Gson;
 public class UserCredential {
     private String username;
     private String password;
+    private String email;
     private String id;
 
-    public UserCredential(String username, String password, String id) {
+    public UserCredential(String username, String password, String email, String id) {
         this.username = username;
         this.password = password;
+        this.email = email;
         this.id = id;
     }
 
@@ -75,4 +77,11 @@ public class UserCredential {
         this.id = id;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

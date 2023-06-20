@@ -1,8 +1,8 @@
 package org.agilelovers.ui.util;
 
+import javafx.application.Platform;
 import org.agilelovers.ui.Constants;
-import org.agilelovers.ui.object.AudioRecorder;
-import org.agilelovers.ui.object.Question;
+import org.agilelovers.ui.controller.MainController;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,32 +12,14 @@ public class RecordingUtils {
     private static AudioRecorder recorder = new AudioRecorder(audioFile);
 
 
-    public static Question endRecording(String id, Question ques) {
+    public static void endRecording(MainController controller, String id) throws IOException {
         // new thread for operations
         recorder.stop();
-
-        String question = null;
-        String temp = "";
-        char upper = 0;
-        try {
-            question = FrontEndAPIUtils.sendAudio(id);
-            System.out.println("Current question: " + question);
-            for (String s : question.split("")) {
-                if (upper == 0) {
-                    upper = (char) (question.charAt(0) - 32);
-                    temp = temp + upper;
-                } else temp = temp + s;
-            }
-            question = temp;
-        } catch (IOException e) {
-            System.err.println(question);
-            throw new RuntimeException(e);
-        }
-        ques.setQuestion(question);
-        return ques;
+        Platform.runLater(() -> controller.setRecordingLabel(false));
     }
 
-    public static void startRecording() {
+    public static void startRecording(MainController controller) {
+        controller.setRecordingLabel(true);
         new Thread(() -> recorder.start()).start();
     }
 }

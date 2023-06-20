@@ -1,60 +1,39 @@
 package org.agilelovers.ui.object;
 
+import org.agilelovers.ui.Constants;
 
-import org.agilelovers.ui.controller.MainController;
-
-public class Question {
-    private String id = "";
-    private String userId = "";
-    private String question = "";
+public class Question extends Prompt {
+    private String entirePrompt = "RECORDING";
     private String answer = "";
 
     public Question() {
+        this.command = Constants.QUESTION_COMMAND;
     }
 
-    public Question(String id, String userId, String question, String answer) {
-        this.id = id;
-        this.userId = userId;
-        this.question = question;
-        this.answer = answer;
-    }
-
-    public String getQuestion() {
-        return this.question;
-    }
-
-    public String getAnswer() {
-        return this.answer;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setQuestion(String newQuestion) {
-        if (MainController.instance != null) MainController.instance.refreshLabels();
-        this.question = newQuestion;
-    }
-
-    public void setAnswer(String newAnswer) {
-        if (MainController.instance != null) { MainController.instance.refreshLabels(); }
-        this.answer = newAnswer;
+    public Question(String entirePrompt) {
+        this();
+        this.entirePrompt = entirePrompt;
     }
 
     @Override
-    public String toString() {
-        return this.question;
+    public void setTitle(String newTitle) {
+        super.setTitle(newTitle);
+        this.entirePrompt = newTitle;
+    }
+
+    @Override
+    public void setBody(String newBody) {
+        super.setBody(newBody);
+        this.answer = newBody;
+    }
+
+    @Override
+    public String getTitle() {
+        return this.entirePrompt;
+    }
+
+    @Override
+    public String getBody() {
+        return this.answer;
     }
 }

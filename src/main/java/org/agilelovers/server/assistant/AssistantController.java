@@ -1,0 +1,117 @@
+package org.agilelovers.server.assistant;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.agilelovers.common.CommandIdentifier;
+import org.agilelovers.common.CommandType;
+import org.agilelovers.common.models.AssistantResponseModel;
+import org.agilelovers.server.common.OpenAIClient;
+import org.agilelovers.server.common.errors.NoAudioError;
+import org.agilelovers.server.common.errors.UserNotFoundError;
+import org.agilelovers.server.user.UserRepository;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("/api/assistant")
+@ApiOperation("Assistant API")
+public class AssistantController {
+    private final UserRepository users;
+    private final OpenAIClient client;
+
+    public AssistantController(UserRepository users) {
+        this.users = users;
+        this.client = new OpenAIClient();
+    }
+
+    private String getCommand(String transcription) {
+        if (transcription.startsWith(CommandIdentifier.QUESTION_COMMAND))
+            return CommandType.ASK_QUESTION;
+        else if (transcription.startsWith(CommandIdentifier.DELETE_PROMPT_COMMAND))
+            return CommandType.DELETE_PROMPT;
+        else if (transcription.startsWith(CommandIdentifier.CLEAR_ALL_COMMAND))
+            return CommandType.CLEAR_ALL;
+        else if (transcription.startsWith(CommandIdentifier.SETUP_EMAIL_COMMAND))
+            return CommandType.SETUP_EMAIL;
+        else if (transcription.startsWith(CommandIdentifier.CREATE_EMAIL_COMMAND) | transcription.equals(CommandIdentifier.CREATE_EMAIL_COMMAND))
+            return CommandType.CREATE_EMAIL;
+        else if (transcription.startsWith(CommandIdentifier.SEND_EMAIL_COMMAND) | transcription.startsWith("setup " +
+                "email"))
+            return CommandType.SEND_EMAIL;
+        else return CommandType.INVALID;
+    }
+
+    private String getCommandArguments(String command, String transcription) {
+        if (command.equals(CommandType.INVALID) ||
+                command.equals(CommandType.SETUP_EMAIL) ||
+                command.equals(CommandType.DELETE_PROMPT) ||
+                command.equals(CommandType.CLEAR_ALL)) return null;
+
+        String result;
+        int starting_index = switch (command) {
+            case CommandType.ASK_QUESTION -> CommandIdentifier.QUESTION_COMMAND.length() - 1;
+            case CommandType.SEND_EMAIL -> CommandIdentifier.SEND_EMAIL_COMMAND.length() - 1;
+            case CommandType.CREATE_EMAIL -> CommandIdentifier.CREATE_EMAIL_COMMAND.length() - 1;
+            default -> 0;
+        };
+
+        if (starting_index >= transcription.length() - 1) return null;
+
+        while (transcription.charAt(starting_index + 1) != ' ') starting_index++;
+
+        result = transcription.substring(starting_index + 1).strip();
+
+        if (command.equals(CommandType.SEND_EMAIL)) result = emailReformat(result);
+
+        return result;
+    }
+
+    private static String emailReformat(String result) {
+        System.out.println(result);
+
+        if (result.lastIndexOf(" ") == -1) return result;
+        int lastAtBeforeSpaceIndex = result.substring(0, result.lastIndexOf(" ")).lastIndexOf("at");
+        if (lastAtBeforeSpaceIndex != -1) {
+            result = result.substring(0, lastAtBeforeSpaceIndex) + "@" + result.substring(lastAtBeforeSpaceIndex + 2);
+        }
+        System.out.println(result);
+        return result.replaceAll(" ", "");
+    }
+
+    @ApiOperation(value = "Ask the SayIt Assistant", notes = "Send an audio file to SayIt Assistant and it will " +
+            "transcribe the output and provide a command and its arguments if any")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 406, message = "The audio file doesn't have any transcribe-able audio or its empty")
+    })
+    @PostMapping("/ask/{uid}")
+    public AssistantResponseModel transcribeAndSave(@RequestParam("file") @ApiParam(name = "audio file") MultipartFile file,
+                                                    @PathVariable @ApiParam(name = "id", value = "User ID") String uid) {
+        if (!users.existsById(uid))
+            throw new UserNotFoundError(uid);
+
+        String transcription = this.client.getTranscription(file);
+
+        if (transcription != null && !transcription.isEmpty()) {
+            transcription = transcription.toLowerCase();
+
+            String command = getCommand(transcription);
+            String command_arguments = getCommandArguments(command, transcription);
+
+            if (command.equals(CommandType.SEND_EMAIL)) {
+                transcription = CommandIdentifier.SEND_EMAIL_COMMAND + " " + command_arguments;
+            }
+
+            return AssistantResponseModel.builder()
+                    .transcribed(transcription)
+                    .command(command)
+                    .command_arguments(command_arguments)
+                    .build();
+        }
+        else
+            throw new NoAudioError();
+    }
+
+}
