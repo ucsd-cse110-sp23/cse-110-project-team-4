@@ -1,5 +1,6 @@
 package org.agilelovers.ui.controller;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -283,14 +284,13 @@ public class MainController {
      * After deleting, no question will be selected from the history list. If no
      * question is selected or in the list, nothing will happen.
      */
-    private void deletePrompt() throws IOException, InterruptedException {
+    private void deletePrompt() {
         System.out.println("Delete Prompt");
-        System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
-        if (this.pastPrompts.isEmpty()) return;
-        if (this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()) == null) {
+        if (this.pastPrompts.isEmpty() || this.historyList.getFocusModel().getFocusedIndex() == -1) {
             noPromptSelectedError();
             return;
         }
+        System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getBody());
 
         Platform.runLater(() -> {
             try {
@@ -374,6 +374,10 @@ public class MainController {
     }
 
     private void sendEmail(Command command) {
+        if (this.pastPrompts.isEmpty() || this.historyList.getFocusModel().getFocusedIndex() == -1) {
+            noPromptSelectedError();
+            return;
+        }
         System.out.println("Send Email");
         Prompt selectedPrompt = this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex());
         if (this.pastPrompts.isEmpty()) return;
@@ -381,14 +385,13 @@ public class MainController {
             noPromptSelectedError();
             return;
         }
-        System.out.println(selectedPrompt.getCommand());
+        System.out.println(new Gson().toJson(selectedPrompt));
         Prompt currentPrompt = new ReturnedEmail(command.getTranscribed());
 
         Platform.runLater(() -> {
             try {
-                System.out.println("Current selection: " + this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()).getCommand());
                 FrontEndAPIUtils.sendEmail(currentPrompt, command, selectedPrompt.getCommand(),
-                        this.pastPrompts.get(this.historyList.getFocusModel().getFocusedIndex()),
+                        selectedPrompt,
                         MainController.uid);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);

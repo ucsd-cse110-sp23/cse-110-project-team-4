@@ -1,7 +1,7 @@
 package org.agilelovers.ui;
 
 public class Constants {
-    public final static String SERVER_URL = "http://localhost:8080";
+    public final static String SERVER_URL = "https://server.agilelovers.org";
     public final static String API_TRANSCRIBE_ENDPOINT = "/api/assistant/ask/";
     public final static String USER_ENDPOINT = "/api/user/";
     public final static String EMAIL_CONFIGURATION_ENDPOINT = "/api/email/config/";

@@ -253,6 +253,9 @@ public class FrontEndAPIUtils {
         if (selectedPrompt instanceof EmailDraft) {
             command = CREATE_EMAIL_COMMAND;
         }
+        System.out.println("SENDING THIS " + mapper.writeValueAsString(
+                new ReturnedEmailModel(selectedPrompt.getId(), currentCommand.getCommand_arguments(),
+                        command, currentCommand.getTranscribed())));
         HttpRequest sendRequest =
                 HttpRequest.newBuilder().uri(URI.create(SERVER_URL + RETURNED_EMAIL_ENDPOINT + SEND_REQUEST + userId))
                         .header("Content-Type", "application/json")
